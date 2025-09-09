@@ -1,0 +1,6 @@
+@SWP391_BackEnd_HostAddress = http://localhost:5202
+
+GET {{SWP391_BackEnd_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
