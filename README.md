@@ -61,11 +61,9 @@ Hệ thống hướng đến việc:
 ---
 
 ## 🛠️ Công nghệ sử dụng (gợi ý)  
-- **Frontend:** ReactJS / Angular / Flutter  
-- **Backend:** ASP.NET Core / Node.js  
-- **Database:** SQL Server / PostgreSQL / MongoDB  
-- **AI & Analytics:** Python / TensorFlow / PowerBI  
-- **Triển khai:** Docker, Azure/AWS/GCP  
+- **Frontend:** ReactJS  
+- **Backend:** ASP.NET Core  
+- **Database:** SQL Server
 
 ---
 
