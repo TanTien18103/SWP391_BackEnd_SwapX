@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace BusinessObjects.Models;
 
@@ -10,6 +11,10 @@ public partial class SwapXContext : DbContext
 {
     public SwapXContext(DbContextOptions<SwapXContext> options)
         : base(options)
+    {
+    }
+
+    public SwapXContext()
     {
     }
 
@@ -44,6 +49,27 @@ public partial class SwapXContext : DbContext
     public virtual DbSet<StationSchedule> StationSchedules { get; set; }
 
     public virtual DbSet<Vehicle> Vehicles { get; set; }
+
+    public static string GetConnectionString(string connectionStringName)
+    {
+        var envConnectionString = Environment.GetEnvironmentVariable(connectionStringName);
+        if (!string.IsNullOrEmpty(envConnectionString))
+            return envConnectionString;
+
+        var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true)
+            .Build();
+        return config.GetConnectionString(connectionStringName);
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        var connectionString = GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connectionString))
+            throw new InvalidOperationException("Connection string 'DefaultConnection' không được tìm thấy.");
+
+        optionsBuilder.UseSqlServer(connectionString);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
