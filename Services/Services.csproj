@@ -11,10 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ApiModels\" />
     <Folder Include="Mapper\" />
     <Folder Include="ServicesHelpers\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
