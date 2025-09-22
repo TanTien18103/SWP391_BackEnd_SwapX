@@ -5,26 +5,38 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Repositories.Repositories.Account;
+using Repositories.Repositories.EvDriver;
 using Services.Services.Account;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add DbContext
 builder.Services.AddDbContext<SwapXContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
+
+// Add Session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 // Register Repositories
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
 
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
 
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -50,12 +62,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// JWT Authentication
+// Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = "Cookies";
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -70,16 +81,18 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
-}).AddCookie("Cookies")
+})
+.AddCookie("Cookies")
 .AddGoogle(googleOptions =>
 {
     googleOptions.ClientId = builder.Configuration["Google:ClientId"];
     googleOptions.ClientSecret = builder.Configuration["Google:ClientSecret"];
     googleOptions.CallbackPath = "/signin-google";
 });
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -88,6 +101,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseSession();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

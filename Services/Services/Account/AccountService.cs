@@ -1,10 +1,14 @@
 ﻿using BusinessObjects.Constants;
+using BusinessObjects.Enums;
 using BusinessObjects.Exceptions;
+using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Repositories.Repositories.Account;
+using Repositories.Repositories.EvDriver;
+using Services.ApiModels.Account;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,14 +22,16 @@ namespace Services.Services.Account
     public class AccountService : IAccountService
     {
         private readonly IAccountRepo _accountRepository;
+        private readonly IEvDriverRepo _evDriverRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AccountService(IAccountRepo accountRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public AccountService(IAccountRepo accountRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IEvDriverRepo evDriverRepo)
         {
             _accountRepository = accountRepository;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _evDriverRepository = evDriverRepo;
         }
 
         private bool VerifyPassword(string inputPassword, string storedPasswordHash)
@@ -86,6 +92,49 @@ namespace Services.Services.Account
             }
 
             return (accessToken, refreshToken);
+        }
+
+        public async Task<string> Register(RegisterRequest registerRequest)
+        {
+            var existingUser = await _accountRepository.GetAccountByUserNameDao(registerRequest.Username);
+            if (existingUser != null)
+                throw new AppException(ResponseCodeConstants.EXISTED, ResponseMessageIdentity.EXISTED_USERNAME, StatusCodes.Status400BadRequest);
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
+
+            var newUser = new BusinessObjects.Models.Account
+            {
+                AccountId = GenerateShortGuid(),
+                Username = registerRequest.Username,
+                Password = hashedPassword,
+                Name = registerRequest.Name,
+                Phone = registerRequest.Phone,
+                Address = registerRequest.Address,
+                Email = registerRequest.Email,
+                Role = RoleEnums.EvDriver.ToString(),
+            };
+
+            var driver = new Evdriver
+            {
+                CustomerId = GenerateShortGuid(),
+                AccountId = newUser.AccountId,
+                Account = newUser
+            };
+
+            newUser.Evdrivers.Add(driver);
+
+            await _accountRepository.AddAccount(newUser);
+
+            string accessToken = CreateToken(newUser);
+            string refreshToken = GenerateRefreshToken();
+
+            if (_httpContextAccessor.HttpContext?.Session != null)
+            {
+                _httpContextAccessor.HttpContext.Session.SetString("RefreshToken", refreshToken);
+                _httpContextAccessor.HttpContext.Session.SetString("UserName", registerRequest.Username);
+            }
+
+            return accessToken;
         }
     }
 }

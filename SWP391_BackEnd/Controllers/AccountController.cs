@@ -29,7 +29,21 @@ namespace SWP391_BackEnd.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Message = ex.Message });
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromForm] Services.ApiModels.Account.RegisterRequest registerRequest)
+        {
+            try
+            {
+                var accessToken = await _accountService.Register(registerRequest);
+                return Ok(new { accessToken });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
     }
