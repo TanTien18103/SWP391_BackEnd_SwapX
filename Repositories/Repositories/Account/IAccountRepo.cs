@@ -10,5 +10,6 @@ namespace Repositories.Repositories.Account
     public interface IAccountRepo
     {
         Task<BusinessObjects.Models.Account> GetAccountByUserNameDao(string username);
+        Task AddAccount(BusinessObjects.Models.Account account);
     }
 }

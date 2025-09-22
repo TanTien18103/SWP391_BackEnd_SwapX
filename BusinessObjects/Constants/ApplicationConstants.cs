@@ -92,6 +92,7 @@ namespace BusinessObjects.Constants
         public const string FORGOT_PASSWORD_SUCCESS = "Xác nhận Otp đặt lại mật khẩu thành công! Vui lòng kiểm tra email để nhận mật khẩu mới.";
         public const string OTP_EXPIRED = "OTP đã hết hạn. Vui lòng yêu cầu mã OTP mới.";
         public const string OTP_INVALID = "Mã OTP không hợp lệ. Vui lòng kiểm tra lại mã OTP bạn đã nhập.";
+        public const string EXISTED_USERNAME = "Username đã tồn tại.";
     }
 
     //Auth-Account Controllers
