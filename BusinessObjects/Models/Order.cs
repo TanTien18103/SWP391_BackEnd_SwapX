@@ -11,13 +11,19 @@ public partial class Order
 
     public string AccountId { get; set; }
 
-    public double? Total { get; set; }
+    public decimal? Total { get; set; }
 
     public string BatteryId { get; set; }
 
     public DateTime? Date { get; set; }
 
     public string ServiceId { get; set; }
+
+    public string Status { get; set; }
+
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
 
     public virtual Account Account { get; set; }
 

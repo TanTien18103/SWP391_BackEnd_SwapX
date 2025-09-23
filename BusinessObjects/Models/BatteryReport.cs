@@ -23,6 +23,10 @@ public partial class BatteryReport
 
     public string Status { get; set; }
 
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
+
     public virtual Account Account { get; set; }
 
     public virtual Battery Battery { get; set; }

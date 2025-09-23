@@ -17,6 +17,12 @@ public partial class StationSchedule
 
     public string FormId { get; set; }
 
+    public string Status { get; set; }
+
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
+
     public virtual ICollection<ExchangeBattery> ExchangeBatteries { get; set; } = new List<ExchangeBattery>();
 
     public virtual Form Form { get; set; }

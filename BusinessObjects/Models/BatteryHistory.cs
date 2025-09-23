@@ -7,7 +7,7 @@ namespace BusinessObjects.Models;
 
 public partial class BatteryHistory
 {
-    public string BatteryHistory1 { get; set; }
+    public string BatteryHistoryId { get; set; }
 
     public string BatteryId { get; set; }
 
@@ -24,6 +24,12 @@ public partial class BatteryHistory
     public DateTime? ActionDate { get; set; }
 
     public string Notes { get; set; }
+
+    public string Status { get; set; }
+
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
 
     public virtual Battery Battery { get; set; }
 

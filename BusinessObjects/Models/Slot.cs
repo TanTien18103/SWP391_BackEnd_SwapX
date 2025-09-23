@@ -19,6 +19,10 @@ public partial class Slot
 
     public int? CordinateY { get; set; }
 
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
+
     public virtual Battery Battery { get; set; }
 
     public virtual Station Station { get; set; }

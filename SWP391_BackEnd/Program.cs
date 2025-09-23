@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using Repositories.Repositories.Account;
 using Repositories.Repositories.EvDriver;
 using Services.Services.Account;
+using Services.ServicesHelpers;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,7 @@ builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
 
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<AccountHelper>();
 
 builder.Services.AddControllers();
 
