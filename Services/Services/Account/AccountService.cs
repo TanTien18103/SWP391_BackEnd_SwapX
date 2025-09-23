@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Repositories.Repositories.Account;
 using Repositories.Repositories.EvDriver;
 using Services.ApiModels.Account;
+using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -25,54 +26,18 @@ namespace Services.Services.Account
         private readonly IEvDriverRepo _evDriverRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AccountHelper _accountHelper;
 
-        public AccountService(IAccountRepo accountRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IEvDriverRepo evDriverRepo)
+        public AccountService(IAccountRepo accountRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IEvDriverRepo evDriverRepo, AccountHelper accountHelper)
         {
             _accountRepository = accountRepository;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _evDriverRepository = evDriverRepo;
+            _accountHelper = accountHelper;
         }
 
-        private bool VerifyPassword(string inputPassword, string storedPasswordHash)
-        {
-            return BCrypt.Net.BCrypt.Verify(inputPassword, storedPasswordHash);
-        }
-
-
-        private string CreateToken(BusinessObjects.Models.Account user)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.AccountId.ToString()),
-            new Claim(ClaimTypes.UserData, user.Username),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
-        };
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: TimeHepler.SystemTimeNow.AddHours(3),
-                signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        private string GenerateRefreshToken()
-        {
-            return Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-        }
-
-        public static string GenerateShortGuid()
-        {
-            Guid guid = Guid.NewGuid();
-            string base64 = Convert.ToBase64String(guid.ToByteArray());
-            return base64.Replace("/", "_").Replace("+", "-").Substring(0, 20);
-        }
+       
 
         public async Task<(string accessToken, string refreshToken)> Login(string username, string password)
         {
@@ -80,10 +45,10 @@ namespace Services.Services.Account
             if (user == null)
                 throw new AppException(ResponseCodeConstants.NOT_FOUND, ResponseMessageConstantsUser.USER_NOT_FOUND, StatusCodes.Status404NotFound);
 
-            if (!VerifyPassword(password, user.Password))
+            if (!_accountHelper.VerifyPassword(password, user.Password))
                 throw new AppException(ResponseCodeConstants.BAD_REQUEST, ResponseMessageIdentity.PASSWORD_INVALID, StatusCodes.Status400BadRequest);
-            string accessToken = CreateToken(user);
-            string refreshToken = GenerateRefreshToken();
+            string accessToken = _accountHelper.CreateToken(user);
+            string refreshToken = _accountHelper.GenerateRefreshToken();
 
             if (_httpContextAccessor.HttpContext?.Session != null)
             {
@@ -104,7 +69,7 @@ namespace Services.Services.Account
 
             var newUser = new BusinessObjects.Models.Account
             {
-                AccountId = GenerateShortGuid(),
+                AccountId = _accountHelper.GenerateShortGuid(),
                 Username = registerRequest.Username,
                 Password = hashedPassword,
                 Name = registerRequest.Name,
@@ -112,21 +77,25 @@ namespace Services.Services.Account
                 Address = registerRequest.Address,
                 Email = registerRequest.Email,
                 Role = RoleEnums.EvDriver.ToString(),
+                StartDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
             };
 
             var driver = new Evdriver
             {
-                CustomerId = GenerateShortGuid(),
+                CustomerId = _accountHelper.GenerateShortGuid(),
                 AccountId = newUser.AccountId,
-                Account = newUser
+                Account = newUser,
+                StartDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
             };
 
             newUser.Evdrivers.Add(driver);
 
             await _accountRepository.AddAccount(newUser);
 
-            string accessToken = CreateToken(newUser);
-            string refreshToken = GenerateRefreshToken();
+            string accessToken = _accountHelper.CreateToken(newUser);
+            string refreshToken = _accountHelper.GenerateRefreshToken();
 
             if (_httpContextAccessor.HttpContext?.Session != null)
             {

@@ -11,11 +11,15 @@ public partial class Battery
 
     public string Status { get; set; }
 
-    public double? Capacity { get; set; }
+    public decimal? Capacity { get; set; }
 
     public string BatteryType { get; set; }
 
     public string StationId { get; set; }
+
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
 

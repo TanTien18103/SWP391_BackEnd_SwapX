@@ -17,6 +17,12 @@ public partial class Rating
 
     public string AccountId { get; set; }
 
+    public string Status { get; set; }
+
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
+
     public virtual Account Account { get; set; }
 
     public virtual Station Station { get; set; }

@@ -23,6 +23,12 @@ public partial class Account
 
     public string Email { get; set; }
 
+    public string Status { get; set; }
+
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
+
     public virtual ICollection<BatteryReport> BatteryReports { get; set; } = new List<BatteryReport>();
 
     public virtual ICollection<BssStaff> BssStaffs { get; set; } = new List<BssStaff>();

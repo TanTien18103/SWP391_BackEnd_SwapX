@@ -11,9 +11,15 @@ public partial class Package
 
     public string BatteryId { get; set; }
 
-    public double? Price { get; set; }
+    public decimal? Price { get; set; }
 
     public string Description { get; set; }
+
+    public string Status { get; set; }
+
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
 
     public virtual Battery Battery { get; set; }
 

@@ -27,6 +27,10 @@ public partial class ExchangeBattery
 
     public string Notes { get; set; }
 
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
+
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
 
     public virtual Battery NewBattery { get; set; }

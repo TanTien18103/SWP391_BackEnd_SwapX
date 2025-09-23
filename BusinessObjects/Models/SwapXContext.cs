@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace BusinessObjects.Models;
 
@@ -11,10 +10,6 @@ public partial class SwapXContext : DbContext
 {
     public SwapXContext(DbContextOptions<SwapXContext> options)
         : base(options)
-    {
-    }
-
-    public SwapXContext()
     {
     }
 
@@ -50,40 +45,19 @@ public partial class SwapXContext : DbContext
 
     public virtual DbSet<Vehicle> Vehicles { get; set; }
 
-    public static string GetConnectionString(string connectionStringName)
-    {
-        var envConnectionString = Environment.GetEnvironmentVariable(connectionStringName);
-        if (!string.IsNullOrEmpty(envConnectionString))
-            return envConnectionString;
-
-        var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-            .Build();
-        return config.GetConnectionString(connectionStringName);
-    }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var connectionString = GetConnectionString("DefaultConnection");
-        if (string.IsNullOrEmpty(connectionString))
-            throw new InvalidOperationException("Connection string 'DefaultConnection' không được tìm thấy.");
-
-        optionsBuilder.UseSqlServer(connectionString);
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__Account__F267253EF7CE81BF");
+            entity.HasKey(e => e.AccountId).HasName("PK__Account__F267253E8574A62D");
 
             entity.ToTable("Account");
 
             entity.Property(e => e.AccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("accountID");
             entity.Property(e => e.Address)
-                .HasMaxLength(50)
+                .HasMaxLength(255)
                 .HasColumnName("address");
             entity.Property(e => e.Email)
                 .HasMaxLength(50)
@@ -92,14 +66,17 @@ public partial class SwapXContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("name");
             entity.Property(e => e.Password)
-                .HasMaxLength(50)
+                .HasMaxLength(255)
                 .HasColumnName("password");
             entity.Property(e => e.Phone)
                 .HasMaxLength(50)
                 .HasColumnName("phone");
-            entity.Property(e => e.Role)
+            entity.Property(e => e.Role).HasMaxLength(50);
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.Status)
                 .HasMaxLength(50)
-                .HasDefaultValue("EV Driver");
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.Username)
                 .HasMaxLength(50)
                 .HasColumnName("username");
@@ -107,243 +84,271 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Battery>(entity =>
         {
-            entity.HasKey(e => e.BatteryId).HasName("PK__Battery__5710803E6F683227");
+            entity.HasKey(e => e.BatteryId).HasName("PK__Battery__5710803E057148A4");
 
             entity.ToTable("Battery");
 
             entity.Property(e => e.BatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("BatteryID");
             entity.Property(e => e.BatteryType)
                 .HasMaxLength(25)
                 .HasColumnName("Battery_type");
-            entity.Property(e => e.Capacity).HasColumnName("capacity");
+            entity.Property(e => e.Capacity)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("capacity");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("stationID");
-            entity.Property(e => e.Status).HasMaxLength(25);
+            entity.Property(e => e.Status)
+                .HasMaxLength(25)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Station).WithMany(p => p.Batteries)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Battery__station__571DF1D5");
+                .HasConstraintName("FK__Battery__station__5441852A");
         });
 
         modelBuilder.Entity<BatteryHistory>(entity =>
         {
-            entity.HasKey(e => e.BatteryHistory1).HasName("PK__BatteryH__98B8C9501C954EE1");
+            entity.HasKey(e => e.BatteryHistoryId).HasName("PK__BatteryH__4E7644D224D96BE1");
 
             entity.ToTable("BatteryHistory");
 
-            entity.Property(e => e.BatteryHistory1)
-                .HasMaxLength(50)
-                .HasColumnName("BatteryHistory");
+            entity.Property(e => e.BatteryHistoryId)
+                .HasMaxLength(100)
+                .HasColumnName("BatteryHistoryID");
             entity.Property(e => e.ActionType).HasMaxLength(50);
             entity.Property(e => e.BatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("BatteryID");
             entity.Property(e => e.EnergyLevel).HasMaxLength(50);
             entity.Property(e => e.ExchangeBatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("ExchangeBatteryID");
             entity.Property(e => e.Notes).HasMaxLength(50);
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("stationID");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.Vin)
-                .HasMaxLength(25)
+                .HasMaxLength(100)
                 .HasColumnName("VIN");
 
             entity.HasOne(d => d.Battery).WithMany(p => p.BatteryHistories)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__BatteryHi__Batte__5812160E");
+                .HasConstraintName("FK__BatteryHi__Batte__5535A963");
 
             entity.HasOne(d => d.ExchangeBattery).WithMany(p => p.BatteryHistories)
                 .HasForeignKey(d => d.ExchangeBatteryId)
-                .HasConstraintName("FK__BatteryHi__Excha__59063A47");
+                .HasConstraintName("FK__BatteryHi__Excha__5629CD9C");
 
             entity.HasOne(d => d.Station).WithMany(p => p.BatteryHistories)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__BatteryHi__stati__59FA5E80");
+                .HasConstraintName("FK__BatteryHi__stati__571DF1D5");
 
             entity.HasOne(d => d.VinNavigation).WithMany(p => p.BatteryHistories)
                 .HasForeignKey(d => d.Vin)
-                .HasConstraintName("FK__BatteryHist__VIN__5AEE82B9");
+                .HasConstraintName("FK__BatteryHist__VIN__5812160E");
         });
 
         modelBuilder.Entity<BatteryReport>(entity =>
         {
-            entity.HasKey(e => e.BatteryReportId).HasName("PK__BatteryR__0A361DA777618EA6");
+            entity.HasKey(e => e.BatteryReportId).HasName("PK__BatteryR__0A361DA7A34DD443");
 
             entity.ToTable("BatteryReport");
 
             entity.Property(e => e.BatteryReportId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("BatteryReportID");
             entity.Property(e => e.AccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("AccountID");
             entity.Property(e => e.BatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("BatteryID");
             entity.Property(e => e.Description)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("description");
             entity.Property(e => e.Image)
-                .HasMaxLength(50)
+                .HasMaxLength(255)
                 .HasColumnName("image");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StationID");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Account).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__BatteryRe__Accou__5BE2A6F2");
+                .HasConstraintName("FK__BatteryRe__Accou__59063A47");
 
             entity.HasOne(d => d.Battery).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__BatteryRe__Batte__5CD6CB2B");
+                .HasConstraintName("FK__BatteryRe__Batte__59FA5E80");
 
             entity.HasOne(d => d.Station).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__BatteryRe__Stati__5DCAEF64");
+                .HasConstraintName("FK__BatteryRe__Stati__5AEE82B9");
         });
 
         modelBuilder.Entity<BssStaff>(entity =>
         {
-            entity.HasKey(e => e.StaffId).HasName("PK__BSS_Staf__96D4AAF7B9641C96");
+            entity.HasKey(e => e.StaffId).HasName("PK__BSS_Staf__96D4AAF7986C9E64");
 
             entity.ToTable("BSS_Staff");
 
             entity.Property(e => e.StaffId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StaffID");
             entity.Property(e => e.AccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("AccountID");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StationID");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Account).WithMany(p => p.BssStaffs)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__BSS_Staff__Accou__5EBF139D");
+                .HasConstraintName("FK__BSS_Staff__Accou__5BE2A6F2");
 
             entity.HasOne(d => d.Station).WithMany(p => p.BssStaffs)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__BSS_Staff__Stati__5FB337D6");
+                .HasConstraintName("FK__BSS_Staff__Stati__5CD6CB2B");
         });
 
         modelBuilder.Entity<Evdriver>(entity =>
         {
-            entity.HasKey(e => e.CustomerId).HasName("PK__EVDriver__A4AE64B84FF7B738");
+            entity.HasKey(e => e.CustomerId).HasName("PK__EVDriver__A4AE64B850060102");
 
             entity.ToTable("EVDriver");
 
             entity.Property(e => e.CustomerId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("CustomerID");
             entity.Property(e => e.AccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("accountID");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.Vin)
-                .HasMaxLength(25)
+                .HasMaxLength(100)
                 .HasColumnName("VIN");
 
             entity.HasOne(d => d.Account).WithMany(p => p.Evdrivers)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__EVDriver__accoun__60A75C0F");
+                .HasConstraintName("FK__EVDriver__accoun__5DCAEF64");
 
             entity.HasOne(d => d.VinNavigation).WithMany(p => p.Evdrivers)
                 .HasForeignKey(d => d.Vin)
-                .HasConstraintName("FK__EVDriver__VIN__619B8048");
+                .HasConstraintName("FK__EVDriver__VIN__5EBF139D");
         });
 
         modelBuilder.Entity<ExchangeBattery>(entity =>
         {
-            entity.HasKey(e => e.ExchangeBatteryId).HasName("PK__Exchange__B321FE92975878A6");
+            entity.HasKey(e => e.ExchangeBatteryId).HasName("PK__Exchange__B321FE92875FA832");
 
             entity.ToTable("ExchangeBattery");
 
             entity.Property(e => e.ExchangeBatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("ExchangeBatteryID");
             entity.Property(e => e.NewBatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("NewBatteryID");
             entity.Property(e => e.Notes).HasMaxLength(50);
             entity.Property(e => e.OldBatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("OldBatteryID");
             entity.Property(e => e.OrderId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("OrderID");
             entity.Property(e => e.ScheduleId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("ScheduleID");
             entity.Property(e => e.StaffAccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StaffAccountID");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("stationID");
-            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.Vin)
-                .HasMaxLength(25)
+                .HasMaxLength(100)
                 .HasColumnName("VIN");
 
             entity.HasOne(d => d.NewBattery).WithMany(p => p.ExchangeBatteryNewBatteries)
                 .HasForeignKey(d => d.NewBatteryId)
-                .HasConstraintName("FK__ExchangeB__NewBa__628FA481");
+                .HasConstraintName("FK__ExchangeB__NewBa__5FB337D6");
 
             entity.HasOne(d => d.OldBattery).WithMany(p => p.ExchangeBatteryOldBatteries)
                 .HasForeignKey(d => d.OldBatteryId)
-                .HasConstraintName("FK__ExchangeB__OldBa__6383C8BA");
+                .HasConstraintName("FK__ExchangeB__OldBa__60A75C0F");
 
             entity.HasOne(d => d.Order).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__ExchangeB__Order__6477ECF3");
+                .HasConstraintName("FK__ExchangeB__Order__619B8048");
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.ScheduleId)
-                .HasConstraintName("FK__ExchangeB__Sched__656C112C");
+                .HasConstraintName("FK__ExchangeB__Sched__628FA481");
 
             entity.HasOne(d => d.StaffAccount).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.StaffAccountId)
-                .HasConstraintName("FK__ExchangeB__Staff__66603565");
+                .HasConstraintName("FK__ExchangeB__Staff__6383C8BA");
 
             entity.HasOne(d => d.Station).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__ExchangeB__stati__6754599E");
+                .HasConstraintName("FK__ExchangeB__stati__6477ECF3");
 
             entity.HasOne(d => d.VinNavigation).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.Vin)
-                .HasConstraintName("FK__ExchangeBat__VIN__68487DD7");
+                .HasConstraintName("FK__ExchangeBat__VIN__656C112C");
         });
 
         modelBuilder.Entity<Form>(entity =>
         {
-            entity.HasKey(e => e.FormId).HasName("PK__Form__FB05B7BDB4D27DDE");
+            entity.HasKey(e => e.FormId).HasName("PK__Form__FB05B7BDD5F28BB4");
 
             entity.ToTable("Form");
 
             entity.Property(e => e.FormId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("FormID");
             entity.Property(e => e.AccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("AccountID");
             entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.Description)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("description");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StationID");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
@@ -351,109 +356,127 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .HasColumnName("title");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Account).WithMany(p => p.Forms)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Form__AccountID__693CA210");
+                .HasConstraintName("FK__Form__AccountID__66603565");
 
             entity.HasOne(d => d.Station).WithMany(p => p.Forms)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Form__StationID__6A30C649");
+                .HasConstraintName("FK__Form__StationID__6754599E");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF0859F60A");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAFA24B73AA");
 
             entity.Property(e => e.OrderId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("OrderID");
             entity.Property(e => e.AccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("AccountID");
             entity.Property(e => e.BatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("BatteryID");
             entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.ServiceId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("ServiceID");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Account).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Orders__AccountI__6B24EA82");
+                .HasConstraintName("FK__Orders__AccountI__68487DD7");
 
             entity.HasOne(d => d.Battery).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__Orders__BatteryI__6C190EBB");
+                .HasConstraintName("FK__Orders__BatteryI__693CA210");
         });
 
         modelBuilder.Entity<Package>(entity =>
         {
-            entity.HasKey(e => e.PackageId).HasName("PK__Package__322035ECE405B783");
+            entity.HasKey(e => e.PackageId).HasName("PK__Package__322035ECD4DE4176");
 
             entity.ToTable("Package");
 
             entity.Property(e => e.PackageId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("PackageID");
             entity.Property(e => e.BatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("BatteryID");
             entity.Property(e => e.Description)
-                .HasMaxLength(90)
+                .HasMaxLength(100)
                 .HasColumnName("description");
+            entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Battery).WithMany(p => p.Packages)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__Package__Battery__6D0D32F4");
+                .HasConstraintName("FK__Package__Battery__6A30C649");
         });
 
         modelBuilder.Entity<Rating>(entity =>
         {
-            entity.HasKey(e => e.RatingId).HasName("PK__Rating__FCCDF85CC456E2FF");
+            entity.HasKey(e => e.RatingId).HasName("PK__Rating__FCCDF85CC2B11A8D");
 
             entity.ToTable("Rating");
 
             entity.Property(e => e.RatingId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("RatingID");
             entity.Property(e => e.AccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("AccountID");
             entity.Property(e => e.Description)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("description");
             entity.Property(e => e.Rating1)
                 .HasMaxLength(50)
                 .HasColumnName("rating");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StationID");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Account).WithMany(p => p.Ratings)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Rating__AccountI__6E01572D");
+                .HasConstraintName("FK__Rating__AccountI__6B24EA82");
 
             entity.HasOne(d => d.Station).WithMany(p => p.Ratings)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Rating__StationI__6EF57B66");
+                .HasConstraintName("FK__Rating__StationI__6C190EBB");
         });
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasKey(e => e.ReportId).HasName("PK__Report__D5BD48E59BF960C8");
+            entity.HasKey(e => e.ReportId).HasName("PK__Report__D5BD48E574B481BD");
 
             entity.ToTable("Report");
 
             entity.Property(e => e.ReportId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("ReportID");
             entity.Property(e => e.AccountId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("AccountID");
             entity.Property(e => e.Description)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("description");
             entity.Property(e => e.Image)
                 .HasMaxLength(50)
@@ -461,57 +484,64 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
-                .HasColumnName("StationID");
-
-            entity.HasOne(d => d.Account).WithMany(p => p.Reports)
-                .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Report__AccountI__6FE99F9F");
-
-            entity.HasOne(d => d.Station).WithMany(p => p.Reports)
-                .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Report__StationI__70DDC3D8");
-        });
-
-        modelBuilder.Entity<Slot>(entity =>
-        {
-            entity.HasKey(e => e.SlotId).HasName("PK__Slot__0A124A4F24BE4FFE");
-
-            entity.ToTable("Slot");
-
-            entity.Property(e => e.SlotId)
-                .HasMaxLength(50)
-                .HasColumnName("SlotID");
-            entity.Property(e => e.BatteryId)
-                .HasMaxLength(50)
-                .HasColumnName("BatteryID");
-            entity.Property(e => e.CordinateX).HasColumnName("cordinate_x");
-            entity.Property(e => e.CordinateY).HasColumnName("cordinate_y");
-            entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StationID");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Account).WithMany(p => p.Reports)
+                .HasForeignKey(d => d.AccountId)
+                .HasConstraintName("FK__Report__AccountI__6D0D32F4");
+
+            entity.HasOne(d => d.Station).WithMany(p => p.Reports)
+                .HasForeignKey(d => d.StationId)
+                .HasConstraintName("FK__Report__StationI__6E01572D");
+        });
+
+        modelBuilder.Entity<Slot>(entity =>
+        {
+            entity.HasKey(e => e.SlotId).HasName("PK__Slot__0A124A4F3658C572");
+
+            entity.ToTable("Slot");
+
+            entity.Property(e => e.SlotId)
+                .HasMaxLength(100)
+                .HasColumnName("SlotID");
+            entity.Property(e => e.BatteryId)
+                .HasMaxLength(100)
+                .HasColumnName("BatteryID");
+            entity.Property(e => e.CordinateX).HasColumnName("cordinate_x");
+            entity.Property(e => e.CordinateY).HasColumnName("cordinate_y");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.StationId)
+                .HasMaxLength(100)
+                .HasColumnName("StationID");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Battery).WithMany(p => p.Slots)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__Slot__BatteryID__71D1E811");
+                .HasConstraintName("FK__Slot__BatteryID__6EF57B66");
 
             entity.HasOne(d => d.Station).WithMany(p => p.Slots)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Slot__StationID__72C60C4A");
+                .HasConstraintName("FK__Slot__StationID__6FE99F9F");
         });
 
         modelBuilder.Entity<Station>(entity =>
         {
-            entity.HasKey(e => e.StationId).HasName("PK__Station__F0A7F3E055DEB6F6");
+            entity.HasKey(e => e.StationId).HasName("PK__Station__F0A7F3E0DD0D884F");
 
             entity.ToTable("Station");
 
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("stationID");
             entity.Property(e => e.BatteryNumber).HasColumnName("battery_number");
             entity.Property(e => e.Location)
@@ -520,71 +550,81 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Rating)
                 .HasMaxLength(50)
                 .HasColumnName("rating");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<StationSchedule>(entity =>
         {
-            entity.HasKey(e => e.StationScheduleId).HasName("PK__StationS__12BF61BE76FEF6F7");
+            entity.HasKey(e => e.StationScheduleId).HasName("PK__StationS__12BF61BE7AB2417C");
 
             entity.ToTable("StationSchedule");
 
             entity.Property(e => e.StationScheduleId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StationScheduleID");
             entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.Description)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("description");
             entity.Property(e => e.FormId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("FormID");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("StationID");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Form).WithMany(p => p.StationSchedules)
                 .HasForeignKey(d => d.FormId)
-                .HasConstraintName("FK__StationSc__FormI__73BA3083");
+                .HasConstraintName("FK__StationSc__FormI__70DDC3D8");
 
             entity.HasOne(d => d.Station).WithMany(p => p.StationSchedules)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__StationSc__Stati__74AE54BC");
+                .HasConstraintName("FK__StationSc__Stati__71D1E811");
         });
 
         modelBuilder.Entity<Vehicle>(entity =>
         {
-            entity.HasKey(e => e.Vin).HasName("PK__Vehicle__C5DF234DDE1772F5");
+            entity.HasKey(e => e.Vin).HasName("PK__Vehicle__C5DF234DECAF7044");
 
             entity.ToTable("Vehicle");
 
             entity.Property(e => e.Vin)
-                .HasMaxLength(25)
+                .HasMaxLength(100)
                 .HasColumnName("VIN");
             entity.Property(e => e.BatteryId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("BatteryID");
             entity.Property(e => e.PackageId)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .HasColumnName("PackageID");
+            entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasColumnName("status");
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
             entity.Property(e => e.VehicleName)
                 .HasMaxLength(50)
-                .HasDefaultValueSql("(NULL)")
                 .HasColumnName("vehicle_name");
             entity.Property(e => e.VehicleType)
                 .HasMaxLength(50)
-                .HasDefaultValueSql("(NULL)")
                 .HasColumnName("vehicle_type");
 
             entity.HasOne(d => d.Battery).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__Vehicle__Battery__75A278F5");
+                .HasConstraintName("FK__Vehicle__Battery__72C60C4A");
 
             entity.HasOne(d => d.Package).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.PackageId)
-                .HasConstraintName("FK__Vehicle__Package__76969D2E");
+                .HasConstraintName("FK__Vehicle__Package__73BA3083");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -17,6 +17,10 @@ public partial class Station
 
     public string Rating { get; set; }
 
+    public DateTime? StartDate { get; set; }
+
+    public DateTime? UpdateDate { get; set; }
+
     public virtual ICollection<Battery> Batteries { get; set; } = new List<Battery>();
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
