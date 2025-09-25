@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.Repositories.Account;
 using Services.ApiModels.Account;
@@ -32,6 +33,35 @@ namespace SWP391_BackEnd.Controllers
                 return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
+        [HttpPost("create_staff_for_admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateStaffForAdmin([FromForm] Services.ApiModels.Account.RegisterRequest registerRequest)
+        {
+            try
+            {
+                var accessToken = await _accountService.CreateStaff(registerRequest);
+                return Ok(new { accessToken });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+        [HttpPut("update_staff_for_admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateStaffForAdmin([FromForm] Services.ApiModels.Account.UpdateStaffRequest updateStaffByAdminRequest)
+        {
+            try
+            {
+                var result = await _accountService.UpdateStaff(updateStaffByAdminRequest);
+                return Ok(new { result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] Services.ApiModels.Account.RegisterRequest registerRequest)

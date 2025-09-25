@@ -37,7 +37,7 @@ namespace Services.Services.Account
             _accountHelper = accountHelper;
         }
 
-       
+  
 
         public async Task<(string accessToken, string refreshToken)> Login(string username, string password)
         {
@@ -103,6 +103,74 @@ namespace Services.Services.Account
                 _httpContextAccessor.HttpContext.Session.SetString("UserName", registerRequest.Username);
             }
 
+            return accessToken;
+        }
+
+        public async Task<string> CreateStaff(RegisterRequest registerRequest)
+        {
+            var existingUser = await _accountRepository.GetAccountByUserNameDao(registerRequest.Username);
+            if (existingUser != null)
+                throw new AppException(ResponseCodeConstants.EXISTED, ResponseMessageIdentity.EXISTED_USERNAME, StatusCodes.Status400BadRequest);
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
+
+            var newUser = new BusinessObjects.Models.Account
+            {
+                AccountId = _accountHelper.GenerateShortGuid(),
+                Username = registerRequest.Username,
+                Password = hashedPassword,
+                Name = registerRequest.Name,
+                Phone = registerRequest.Phone,
+                Address = registerRequest.Address,
+                Email = registerRequest.Email,
+                Role = RoleEnums.Bsstaff.ToString(),
+                StartDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
+            };
+
+            var driver = new BssStaff
+            {
+                StaffId = _accountHelper.GenerateShortGuid(),
+                AccountId = newUser.AccountId,
+                Account = newUser,
+                StartDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow,
+            };
+
+            newUser.BssStaffs.Add(driver);
+
+            await _accountRepository.AddAccount(newUser);
+
+            string accessToken = _accountHelper.CreateToken(newUser);
+            string refreshToken = _accountHelper.GenerateRefreshToken();
+
+            if (_httpContextAccessor.HttpContext?.Session != null)
+            {
+                _httpContextAccessor.HttpContext.Session.SetString("RefreshToken", refreshToken);
+                _httpContextAccessor.HttpContext.Session.SetString("UserName", registerRequest.Username);
+            }
+
+            return accessToken;
+        }
+        public async Task<string> UpdateStaff(UpdateStaffRequest updateStaffRequest)
+        {
+            var existingUser = await _accountRepository.GetAccountById(updateStaffRequest.AccountId);
+            if (existingUser == null)
+                throw new AppException(ResponseCodeConstants.NOT_FOUND, ResponseMessageConstantsUser.USER_NOT_FOUND, StatusCodes.Status404NotFound);
+
+            // Only update if the field is not null
+            if (updateStaffRequest.Name != null)
+                existingUser.Name = updateStaffRequest.Name;
+            if (updateStaffRequest.Phone != null)
+                existingUser.Phone = updateStaffRequest.Phone;
+            if (updateStaffRequest.Address != null)
+                existingUser.Address = updateStaffRequest.Address;
+            if (updateStaffRequest.Email != null)
+                existingUser.Email = updateStaffRequest.Email;
+
+            existingUser.UpdateDate = DateTime.UtcNow;
+            await _accountRepository.UpdateAccount(existingUser);
+            string accessToken = _accountHelper.CreateToken(existingUser);
             return accessToken;
         }
     }
