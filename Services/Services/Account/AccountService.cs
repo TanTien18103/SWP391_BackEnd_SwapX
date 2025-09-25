@@ -173,5 +173,29 @@ namespace Services.Services.Account
             string accessToken = _accountHelper.CreateToken(existingUser);
             return accessToken;
         }
+        public async Task<List<BusinessObjects.Models.Account>> GetAllAccounts(BusinessObjects.Models.Account account)
+        {
+            var accounts = await _accountRepository.GetAll(account);
+            return accounts;
+        }
+        public async Task<BusinessObjects.Models.Account> GetAccountById(string accountId)
+        {
+            var account = await _accountRepository.GetAccountById(accountId);
+            if (account == null)
+                throw new AppException(ResponseCodeConstants.NOT_FOUND, ResponseMessageConstantsUser.USER_NOT_FOUND, StatusCodes.Status404NotFound);
+            return account;
+        }
+
+        public async Task<List<BusinessObjects.Models.BssStaff>> GetAllStaff(BusinessObjects.Models.Account account)
+        {
+            var staffs = await _accountRepository.GetAllStaff(account);
+            return staffs;
+        }
+        public async Task<List<BusinessObjects.Models.Evdriver>> GetAllCustomer(BusinessObjects.Models.Account account)
+        {
+            var customers = await _accountRepository.GetAllCustomer(account);
+            return customers;
+        }
+
     }
 }

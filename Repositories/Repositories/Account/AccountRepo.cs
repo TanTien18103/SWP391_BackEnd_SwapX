@@ -44,5 +44,14 @@ namespace Repositories.Repositories.Account
             await _context.SaveChangesAsync();
             return account;
         }
+        public async Task<List<BusinessObjects.Models.BssStaff>> GetAllStaff(BusinessObjects.Models.Account account)
+        {
+            return await _context.BssStaffs.ToListAsync();
+        }
+        public async Task<List<BusinessObjects.Models.Evdriver>> GetAllCustomer(BusinessObjects.Models.Account account)
+        {
+            return await _context.Evdrivers.ToListAsync();
+        }
+
     }
 }

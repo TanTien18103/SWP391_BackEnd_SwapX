@@ -15,6 +15,7 @@ namespace Repositories.Repositories.Account
         Task<BusinessObjects.Models.Account> UpdateAccount(BusinessObjects.Models.Account account);
         Task<BusinessObjects.Models.Account> GetAccountById(string accountId);
         Task<List<BusinessObjects.Models.Account>> GetAll(BusinessObjects.Models.Account account);
-
+        Task<List<BusinessObjects.Models.BssStaff>> GetAllStaff(BusinessObjects.Models.Account account);
+        Task<List<BusinessObjects.Models.Evdriver>> GetAllCustomer(BusinessObjects.Models.Account account);
     }
 }

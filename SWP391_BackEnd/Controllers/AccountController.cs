@@ -76,5 +76,69 @@ namespace SWP391_BackEnd.Controllers
                 return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
+        [HttpGet("get_all_account_for_admin")]
+        [Authorize (Roles = "Admin")]
+        public async Task<IActionResult> GetAllAccount()
+        {
+            try
+            {
+                var adminUsername = User.Identity.Name;
+                var adminAccount = await _accountRepo.GetAccountByUserNameDao(adminUsername);
+                var accounts = await _accountService.GetAllAccounts(adminAccount);
+                return Ok(accounts);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+        [HttpGet("get_account_by_id/{accountId}_for_admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAccountById(string accountId)
+        {
+            try
+            {
+                var account = await _accountService.GetAccountById(accountId);
+                return Ok(account);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+        [HttpGet("get_all_staff_for_admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllStaff()
+        {
+            try
+            {
+                var adminUsername = User.Identity.Name;
+                var adminAccount = await _accountRepo.GetAccountByUserNameDao(adminUsername);
+                var staffs = await _accountService.GetAllStaff(adminAccount);
+                return Ok(staffs);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+        [HttpGet("get_all_customer_for_admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllCustomer()
+        {
+            try
+            {
+                var adminUsername = User.Identity.Name;
+                var adminAccount = await _accountRepo.GetAccountByUserNameDao(adminUsername);
+                var customers = await _accountService.GetAllCustomer(adminAccount);
+                return Ok(customers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
+
+
     }
 }
