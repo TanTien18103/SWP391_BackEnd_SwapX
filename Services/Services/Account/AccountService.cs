@@ -191,7 +191,8 @@ namespace Services.Services.Account
             var staffs = await _accountRepository.GetAllStaff();
             return staffs;
         }
-        public async Task<List<BusinessObjects.Models.Account>>  GetAllCustomer()
+
+        public async Task<List<BusinessObjects.Models.Account>> GetAllCustomer()
         {
             var customers = await _accountRepository.GetAllCustomer();
             return customers;
