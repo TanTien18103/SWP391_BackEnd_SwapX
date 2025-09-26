@@ -76,15 +76,8 @@ namespace SWP391_BackEnd.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAccountById(string accountId)
         {
-            try
-            {
-                var account = await _accountService.GetAccountById(accountId);
-                return Ok(account);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
-            }
+            var res = await _accountService.GetAccountById(accountId);
+            return StatusCode(res.StatusCode, res);
         }
 
         [HttpGet("get_all_staff_for_admin")]
