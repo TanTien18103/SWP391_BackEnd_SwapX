@@ -365,3 +365,4 @@ FodyWeavers.xsd
 .idea/.idea.SWP391_BackEnd/.idea/projectSettingsUpdater.xml
 .idea/.idea.SWP391_BackEnd/.idea/workspace.xml
 .idea/workspace.xml
+*.xml
