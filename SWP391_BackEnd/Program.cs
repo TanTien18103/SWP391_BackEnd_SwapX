@@ -1,5 +1,4 @@
 using BusinessObjects.Models;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,8 +9,43 @@ using Services.Services.Account;
 using Services.Services.Email;
 using Services.ServicesHelpers;
 using System.Text;
+using BusinessObjects.AppSettings;
+using CloudinaryDotNet;
+using Net.payOS;
+using Repositories.Repositories.OrderRepo;
+using Services.Services;
+using SWP391_BackEnd.Helpers;
+using Account = CloudinaryDotNet.Account;
+
 
 var builder = WebApplication.CreateBuilder(args);
+//Add Cloud setting
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddSingleton<Cloudinary>(sp =>
+{
+    var settings = builder.Configuration
+        .GetSection("CloudinarySettings").Get<CloudinarySettings>();
+
+    var account = new Account(
+        settings.CloudName,
+        settings.ApiKey,
+        settings.ApiSecret
+    );
+
+    return new Cloudinary(account);
+});
+
+//Add config PayOS
+// Bind config
+builder.Services.Configure<PayOSConfig>(builder.Configuration.GetSection("PayOS"));
+var payOSConfig = builder.Configuration.GetSection("PayOS").Get<PayOSConfig>();
+
+// Đăng ký PayOS SDK
+builder.Services.AddSingleton(new PayOS(payOSConfig.ClientId, payOSConfig.ApiKey, payOSConfig.ChecksumKey));
+
+// Đăng ký helper verify
+builder.Services.AddSingleton<PayOSHelper>(new PayOSHelper(payOSConfig));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -49,12 +83,14 @@ options.AddPolicy("AllowAllOrigins",
 // Register Repositories
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 //Register Helper
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<AccountHelper>();
 
 builder.Services.AddControllers();
