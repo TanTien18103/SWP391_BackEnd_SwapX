@@ -3,7 +3,7 @@ using System.Text;
 using BusinessObjects.AppSettings;
 using BusinessObjects.Dtos;
 
-namespace SWP391_BackEnd.Helpers
+namespace Services.Helpers
 {
     public class PayOSHelper
     {

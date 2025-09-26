@@ -1,4 +1,4 @@
-namespace SWP391_BackEnd
+namespace Services
 {
     public class WeatherForecast
     {

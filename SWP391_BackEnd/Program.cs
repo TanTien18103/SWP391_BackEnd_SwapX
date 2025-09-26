@@ -13,8 +13,9 @@ using BusinessObjects.AppSettings;
 using CloudinaryDotNet;
 using Net.payOS;
 using Repositories.Repositories.OrderRepo;
+using Services;
 using Services.Services;
-using SWP391_BackEnd.Helpers;
+using Services.Helpers;
 using Account = CloudinaryDotNet.Account;
 
 
@@ -88,9 +89,11 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPayOSService, PayOSService>();
 
 //Register Helper
-builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<AccountHelper>();
 
 builder.Services.AddControllers();

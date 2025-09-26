@@ -5,7 +5,7 @@ using Repositories.Repositories.Account;
 using Services.ApiModels.Account;
 using Services.Services.Account;
 
-namespace SWP391_BackEnd.Controllers
+namespace Services.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -36,7 +36,7 @@ namespace SWP391_BackEnd.Controllers
 
         [HttpPost("create_staff_for_admin")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateStaffForAdmin([FromForm] Services.ApiModels.Account.RegisterRequest registerRequest)
+        public async Task<IActionResult> CreateStaffForAdmin([FromForm] RegisterRequest registerRequest)
         {
             var res = await _accountService.CreateStaff(registerRequest);
             return StatusCode(res.StatusCode, res);
@@ -44,14 +44,14 @@ namespace SWP391_BackEnd.Controllers
 
         [HttpPut("update_staff_for_admin")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateStaffForAdmin([FromForm] Services.ApiModels.Account.UpdateStaffRequest updateStaffByAdminRequest)
+        public async Task<IActionResult> UpdateStaffForAdmin([FromForm] UpdateStaffRequest updateStaffByAdminRequest)
         {
             var res = await _accountService.UpdateStaff(updateStaffByAdminRequest);
             return StatusCode(res.StatusCode, res);
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromForm] Services.ApiModels.Account.RegisterRequest registerRequest)
+        public async Task<IActionResult> Register([FromForm] RegisterRequest registerRequest)
         {
             try
             {
