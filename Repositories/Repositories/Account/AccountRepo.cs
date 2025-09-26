@@ -1,4 +1,5 @@
-﻿using BusinessObjects.Models;
+﻿using BusinessObjects.Enums;
+using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace Repositories.Repositories.Account
         {
            return await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
         }
-        public async Task<List<BusinessObjects.Models.Account>> GetAll(BusinessObjects.Models.Account account)
+        public async Task<List<BusinessObjects.Models.Account>> GetAll()
         {
             return await _context.Accounts.ToListAsync();
         }
@@ -44,13 +45,13 @@ namespace Repositories.Repositories.Account
             await _context.SaveChangesAsync();
             return account;
         }
-        public async Task<List<BusinessObjects.Models.BssStaff>> GetAllStaff(BusinessObjects.Models.Account account)
+        public async Task<List<BusinessObjects.Models.Account>> GetAllStaff()
         {
-            return await _context.BssStaffs.ToListAsync();
+            return await _context.Accounts.Where(a => a.Role == RoleEnums.Bsstaff.ToString()).ToListAsync();
         }
-        public async Task<List<BusinessObjects.Models.Evdriver>> GetAllCustomer(BusinessObjects.Models.Account account)
+        public async Task<List<BusinessObjects.Models.Account>> GetAllCustomer()
         {
-            return await _context.Evdrivers.ToListAsync();
+            return await _context.Accounts.Where(a => a.Role == RoleEnums.EvDriver.ToString()).ToListAsync();
         }
 
     }
