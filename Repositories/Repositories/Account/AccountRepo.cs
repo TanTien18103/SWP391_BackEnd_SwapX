@@ -23,9 +23,35 @@ namespace Repositories.Repositories.Account
             await _context.SaveChangesAsync();
         }
 
+
+
         public async Task<BusinessObjects.Models.Account> GetAccountByUserNameDao(string username)
         {
             return await _context.Accounts.FirstOrDefaultAsync(a => a.Username == username);
         }
+        public async Task<BusinessObjects.Models.Account> GetAccountById(string accountId)
+        {
+           return await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
+        }
+        public async Task<List<BusinessObjects.Models.Account>> GetAll(BusinessObjects.Models.Account account)
+        {
+            return await _context.Accounts.ToListAsync();
+        }
+
+        public async Task<BusinessObjects.Models.Account> UpdateAccount(BusinessObjects.Models.Account account)
+        {
+            _context.Accounts.Update(account);
+            await _context.SaveChangesAsync();
+            return account;
+        }
+        public async Task<List<BusinessObjects.Models.BssStaff>> GetAllStaff(BusinessObjects.Models.Account account)
+        {
+            return await _context.BssStaffs.ToListAsync();
+        }
+        public async Task<List<BusinessObjects.Models.Evdriver>> GetAllCustomer(BusinessObjects.Models.Account account)
+        {
+            return await _context.Evdrivers.ToListAsync();
+        }
+
     }
 }
