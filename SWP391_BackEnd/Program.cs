@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using Repositories.Repositories.Account;
 using Repositories.Repositories.EvDriver;
 using Services.Services.Account;
+using Services.Services.Email;
 using Services.ServicesHelpers;
 using System.Text;
 
@@ -27,13 +28,26 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
+// CORS Policy
+builder.Services.AddCors(options =>
+{
+options.AddPolicy("AllowAllOrigins",
+    builder =>
+    {
+        builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+    });
+});
 // Register Repositories
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
 
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+//Register Helper
 builder.Services.AddScoped<AccountHelper>();
 
 builder.Services.AddControllers();
@@ -102,6 +116,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
+app.UseCors("AllowAllOrigins");
 
 app.UseSession();
 
