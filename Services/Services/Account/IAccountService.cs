@@ -1,4 +1,5 @@
-﻿using Services.ApiModels.Account;
+﻿using Services.ApiModels;
+using Services.ApiModels.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,11 @@ namespace Services.Services.Account
         Task<(string accessToken, string refreshToken)> Login(string username, string password);
 
         Task<string> Register(RegisterRequest registerRequest);
-        Task<string> CreateStaff(RegisterRequest registerRequest);
-        Task<string> UpdateStaff(UpdateStaffRequest updateStaffRequest);
-        Task<List<BusinessObjects.Models.Account>> GetAllAccounts();
-        Task<BusinessObjects.Models.Account> GetAccountById(string accountId);
-        Task<List<BusinessObjects.Models.Account>> GetAllStaff();
-        Task<List<BusinessObjects.Models.Account>> GetAllCustomer();
+        Task<ResultModel> CreateStaff(RegisterRequest registerRequest);
+        Task<ResultModel> UpdateStaff(UpdateStaffRequest updateStaffRequest);
+        Task<ResultModel> GetAllAccounts();
+        Task<ResultModel> GetAccountById(string accountId);
+        Task<ResultModel> GetAllStaff();
+        Task<ResultModel> GetAllCustomer();
     }
 }

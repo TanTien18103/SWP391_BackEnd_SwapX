@@ -32,11 +32,14 @@ namespace Repositories.Repositories.Account
         }
         public async Task<BusinessObjects.Models.Account> GetAccountById(string accountId)
         {
-           return await _context.Accounts.FirstOrDefaultAsync(a => a.AccountId == accountId);
+           return await _context.Accounts
+                .Include(a => a.BssStaffs).Include(a => a.Evdrivers)
+                .FirstOrDefaultAsync(a => a.AccountId == accountId);
         }
         public async Task<List<BusinessObjects.Models.Account>> GetAll()
         {
-            return await _context.Accounts.ToListAsync();
+            return await _context.Accounts.Include(a => a.BssStaffs).Include(a => a.Evdrivers)
+                .ToListAsync();
         }
 
         public async Task<BusinessObjects.Models.Account> UpdateAccount(BusinessObjects.Models.Account account)
@@ -47,11 +50,13 @@ namespace Repositories.Repositories.Account
         }
         public async Task<List<BusinessObjects.Models.Account>> GetAllStaff()
         {
-            return await _context.Accounts.Where(a => a.Role == RoleEnums.Bsstaff.ToString()).ToListAsync();
+            return await _context.Accounts.Include(a => a.BssStaffs).
+                Where(a => a.Role == RoleEnums.Bsstaff.ToString()).ToListAsync();
         }
         public async Task<List<BusinessObjects.Models.Account>> GetAllCustomer()
         {
-            return await _context.Accounts.Where(a => a.Role == RoleEnums.EvDriver.ToString()).ToListAsync();
+            return await _context.Accounts.Include(a => a.Evdrivers).
+                Where(a => a.Role == RoleEnums.EvDriver.ToString()).ToListAsync();
         }
 
     }

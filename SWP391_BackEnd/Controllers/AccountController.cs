@@ -33,35 +33,21 @@ namespace SWP391_BackEnd.Controllers
                 return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
-        
+
         [HttpPost("create_staff_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStaffForAdmin([FromForm] Services.ApiModels.Account.RegisterRequest registerRequest)
         {
-            try
-            {
-                var accessToken = await _accountService.CreateStaff(registerRequest);
-                return Ok(new { accessToken });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
-            }
+            var res = await _accountService.CreateStaff(registerRequest);
+            return StatusCode(res.StatusCode, res);
         }
-        
+
         [HttpPut("update_staff_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStaffForAdmin([FromForm] Services.ApiModels.Account.UpdateStaffRequest updateStaffByAdminRequest)
         {
-            try
-            {
-                var result = await _accountService.UpdateStaff(updateStaffByAdminRequest);
-                return Ok(new { result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
-            }
+            var res = await _accountService.UpdateStaff(updateStaffByAdminRequest);
+            return StatusCode(res.StatusCode, res);
         }
 
         [HttpPost("register")]
@@ -77,22 +63,15 @@ namespace SWP391_BackEnd.Controllers
                 return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
-        
+
         [HttpGet("get_all_account_for_admin")]
-        [Authorize (Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllAccount()
         {
-            try
-            {
-                var accounts = await _accountService.GetAllAccounts();
-                return Ok(accounts);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
-            }
+            var res = await _accountService.GetAllAccounts();
+            return StatusCode(res.StatusCode, res);
         }
-        
+
         [HttpGet("get_account_by_id/{accountId}_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAccountById(string accountId)
@@ -107,35 +86,22 @@ namespace SWP391_BackEnd.Controllers
                 return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
-        
+
         [HttpGet("get_all_staff_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllStaff()
         {
-            try
-            {
-                var staffs = await _accountService.GetAllStaff();
-                return Ok(staffs);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
-            }
+            var res = await _accountService.GetAllStaff();
+            return StatusCode(res.StatusCode, res);
+
         }
-     
+
         [HttpGet("get_all_customer_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllCustomer()
         {
-            try
-            {
-                var customers = await _accountService.GetAllCustomer();
-                return Ok(customers);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
-            }
+            var res = await _accountService.GetAllCustomer();
+            return StatusCode(res.StatusCode, res);
         }
     }
 }
