@@ -186,12 +186,12 @@ namespace Services.Services.Account
             return account;
         }
 
-        public async Task<List<BusinessObjects.Models.BssStaff>> GetAllStaff()
+        public async Task<List<BusinessObjects.Models.Account>> GetAllStaff()
         {
             var staffs = await _accountRepository.GetAllStaff();
             return staffs;
         }
-        public async Task<List<BusinessObjects.Models.Evdriver>> GetAllCustomer()
+        public async Task<List<BusinessObjects.Models.Account>>  GetAllCustomer()
         {
             var customers = await _accountRepository.GetAllCustomer();
             return customers;
