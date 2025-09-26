@@ -127,5 +127,7 @@ namespace BusinessObjects.Constants
         public const string CUSTOMER_NOT_FOUND = "Không tìm thấy khách hàng";
         public const string CUSTOMER_INFO_NOT_FOUND = "Không tìm thấy thông tin khách hàng";
         public const string CUSTOMER_BANK_INFO_NOT_FOUND = "Không tìm thấy thông tin tài khoản ngân hàng của khách hàng";
+        public const string USER_NOT_STAFF = "Người dùng không phải là nhân viên";
+        public const string CREATE_STAFF_SUCCESS= "Tạo nhân viên thành công";
     }
 }
