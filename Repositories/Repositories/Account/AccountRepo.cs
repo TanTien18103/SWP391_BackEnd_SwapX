@@ -58,6 +58,7 @@ namespace Repositories.Repositories.Account
             return await _context.Accounts.Include(a => a.Evdrivers).
                 Where(a => a.Role == RoleEnums.EvDriver.ToString()).ToListAsync();
         }
+        
 
     }
 }

@@ -96,5 +96,19 @@ namespace SWP391_BackEnd.Controllers
             var res = await _accountService.GetAllCustomer();
             return StatusCode(res.StatusCode, res);
         }
+        [HttpPut("delete_staff_for_admin/{accountId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteStaff(string accountId)
+        {
+            var res = await _accountService.DeleteStaff(accountId);
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpPut("delete_customer_for_admin/{accountId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteCustomer(string accountId)
+        {
+            var res = await _accountService.DeleteCustomer(accountId);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

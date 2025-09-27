@@ -19,5 +19,8 @@ namespace Services.Services.Account
         Task<ResultModel> GetAccountById(string accountId);
         Task<ResultModel> GetAllStaff();
         Task<ResultModel> GetAllCustomer();
+        Task<ResultModel> DeleteStaff(string accountId);
+        Task<ResultModel> DeleteCustomer(string accountId);
+
     }
 }
