@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessObjects.TimeCoreHelper;
 
 namespace Services.Services.Station
 {
@@ -40,8 +41,8 @@ namespace Services.Services.Station
                     Status = StationStatusEnum.Active.ToString(),
                     Rating = addStationRequest.Rating,
                     BatteryNumber = addStationRequest.BatteryNumber,
-                    StartDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
                 };
 
                 await _stationRepository.AddStation(station);

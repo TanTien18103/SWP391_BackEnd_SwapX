@@ -9,11 +9,9 @@ namespace SWP391_BackEnd.Controllers;
 [ApiController]
 public class StationController : ControllerBase
 {
-    private readonly IStationRepo _stationRepo;
     private readonly IStationService _stationService;
-    public StationController(IStationRepo stationRepo, IStationService stationService)
+    public StationController(IStationService stationService)
     {
-        _stationRepo = stationRepo;
         _stationService = stationService;
     }
     [HttpPost("add_station_for_admin")]
