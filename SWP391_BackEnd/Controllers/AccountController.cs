@@ -34,6 +34,27 @@ namespace Services.Controllers
             }
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var res = await _accountService.Logout();
+            return StatusCode(res.StatusCode, res);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest forgotPasswordRequest)
+        {
+            var res = await _accountService.ForgotPassword(forgotPasswordRequest.Email);
+            return Ok(res);
+        }
+
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp(string email, [FromQuery] string otp)
+        {
+            var res = await _accountService.ForgotPasswordVerifyOtp(email, otp);
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpPost("create_staff_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStaffForAdmin([FromForm] RegisterRequest registerRequest)

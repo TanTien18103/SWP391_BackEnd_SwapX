@@ -93,6 +93,7 @@ namespace BusinessObjects.Constants
         public const string OTP_EXPIRED = "OTP đã hết hạn. Vui lòng yêu cầu mã OTP mới.";
         public const string OTP_INVALID = "Mã OTP không hợp lệ. Vui lòng kiểm tra lại mã OTP bạn đã nhập.";
         public const string EXISTED_USERNAME = "Username đã tồn tại.";
+        public const string LOGOUT_SUCCESS = "Đăng xuất thành công.";
     }
 
     //Auth-Account Controllers
@@ -132,6 +133,14 @@ namespace BusinessObjects.Constants
         public const string USER_NOT_CUSTOMER = "Người dùng không phải là khách hàng";
 
     }
+    public class ResponseMessageImage
+    {
+        public const string INVALID_IMAGE = "Hình ảnh không hợp lệ. ";
+        public const string INVALID_SIZE = "Kích thước hình ảnh không hợp lệ. ";
+        public const string INVALID_FORMAT = "Định dạng hình ảnh không hợp lệ. ";
+        public const string INVALID_URL = "Đường dẫn hình ảnh không hợp lệ. ";
+    }
+
     //For Station (0-0-1)
     public class ResponseMessageConstantsStation
     {
@@ -144,5 +153,15 @@ namespace BusinessObjects.Constants
         public const string GET_STATION_LIST_SUCCESS = "Lấy danh sách trạm thành công";
         public const string GET_STATION_DETAIL_SUCCESS = "Lấy chi tiết trạm thành công";
         public static string ADD_STATION_FAIL = "Thêm trạm thất bại";
+    }
+    public static class EmailConstants
+    {
+        // OTP
+        public const string OtpSubject = "Otp xác nhận đổi mật khẩu mới của bạn";
+        public const string OtpBodyTemplate = "Otp xác nhận đổi mật khẩu mới của bạn là: <b>{0}</b>. Hãy nhập otp để nhận mật khẩu mới ngay.";
+
+        // New Password
+        public const string NewPasswordSubject = "Mật khẩu mới của bạn";
+        public const string NewPasswordBodyTemplate = "Mật khẩu mới của bạn là: <b>{0}</b>. Hãy đăng nhập và đổi mật khẩu ngay.";
     }
 }

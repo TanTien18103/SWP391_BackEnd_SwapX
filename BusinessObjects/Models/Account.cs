@@ -29,6 +29,10 @@ public partial class Account
 
     public DateTime? UpdateDate { get; set; }
 
+    public string OtpCode { get; set; }
+
+    public DateTime? OtpExpiredTime { get; set; }
+
     public virtual ICollection<BatteryReport> BatteryReports { get; set; } = new List<BatteryReport>();
 
     public virtual ICollection<BssStaff> BssStaffs { get; set; } = new List<BssStaff>();

@@ -26,7 +26,7 @@ namespace Repositories.Repositories.Account
 
 
 
-        public async Task<BusinessObjects.Models.Account> GetAccountByUserNameDao(string username)
+        public async Task<BusinessObjects.Models.Account> GetAccountByUserName(string username)
         {
             return await _context.Accounts.FirstOrDefaultAsync(a => a.Username == username);
         }
@@ -58,7 +58,10 @@ namespace Repositories.Repositories.Account
             return await _context.Accounts.Include(a => a.Evdrivers).
                 Where(a => a.Role == RoleEnums.EvDriver.ToString()).ToListAsync();
         }
-        
 
+        public async Task<BusinessObjects.Models.Account> GetAccountByEmail(string email)
+        {
+            return await _context.Accounts.FirstOrDefaultAsync(a => a.Email == email);
+        }
     }
 }

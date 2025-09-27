@@ -10,6 +10,7 @@ using Repositories.Repositories.Account;
 using Repositories.Repositories.EvDriver;
 using Services.ApiModels;
 using Services.ApiModels.Account;
+using Services.Services.Email;
 using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
@@ -27,22 +28,22 @@ namespace Services.Services.Account
         private readonly IEvDriverRepo _evDriverRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEmailService _emailService;
         private readonly AccountHelper _accountHelper;
 
-        public AccountService(IAccountRepo accountRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IEvDriverRepo evDriverRepo, AccountHelper accountHelper)
+        public AccountService(IAccountRepo accountRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IEvDriverRepo evDriverRepo, AccountHelper accountHelper, IEmailService emailService)
         {
             _accountRepository = accountRepository;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _evDriverRepository = evDriverRepo;
             _accountHelper = accountHelper;
+            _emailService = emailService;
         }
-
-
 
         public async Task<(string accessToken, string refreshToken)> Login(string username, string password)
         {
-            var user = await _accountRepository.GetAccountByUserNameDao(username);
+            var user = await _accountRepository.GetAccountByUserName(username);
             if (user == null)
                 throw new AppException(ResponseCodeConstants.NOT_FOUND, ResponseMessageConstantsUser.USER_NOT_FOUND, StatusCodes.Status404NotFound);
 
@@ -62,7 +63,7 @@ namespace Services.Services.Account
 
         public async Task<string> Register(RegisterRequest registerRequest)
         {
-            var existingUser = await _accountRepository.GetAccountByUserNameDao(registerRequest.Username);
+            var existingUser = await _accountRepository.GetAccountByUserName(registerRequest.Username);
             if (existingUser != null)
                 throw new AppException(ResponseCodeConstants.EXISTED, ResponseMessageIdentity.EXISTED_USERNAME, StatusCodes.Status400BadRequest);
 
@@ -111,7 +112,7 @@ namespace Services.Services.Account
         {
             try
             {
-                var existingUser = await _accountRepository.GetAccountByUserNameDao(registerRequest.Username);
+                var existingUser = await _accountRepository.GetAccountByUserName(registerRequest.Username);
                 if (existingUser != null)
                     throw new AppException(ResponseCodeConstants.EXISTED, ResponseMessageIdentity.EXISTED_USERNAME, StatusCodes.Status400BadRequest);
 
@@ -127,8 +128,8 @@ namespace Services.Services.Account
                     Address = registerRequest.Address,
                     Email = registerRequest.Email,
                     Role = RoleEnums.Bsstaff.ToString(),
-                    StartDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
                 };
 
                 var driver = new BssStaff
@@ -136,8 +137,8 @@ namespace Services.Services.Account
                     StaffId = _accountHelper.GenerateShortGuid(),
                     AccountId = newUser.AccountId,
                     Account = newUser,
-                    StartDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
                 };
 
                 newUser.BssStaffs.Add(driver);
@@ -201,7 +202,7 @@ namespace Services.Services.Account
                 if (updateStaffRequest.Email != null)
                     existingUser.Email = updateStaffRequest.Email;
 
-                existingUser.UpdateDate = DateTime.UtcNow;
+                existingUser.UpdateDate = TimeHepler.SystemTimeNow;
                 await _accountRepository.UpdateAccount(existingUser);
                 return new ResultModel
                 {
@@ -442,5 +443,139 @@ namespace Services.Services.Account
             }
 
         }
+        public async Task<ResultModel> Logout()
+        {
+            try
+            {
+                if (_httpContextAccessor.HttpContext?.Session != null)
+                {
+                    _httpContextAccessor.HttpContext?.Session.Clear();
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageIdentity.LOGOUT_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> ForgotPassword(string email)
+        {
+            var res = new ResultModel();
+            try
+            {
+                var user = await _accountRepository.GetAccountByEmail(email);
+                if (user == null)
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.NOT_FOUND;
+                    res.Message = ResponseMessageIdentity.INCORRECT_EMAIL;
+                    res.StatusCode = StatusCodes.Status404NotFound;
+                    return res;
+                }
+                var random = new Random();
+                string otp = random.Next(100000, 999999).ToString();
+
+                user.OtpCode = otp;
+                user.OtpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(5);
+                user.UpdateDate = TimeHepler.SystemTimeNow;
+                await _accountRepository.UpdateAccount(user);
+
+                string subject = EmailConstants.OtpSubject;
+                string body = string.Format(EmailConstants.OtpBodyTemplate, otp);
+
+                await _emailService.SendEmail(email, subject, body);
+
+                res.IsSuccess = true;
+                res.ResponseCode = ResponseCodeConstants.SUCCESS;
+                res.Message = ResponseMessageIdentitySuccess.FORGOT_PASSWORD_SUCCESS;
+                res.StatusCode = StatusCodes.Status200OK;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.IsSuccess = false;
+                res.ResponseCode = ResponseCodeConstants.FAILED;
+                res.Message = ex.Message;
+                res.StatusCode = StatusCodes.Status500InternalServerError;
+                return res;
+            }
+        }
+
+        public async Task<ResultModel> ForgotPasswordVerifyOtp(string email, string otp)
+        {
+            var res = new ResultModel();
+            try
+            {
+                var user = await _accountRepository.GetAccountByEmail(email);
+                if (user == null)
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.NOT_FOUND;
+                    res.Message = ResponseMessageIdentity.INCORRECT_EMAIL;
+                    res.StatusCode = StatusCodes.Status404NotFound;
+                    return res;
+                }
+
+                if (user.OtpExpiredTime < TimeHepler.SystemTimeNow)
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.BAD_REQUEST;
+                    res.Message = ResponseMessageIdentity.OTP_EXPIRED;
+                    res.StatusCode = StatusCodes.Status400BadRequest;
+                    return res;
+                }
+
+                if (user.OtpCode != otp)
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.BAD_REQUEST;
+                    res.Message = ResponseMessageIdentity.OTP_INVALID;
+                    res.StatusCode = StatusCodes.Status400BadRequest;
+                    return res;
+                }
+
+                string newPassword = _accountHelper.GenerateShortGuid();
+                user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                user.OtpExpiredTime = null;
+                user.OtpCode = null;
+
+                await _accountRepository.UpdateAccount(user);
+
+                string subject = EmailConstants.NewPasswordSubject;
+                string body = string.Format(EmailConstants.NewPasswordBodyTemplate, newPassword);
+
+                await _emailService.SendEmail(email, subject, body);
+
+                res.IsSuccess = true;
+                res.ResponseCode = ResponseCodeConstants.SUCCESS;
+                res.Message = ResponseMessageIdentity.FORGOT_PASSWORD_SUCCESS;
+                res.StatusCode = StatusCodes.Status200OK;
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.IsSuccess = false;
+                res.ResponseCode = ResponseCodeConstants.FAILED;
+                res.Message = ex.Message;
+                res.StatusCode = StatusCodes.Status500InternalServerError;
+
+                return res;
+            }
+        }
+
     }
 }
