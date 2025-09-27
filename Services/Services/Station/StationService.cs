@@ -31,7 +31,6 @@ namespace Services.Services.Station
 
         public async Task<ResultModel> AddStation(AddStationRequest addStationRequest)
         {
-
             try
             {
                 var station = new BusinessObjects.Models.Station
@@ -40,7 +39,7 @@ namespace Services.Services.Station
                     Location = addStationRequest.Location,
                     Status = StationStatusEnum.Active.ToString(),
                     Rating = addStationRequest.Rating,
-                    BatteryNumber = addStationRequest.BatteryNumber,
+                    BatteryNumber = addStationRequest.BatteryNumber ?? 0, // Set to 0 if null
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
                 };
@@ -68,19 +67,179 @@ namespace Services.Services.Station
                 };
             }
         }
-        public Task<ResultModel> GetAllStations()
+        public async Task<ResultModel> GetAllStations()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var stations = _stationRepository.GetAllStations().Result;
+                if (stations == null || stations.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_LIST_EMPTY,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.GET_ALL_STATION_SUCCESS,
+                    Data = stations,
+                    StatusCode = StatusCodes.Status200OK
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.GET_ALL_STATION_FAIL,
+                    Data = ex.Message
+                };
+            }
         }
 
-        public Task<ResultModel> GetStationById(string stationId)
+        public async Task<ResultModel> GetStationById(string stationId)
         {
-            throw new NotImplementedException();
+
+            try
+            {
+                var station = await _stationRepository.GetStationById(stationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.GET_STATION_SUCCESS,
+                    Data = station,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.GET_STATION_FAIL,
+                    Data = ex.Message
+                };
+            }
         }
 
-        public Task<ResultModel> UpdateStation(UpdateStationRequest updateStationRequest)
+        public async Task<ResultModel> UpdateStation(UpdateStationRequest updateStationRequest)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var existingStation = await _stationRepository.GetStationById(updateStationRequest.StationId);
+                if (existingStation == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                if (updateStationRequest.BatteryNumber.HasValue)
+                {
+                    existingStation.BatteryNumber = updateStationRequest.BatteryNumber.Value;
+                }
+                else
+                {
+                    existingStation.BatteryNumber = 0;
+                }
+                if (!string.IsNullOrEmpty(updateStationRequest.Location))
+                {
+                    existingStation.Location = updateStationRequest.Location;
+                }
+                if (!string.IsNullOrEmpty(updateStationRequest.Rating))
+                {
+                    existingStation.Rating = updateStationRequest.Rating;
+                }
+                existingStation.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedStation = await _stationRepository.UpdateStation(existingStation);
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.UPDATE_STATION_SUCCESS,
+                    Data = updatedStation,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.UPDATE_STATION_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
+        public async Task<ResultModel> DeleteStation(string stationId)
+        {
+            try
+            {
+                var existingStation = await _stationRepository.GetStationById(stationId);
+                if (existingStation == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                existingStation.Status = StationStatusEnum.Inactive.ToString();
+                existingStation.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedStation = await _stationRepository.UpdateStation(existingStation);
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.DELETE_STATION_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.DELETE_STATION_FAILED,
+                    Data = ex.Message
+                };
+            }
         }
     }
 }

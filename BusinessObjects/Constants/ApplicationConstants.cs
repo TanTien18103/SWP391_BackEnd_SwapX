@@ -129,7 +129,7 @@ namespace BusinessObjects.Constants
         public const string CUSTOMER_INFO_NOT_FOUND = "Không tìm thấy thông tin khách hàng";
         public const string CUSTOMER_BANK_INFO_NOT_FOUND = "Không tìm thấy thông tin tài khoản ngân hàng của khách hàng";
         public const string USER_NOT_STAFF = "Người dùng không phải là nhân viên";
-        public const string CREATE_STAFF_SUCCESS= "Tạo nhân viên thành công";
+        public const string CREATE_STAFF_SUCCESS = "Tạo nhân viên thành công";
         public const string USER_NOT_CUSTOMER = "Người dùng không phải là khách hàng";
 
     }
@@ -153,6 +153,13 @@ namespace BusinessObjects.Constants
         public const string GET_STATION_LIST_SUCCESS = "Lấy danh sách trạm thành công";
         public const string GET_STATION_DETAIL_SUCCESS = "Lấy chi tiết trạm thành công";
         public static string ADD_STATION_FAIL = "Thêm trạm thất bại";
+        public static string GET_ALL_STATION_FAIL = "Lấy danh sách trạm thất bại";
+        public static string STATION_LIST_EMPTY = "Lấy danh sách trạm thất bại";
+        public static string GET_ALL_STATION_SUCCESS = "Lấy danh sách trạm thành công";
+        public static string UPDATE_STATION_FAILED = "Cập nhật trạm thất bại";
+        public static string GET_STATION_FAIL = "Lấy trạm thất bại";
+        public static string GET_STATION_SUCCESS = "Lấy trạm thành công";
+        public static string DELETE_STATION_FAILED = "Xóa trạm thất bại";
     }
     public static class EmailConstants
     {
