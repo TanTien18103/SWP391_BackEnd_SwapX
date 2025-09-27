@@ -132,4 +132,17 @@ namespace BusinessObjects.Constants
         public const string USER_NOT_CUSTOMER = "Người dùng không phải là khách hàng";
 
     }
+    //For Station (0-0-1)
+    public class ResponseMessageConstantsStation
+    {
+        public const string STATION_NOT_FOUND = "Không tìm thấy trạm";
+        public const string STATION_EXISTED = "Trạm đã tồn tại";
+        public const string ADD_STATION_SUCCESS = "Thêm trạm thành công";
+        public const string UPDATE_STATION_SUCCESS = "Cập nhật trạm thành công";
+        public const string DELETE_STATION_SUCCESS = "Xóa trạm thành công";
+        public const string STATION_INACTIVE = "Trạm đã bị ngừng hoạt động";
+        public const string GET_STATION_LIST_SUCCESS = "Lấy danh sách trạm thành công";
+        public const string GET_STATION_DETAIL_SUCCESS = "Lấy chi tiết trạm thành công";
+        public static string ADD_STATION_FAIL = "Thêm trạm thất bại";
+    }
 }
