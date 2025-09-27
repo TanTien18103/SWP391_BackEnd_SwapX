@@ -65,6 +65,8 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
+            entity.Property(e => e.OtpCode).HasMaxLength(10);
+            entity.Property(e => e.OtpExpiredTime).HasColumnType("datetime");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
