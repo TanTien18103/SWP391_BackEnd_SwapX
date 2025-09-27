@@ -17,6 +17,8 @@ using Services;
 using Services.Services;
 using Services.Helpers;
 using Account = CloudinaryDotNet.Account;
+using Repositories.Repositories.Station;
+using Services.Services.Station;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,18 +75,19 @@ builder.Services.AddSession(options =>
 // CORS Policy
 builder.Services.AddCors(options =>
 {
-options.AddPolicy("AllowAllOrigins",
-    builder =>
-    {
-        builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-    });
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+        });
 });
 // Register Repositories
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IStationRepo, StationRepo>();
 
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -92,6 +95,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPayOSService, PayOSService>();
+builder.Services.AddScoped<IStationService, StationService>();
 
 //Register Helper
 builder.Services.AddScoped<AccountHelper>();
