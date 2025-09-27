@@ -154,4 +154,14 @@ namespace BusinessObjects.Constants
         public const string GET_STATION_DETAIL_SUCCESS = "Lấy chi tiết trạm thành công";
         public static string ADD_STATION_FAIL = "Thêm trạm thất bại";
     }
+    public static class EmailConstants
+    {
+        // OTP
+        public const string OtpSubject = "Otp xác nhận đổi mật khẩu mới của bạn";
+        public const string OtpBodyTemplate = "Otp xác nhận đổi mật khẩu mới của bạn là: <b>{0}</b>. Hãy nhập otp để nhận mật khẩu mới ngay.";
+
+        // New Password
+        public const string NewPasswordSubject = "Mật khẩu mới của bạn";
+        public const string NewPasswordBodyTemplate = "Mật khẩu mới của bạn là: <b>{0}</b>. Hãy đăng nhập và đổi mật khẩu ngay.";
+    }
 }

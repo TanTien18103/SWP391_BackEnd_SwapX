@@ -12,6 +12,10 @@ namespace Services.Services.Account
     {
         Task<(string accessToken, string refreshToken)> Login(string username, string password);
         Task<ResultModel> Logout();
+        Task<ResultModel> ForgotPassword(string email);
+        Task<ResultModel> ForgotPasswordVerifyOtp(string email, string otp);
+
+
 
         Task<string> Register(RegisterRequest registerRequest);
         Task<ResultModel> CreateStaff(RegisterRequest registerRequest);
