@@ -346,6 +346,101 @@ namespace Services.Services.Account
 
             }
         }
+        public async Task<ResultModel> DeleteStaff(string accountId)
+        {
+            try
+            {
+                var existingUser = await _accountRepository.GetAccountById(accountId);
+                if (existingUser == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                if (existingUser.Role != RoleEnums.Bsstaff.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsUser.USER_NOT_STAFF,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+                // Set status to Inactive
+                existingUser.Status = AccountStatusEnums.Inactive.ToString();
+                await _accountRepository.UpdateAccount(existingUser);
 
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsUser.DELETE_USER_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+        public async Task<ResultModel> DeleteCustomer(string accountId)
+        {
+            try
+            {
+                var existingUser = await _accountRepository.GetAccountById(accountId);
+                if (existingUser == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                if (existingUser.Role != RoleEnums.EvDriver.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsUser.USER_NOT_CUSTOMER,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+                // Set status to Inactive
+                existingUser.Status = AccountStatusEnums.Inactive.ToString();
+                await _accountRepository.UpdateAccount(existingUser);
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsUser.DELETE_USER_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+
+        }
     }
 }

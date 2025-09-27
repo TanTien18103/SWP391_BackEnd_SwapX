@@ -17,5 +17,6 @@ namespace Repositories.Repositories.Account
         Task<List<BusinessObjects.Models.Account>> GetAll();
         Task<List<BusinessObjects.Models.Account>> GetAllStaff();
         Task<List<BusinessObjects.Models.Account>> GetAllCustomer();
+        
     }
 }
