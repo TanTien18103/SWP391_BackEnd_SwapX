@@ -127,8 +127,8 @@ namespace Services.Services.Account
                     Address = registerRequest.Address,
                     Email = registerRequest.Email,
                     Role = RoleEnums.Bsstaff.ToString(),
-                    StartDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
                 };
 
                 var driver = new BssStaff
@@ -136,8 +136,8 @@ namespace Services.Services.Account
                     StaffId = _accountHelper.GenerateShortGuid(),
                     AccountId = newUser.AccountId,
                     Account = newUser,
-                    StartDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
                 };
 
                 newUser.BssStaffs.Add(driver);
@@ -201,7 +201,7 @@ namespace Services.Services.Account
                 if (updateStaffRequest.Email != null)
                     existingUser.Email = updateStaffRequest.Email;
 
-                existingUser.UpdateDate = DateTime.UtcNow;
+                existingUser.UpdateDate = TimeHepler.SystemTimeNow;
                 await _accountRepository.UpdateAccount(existingUser);
                 return new ResultModel
                 {
@@ -441,6 +441,33 @@ namespace Services.Services.Account
                 };
             }
 
+        }
+        public async Task<ResultModel> Logout()
+        {
+            try
+            {
+                if (_httpContextAccessor.HttpContext?.Session != null)
+                {
+                    _httpContextAccessor.HttpContext?.Session.Clear();
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageIdentity.LOGOUT_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
         }
     }
 }
