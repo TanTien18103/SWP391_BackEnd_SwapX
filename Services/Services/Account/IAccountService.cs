@@ -14,6 +14,7 @@ namespace Services.Services.Account
         Task<ResultModel> Logout();
         Task<ResultModel> ForgotPassword(string email);
         Task<ResultModel> ForgotPasswordVerifyOtp(string email, string otp);
+        Task<ResultModel> ChangePassword(ChangePasswordRequest request);
 
 
 
