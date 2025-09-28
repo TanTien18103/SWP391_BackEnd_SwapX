@@ -79,6 +79,7 @@ namespace Services.Services.Account
                 Address = registerRequest.Address,
                 Email = registerRequest.Email,
                 Role = RoleEnums.EvDriver.ToString(),
+                Status = AccountStatusEnums.Active.ToString(),
                 StartDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow,
             };
@@ -664,5 +665,67 @@ namespace Services.Services.Account
             }
         }
 
+        public async Task<ResultModel> GetCurrentUser()
+        {
+            try
+            {
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                    || string.IsNullOrEmpty(authHeader)
+                    || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepository.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var existingAccount = await _accountRepository.GetAccountById(accountId);
+                if (existingAccount == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageIdentity.ACCOUNT_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
+                    Data = existingAccount,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
     }
 }
