@@ -147,5 +147,12 @@ namespace Services.Controllers
             var res = await _accountService.DeleteCustomer(accountId);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpPut("update_customer_for_admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateCustomerForAdmin([FromForm] UpdateCustomerRequest updateCustomerRequest)
+        {
+            var res = await _accountService.UpdateCustomer(updateCustomerRequest);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }
