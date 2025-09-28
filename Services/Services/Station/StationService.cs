@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessObjects.TimeCoreHelper;
+using Services.ServicesHelpers;
 
 namespace Services.Services.Station
 {
@@ -20,13 +21,15 @@ namespace Services.Services.Station
         private readonly IStationRepo _stationRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AccountHelper _accountHelper;
 
 
-        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper)
         {
             _stationRepository = stationRepository;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _accountHelper = accountHelper;
         }
 
         public async Task<ResultModel> AddStation(AddStationRequest addStationRequest)
@@ -35,7 +38,7 @@ namespace Services.Services.Station
             {
                 var station = new BusinessObjects.Models.Station
                 {
-                    StationId = Guid.NewGuid().ToString(),
+                    StationId = _accountHelper.GenerateShortGuid(),
                     Location = addStationRequest.Location,
                     Status = StationStatusEnum.Active.ToString(),
                     Rating = addStationRequest.Rating,
