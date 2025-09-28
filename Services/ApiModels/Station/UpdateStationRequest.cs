@@ -15,7 +15,5 @@ namespace Services.ApiModels.Station
         public int? BatteryNumber { get; set; }
 
         public string? Location { get; set; }
-
-        public string? Rating { get; set; }
     }
 }

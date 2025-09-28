@@ -15,7 +15,7 @@ public partial class Station
 
     public string Status { get; set; }
 
-    public string Rating { get; set; }
+    public decimal? Rating { get; set; }
 
     public DateTime? StartDate { get; set; }
 
