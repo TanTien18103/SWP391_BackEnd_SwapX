@@ -41,7 +41,7 @@ namespace Services.Services.Station
                     StationId = _accountHelper.GenerateShortGuid(),
                     Location = addStationRequest.Location,
                     Status = StationStatusEnum.Active.ToString(),
-                    Rating = addStationRequest.Rating,
+                    Rating = 0m,
                     BatteryNumber = addStationRequest.BatteryNumber ?? 0, // Set to 0 if null
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
@@ -176,10 +176,6 @@ namespace Services.Services.Station
                 if (!string.IsNullOrEmpty(updateStationRequest.Location))
                 {
                     existingStation.Location = updateStationRequest.Location;
-                }
-                if (!string.IsNullOrEmpty(updateStationRequest.Rating))
-                {
-                    existingStation.Rating = updateStationRequest.Rating;
                 }
                 existingStation.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedStation = await _stationRepository.UpdateStation(existingStation);

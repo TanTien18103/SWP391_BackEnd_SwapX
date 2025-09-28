@@ -9,7 +9,7 @@ public partial class Rating
 {
     public string RatingId { get; set; }
 
-    public string Rating1 { get; set; }
+    public decimal? Rating1 { get; set; }
 
     public string Description { get; set; }
 
