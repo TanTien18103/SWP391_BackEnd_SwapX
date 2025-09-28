@@ -15,10 +15,6 @@ namespace Services.Services.Account
         Task<ResultModel> ForgotPassword(string email);
         Task<ResultModel> ForgotPasswordVerifyOtp(string email, string otp);
         Task<ResultModel> ChangePassword(ChangePasswordRequest request);
-        Task<ResultModel> GetCurrentUser();
-
-
-
         Task<string> Register(RegisterRequest registerRequest);
         Task<ResultModel> CreateStaff(RegisterRequest registerRequest);
         Task<ResultModel> UpdateStaff(UpdateStaffRequest updateStaffRequest);
