@@ -41,6 +41,14 @@ namespace Services.Controllers
             return StatusCode(res.StatusCode, res);
         }
 
+        [HttpGet("current-user")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+           var res = await _accountService.GetCurrentUser();
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest forgotPasswordRequest)
         {
