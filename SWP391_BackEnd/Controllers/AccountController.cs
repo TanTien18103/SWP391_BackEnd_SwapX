@@ -55,6 +55,14 @@ namespace Services.Controllers
             return StatusCode(res.StatusCode, res);
         }
 
+        [Authorize]
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var res = await _accountService.ChangePassword(request);
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpPost("create_staff_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStaffForAdmin([FromForm] RegisterRequest registerRequest)

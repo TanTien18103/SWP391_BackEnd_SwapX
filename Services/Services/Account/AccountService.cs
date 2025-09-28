@@ -577,5 +577,92 @@ namespace Services.Services.Account
             }
         }
 
+        public async Task<ResultModel> ChangePassword(ChangePasswordRequest request)
+        {
+            try
+            {
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                    || string.IsNullOrEmpty(authHeader)
+                    || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepository.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var existingAccount = await _accountRepository.GetAccountById(accountId);
+                if (existingAccount == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageIdentity.ACCOUNT_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                if (!_accountHelper.VerifyPassword(request.OldPassword, existingAccount.Password))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.OLD_PASSWORD_WRONG,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                if (_accountHelper.VerifyPassword(request.NewPassword, existingAccount.Password))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.NEW_PASSWORD_CANNOT_MATCH,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                existingAccount.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+                await _accountRepository.UpdateAccount(existingAccount);
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageIdentitySuccess.CHANGE_PASSWORD_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
     }
 }

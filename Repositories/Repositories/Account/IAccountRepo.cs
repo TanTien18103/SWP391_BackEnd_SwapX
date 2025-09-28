@@ -18,6 +18,6 @@ namespace Repositories.Repositories.Account
         Task<List<BusinessObjects.Models.Account>> GetAllStaff();
         Task<List<BusinessObjects.Models.Account>> GetAllCustomer();
         Task<BusinessObjects.Models.Account> GetAccountByEmail(string email);
-
+        Task<string> GetAccountIdFromToken(string token);
     }
 }
