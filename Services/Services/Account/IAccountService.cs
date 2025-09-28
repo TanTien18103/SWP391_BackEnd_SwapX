@@ -11,6 +11,12 @@ namespace Services.Services.Account
     public interface IAccountService
     {
         Task<(string accessToken, string refreshToken)> Login(string username, string password);
+        Task<ResultModel> Logout();
+        Task<ResultModel> ForgotPassword(string email);
+        Task<ResultModel> ForgotPasswordVerifyOtp(string email, string otp);
+        Task<ResultModel> ChangePassword(ChangePasswordRequest request);
+
+
 
         Task<string> Register(RegisterRequest registerRequest);
         Task<ResultModel> CreateStaff(RegisterRequest registerRequest);
@@ -19,5 +25,8 @@ namespace Services.Services.Account
         Task<ResultModel> GetAccountById(string accountId);
         Task<ResultModel> GetAllStaff();
         Task<ResultModel> GetAllCustomer();
+        Task<ResultModel> DeleteStaff(string accountId);
+        Task<ResultModel> DeleteCustomer(string accountId);
+
     }
 }

@@ -34,6 +34,35 @@ namespace Services.Controllers
             }
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var res = await _accountService.Logout();
+            return StatusCode(res.StatusCode, res);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest forgotPasswordRequest)
+        {
+            var res = await _accountService.ForgotPassword(forgotPasswordRequest.Email);
+            return Ok(res);
+        }
+
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp(string email, [FromQuery] string otp)
+        {
+            var res = await _accountService.ForgotPasswordVerifyOtp(email, otp);
+            return StatusCode(res.StatusCode, res);
+        }
+
+        [Authorize]
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var res = await _accountService.ChangePassword(request);
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpPost("create_staff_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStaffForAdmin([FromForm] RegisterRequest registerRequest)
@@ -94,6 +123,20 @@ namespace Services.Controllers
         public async Task<IActionResult> GetAllCustomer()
         {
             var res = await _accountService.GetAllCustomer();
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpPut("delete_staff_for_admin/{accountId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteStaff(string accountId)
+        {
+            var res = await _accountService.DeleteStaff(accountId);
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpPut("delete_customer_for_admin/{accountId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteCustomer(string accountId)
+        {
+            var res = await _accountService.DeleteCustomer(accountId);
             return StatusCode(res.StatusCode, res);
         }
     }

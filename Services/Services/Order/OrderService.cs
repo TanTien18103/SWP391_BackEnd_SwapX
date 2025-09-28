@@ -1,5 +1,6 @@
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
+using BusinessObjects.TimeCoreHelper;
 using Repositories.Repositories.OrderRepo;
 
 namespace Services.Services;
@@ -16,8 +17,8 @@ public class OrderService : IOrderService
     public async Task<Order> CreateOrderAsync(Order order)
     {
         order.Status = PaymentStatus.Pending.ToString();
-        order.StartDate = DateTime.UtcNow;
-        order.UpdateDate = DateTime.UtcNow;
+        order.StartDate = TimeHepler.SystemTimeNow;
+        order.UpdateDate = TimeHepler.SystemTimeNow;
 
         return await _orderRepository.CreateOrderAsync(order);
     }

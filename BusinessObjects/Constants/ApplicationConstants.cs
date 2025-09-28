@@ -93,6 +93,7 @@ namespace BusinessObjects.Constants
         public const string OTP_EXPIRED = "OTP đã hết hạn. Vui lòng yêu cầu mã OTP mới.";
         public const string OTP_INVALID = "Mã OTP không hợp lệ. Vui lòng kiểm tra lại mã OTP bạn đã nhập.";
         public const string EXISTED_USERNAME = "Username đã tồn tại.";
+        public const string LOGOUT_SUCCESS = "Đăng xuất thành công.";
     }
 
     //Auth-Account Controllers
@@ -128,6 +129,46 @@ namespace BusinessObjects.Constants
         public const string CUSTOMER_INFO_NOT_FOUND = "Không tìm thấy thông tin khách hàng";
         public const string CUSTOMER_BANK_INFO_NOT_FOUND = "Không tìm thấy thông tin tài khoản ngân hàng của khách hàng";
         public const string USER_NOT_STAFF = "Người dùng không phải là nhân viên";
-        public const string CREATE_STAFF_SUCCESS= "Tạo nhân viên thành công";
+        public const string CREATE_STAFF_SUCCESS = "Tạo nhân viên thành công";
+        public const string USER_NOT_CUSTOMER = "Người dùng không phải là khách hàng";
+
+    }
+    public class ResponseMessageImage
+    {
+        public const string INVALID_IMAGE = "Hình ảnh không hợp lệ. ";
+        public const string INVALID_SIZE = "Kích thước hình ảnh không hợp lệ. ";
+        public const string INVALID_FORMAT = "Định dạng hình ảnh không hợp lệ. ";
+        public const string INVALID_URL = "Đường dẫn hình ảnh không hợp lệ. ";
+    }
+
+    //For Station (0-0-1)
+    public class ResponseMessageConstantsStation
+    {
+        public const string STATION_NOT_FOUND = "Không tìm thấy trạm";
+        public const string STATION_EXISTED = "Trạm đã tồn tại";
+        public const string ADD_STATION_SUCCESS = "Thêm trạm thành công";
+        public const string UPDATE_STATION_SUCCESS = "Cập nhật trạm thành công";
+        public const string DELETE_STATION_SUCCESS = "Xóa trạm thành công";
+        public const string STATION_INACTIVE = "Trạm đã bị ngừng hoạt động";
+        public const string GET_STATION_LIST_SUCCESS = "Lấy danh sách trạm thành công";
+        public const string GET_STATION_DETAIL_SUCCESS = "Lấy chi tiết trạm thành công";
+        public static string ADD_STATION_FAIL = "Thêm trạm thất bại";
+        public static string GET_ALL_STATION_FAIL = "Lấy danh sách trạm thất bại";
+        public static string STATION_LIST_EMPTY = "Lấy danh sách trạm thất bại";
+        public static string GET_ALL_STATION_SUCCESS = "Lấy danh sách trạm thành công";
+        public static string UPDATE_STATION_FAILED = "Cập nhật trạm thất bại";
+        public static string GET_STATION_FAIL = "Lấy trạm thất bại";
+        public static string GET_STATION_SUCCESS = "Lấy trạm thành công";
+        public static string DELETE_STATION_FAILED = "Xóa trạm thất bại";
+    }
+    public static class EmailConstants
+    {
+        // OTP
+        public const string OtpSubject = "Otp xác nhận đổi mật khẩu mới của bạn";
+        public const string OtpBodyTemplate = "Otp xác nhận đổi mật khẩu mới của bạn là: <b>{0}</b>. Hãy nhập otp để nhận mật khẩu mới ngay.";
+
+        // New Password
+        public const string NewPasswordSubject = "Mật khẩu mới của bạn";
+        public const string NewPasswordBodyTemplate = "Mật khẩu mới của bạn là: <b>{0}</b>. Hãy đăng nhập và đổi mật khẩu ngay.";
     }
 }
