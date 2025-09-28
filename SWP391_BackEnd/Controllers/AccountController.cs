@@ -62,6 +62,14 @@ namespace Services.Controllers
             return StatusCode(res.StatusCode, res);
         }
 
+        [HttpGet("get-currrent")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+             var res = await _accountService.GetCurrentUser();
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpPost("create_staff_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStaffForAdmin([FromForm] RegisterRequest registerRequest)
