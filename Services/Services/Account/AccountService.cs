@@ -664,115 +664,68 @@ namespace Services.Services.Account
                 };
             }
         }
-
-
-        public async Task<ResultModel> UpdateCustomer(UpdateCustomerRequest updateCustomerRequest)
+        public Task<ResultModel> UpdateCustomer(UpdateCustomerRequest updateCustomerRequest)
         {
             try
             {
-                var existingUser = await _accountRepository.GetAccountById(updateCustomerRequest.AccountId);
-                if (existingUser == null)
-
-        public async Task<ResultModel> GetCurrentUser()
-        {
-            try
-            {
-                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
-                    || string.IsNullOrEmpty(authHeader)
-                    || !authHeader.ToString().StartsWith("Bearer "))
-
+               
+                var task = Task.Run(async () =>
                 {
+                    var existingUser = await _accountRepository.GetAccountById(updateCustomerRequest.AccountId);
+                    if (existingUser == null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                            Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                            StatusCode = StatusCodes.Status404NotFound
+                        };
+                    }
+                    if (existingUser.Role != RoleEnums.EvDriver.ToString())
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                            Message = ResponseMessageConstantsUser.USER_NOT_CUSTOMER,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+                    // Only update if the field is not null
+                    if (updateCustomerRequest.Name != null)
+                        existingUser.Name = updateCustomerRequest.Name;
+                    if (updateCustomerRequest.Phone != null)
+                        existingUser.Phone = updateCustomerRequest.Phone;
+                    if (updateCustomerRequest.Address != null)
+                        existingUser.Address = updateCustomerRequest.Address;
+                    if (updateCustomerRequest.Email != null)
+                        existingUser.Email = updateCustomerRequest.Email;
+                    existingUser.UpdateDate = TimeHepler.SystemTimeNow;
+                    await _accountRepository.UpdateAccount(existingUser);
                     return new ResultModel
                     {
-                        IsSuccess = false,
-
-                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
-                        StatusCode = StatusCodes.Status404NotFound
+                        IsSuccess = true,
+                        ResponseCode = ResponseCodeConstants.SUCCESS,
+                        Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
+                        Data = existingUser,
+                        StatusCode = StatusCodes.Status200OK
                     };
-                }
-                if (existingUser.Role != RoleEnums.EvDriver.ToString())
-
-                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
-                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
-                        StatusCode = StatusCodes.Status401Unauthorized
-                    };
-                }
-
-                var token = authHeader.ToString().Substring("Bearer ".Length);
-                var accountId = await _accountRepository.GetAccountIdFromToken(token);
-                if (string.IsNullOrEmpty(accountId))
-                {
-                    return new ResultModel
-                    {
-                        IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
-                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
-                        StatusCode = StatusCodes.Status401Unauthorized
-                    };
-                }
-
-                var existingAccount = await _accountRepository.GetAccountById(accountId);
-                if (existingAccount == null)
-
-                {
-                    return new ResultModel
-                    {
-                        IsSuccess = false,
-
-                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
-                        Message = ResponseMessageConstantsUser.USER_NOT_CUSTOMER,
-                        StatusCode = StatusCodes.Status400BadRequest
-                    };
-                }
-                // Only update if the field is not null
-                if (updateCustomerRequest.Name != null)
-                    existingUser.Name = updateCustomerRequest.Name;
-                if (updateCustomerRequest.Phone != null)
-                    existingUser.Phone = updateCustomerRequest.Phone;
-                if (updateCustomerRequest.Address != null)
-                    existingUser.Address = updateCustomerRequest.Address;
-                if (updateCustomerRequest.Email != null)
-                    existingUser.Email = updateCustomerRequest.Email;
-                existingUser.UpdateDate = TimeHepler.SystemTimeNow;
-                await _accountRepository.UpdateAccount(existingUser);
-
-                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = ResponseMessageIdentity.ACCOUNT_NOT_FOUND,
-                        StatusCode = StatusCodes.Status404NotFound
-                    };
-                }
-
-
-                return new ResultModel
-                {
-                    IsSuccess = true,
-                    ResponseCode = ResponseCodeConstants.SUCCESS,
-
-                    Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
-                    Data = existingUser,
-                    StatusCode = StatusCodes.Status200OK
-                };
-
-            }
-            catch(Exception ex)
-
-                    Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = existingAccount,
-                    StatusCode = StatusCodes.Status200OK
-                };
+                });
+                return task;
             }
             catch (Exception ex)
-
             {
-                return new ResultModel
+                return Task.FromResult(new ResultModel
                 {
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
-                };
+                });
             }
         }
     }
 }
+
+
