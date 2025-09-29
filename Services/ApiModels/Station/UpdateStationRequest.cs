@@ -10,7 +10,7 @@ namespace Services.ApiModels.Station
     public class UpdateStationRequest
     {
         public string? StationId { get; set; }
-        [Range(0, 30, ErrorMessage = "BatteryNumber must be between 1 and 30.")]
+        [Range(0, 30, ErrorMessage = "BatteryNumber must be between 0 and 30.")]
 
         public int? BatteryNumber { get; set; }
 

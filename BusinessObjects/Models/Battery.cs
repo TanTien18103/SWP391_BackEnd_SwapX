@@ -11,11 +11,15 @@ public partial class Battery
 
     public string Status { get; set; }
 
-    public decimal? Capacity { get; set; }
+    public int? Capacity { get; set; }
 
     public string BatteryType { get; set; }
 
     public string StationId { get; set; }
+
+    public string Specification { get; set; }
+
+    public decimal? BatteryQuality { get; set; }
 
     public DateTime? StartDate { get; set; }
 

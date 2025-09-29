@@ -49,7 +49,7 @@ public partial class SwapXContext : DbContext
     {
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__Account__F267253E494B6793");
+            entity.HasKey(e => e.AccountId).HasName("PK__Account__F267253E9C6E442D");
 
             entity.ToTable("Account");
 
@@ -86,19 +86,23 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Battery>(entity =>
         {
-            entity.HasKey(e => e.BatteryId).HasName("PK__Battery__5710803E359BFD2C");
+            entity.HasKey(e => e.BatteryId).HasName("PK__Battery__5710803E287D4B4A");
 
             entity.ToTable("Battery");
 
             entity.Property(e => e.BatteryId)
                 .HasMaxLength(100)
                 .HasColumnName("BatteryID");
+            entity.Property(e => e.BatteryQuality)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("batteryQuality");
             entity.Property(e => e.BatteryType)
                 .HasMaxLength(25)
                 .HasColumnName("Battery_type");
-            entity.Property(e => e.Capacity)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("capacity");
+            entity.Property(e => e.Capacity).HasColumnName("capacity");
+            entity.Property(e => e.Specification)
+                .HasMaxLength(20)
+                .HasColumnName("specification");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.StationId)
                 .HasMaxLength(100)
@@ -115,7 +119,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<BatteryHistory>(entity =>
         {
-            entity.HasKey(e => e.BatteryHistoryId).HasName("PK__BatteryH__4E7644D2EB9CD226");
+            entity.HasKey(e => e.BatteryHistoryId).HasName("PK__BatteryH__4E7644D24A446D7E");
 
             entity.ToTable("BatteryHistory");
 
@@ -162,7 +166,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<BatteryReport>(entity =>
         {
-            entity.HasKey(e => e.BatteryReportId).HasName("PK__BatteryR__0A361DA73C794498");
+            entity.HasKey(e => e.BatteryReportId).HasName("PK__BatteryR__0A361DA7C09CCE11");
 
             entity.ToTable("BatteryReport");
 
@@ -208,7 +212,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<BssStaff>(entity =>
         {
-            entity.HasKey(e => e.StaffId).HasName("PK__BSS_Staf__96D4AAF7748B7181");
+            entity.HasKey(e => e.StaffId).HasName("PK__BSS_Staf__96D4AAF7F2826E50");
 
             entity.ToTable("BSS_Staff");
 
@@ -238,7 +242,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Evdriver>(entity =>
         {
-            entity.HasKey(e => e.CustomerId).HasName("PK__EVDriver__A4AE64B8D6C4CD9E");
+            entity.HasKey(e => e.CustomerId).HasName("PK__EVDriver__A4AE64B868918DE6");
 
             entity.ToTable("EVDriver");
 
@@ -268,7 +272,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<ExchangeBattery>(entity =>
         {
-            entity.HasKey(e => e.ExchangeBatteryId).HasName("PK__Exchange__B321FE92C637150E");
+            entity.HasKey(e => e.ExchangeBatteryId).HasName("PK__Exchange__B321FE92B7665EFC");
 
             entity.ToTable("ExchangeBattery");
 
@@ -334,7 +338,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Form>(entity =>
         {
-            entity.HasKey(e => e.FormId).HasName("PK__Form__FB05B7BD51BC9C77");
+            entity.HasKey(e => e.FormId).HasName("PK__Form__FB05B7BD4218BBBD");
 
             entity.ToTable("Form");
 
@@ -371,7 +375,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAFF815B325");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF8CE09CA2");
 
             entity.Property(e => e.OrderId)
                 .HasMaxLength(100)
@@ -404,7 +408,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Package>(entity =>
         {
-            entity.HasKey(e => e.PackageId).HasName("PK__Package__322035EC865FABF0");
+            entity.HasKey(e => e.PackageId).HasName("PK__Package__322035EC6A45A890");
 
             entity.ToTable("Package");
 
@@ -431,7 +435,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Rating>(entity =>
         {
-            entity.HasKey(e => e.RatingId).HasName("PK__Rating__FCCDF85C3224AEEC");
+            entity.HasKey(e => e.RatingId).HasName("PK__Rating__FCCDF85CD48F902B");
 
             entity.ToTable("Rating");
 
@@ -467,7 +471,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasKey(e => e.ReportId).HasName("PK__Report__D5BD48E515FD650F");
+            entity.HasKey(e => e.ReportId).HasName("PK__Report__D5BD48E504DC6B1F");
 
             entity.ToTable("Report");
 
@@ -506,7 +510,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Slot>(entity =>
         {
-            entity.HasKey(e => e.SlotId).HasName("PK__Slot__0A124A4F431E0722");
+            entity.HasKey(e => e.SlotId).HasName("PK__Slot__0A124A4F88119764");
 
             entity.ToTable("Slot");
 
@@ -538,7 +542,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Station>(entity =>
         {
-            entity.HasKey(e => e.StationId).HasName("PK__Station__F0A7F3E04C618209");
+            entity.HasKey(e => e.StationId).HasName("PK__Station__F0A7F3E0EE3A1E80");
 
             entity.ToTable("Station");
 
@@ -561,7 +565,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<StationSchedule>(entity =>
         {
-            entity.HasKey(e => e.StationScheduleId).HasName("PK__StationS__12BF61BE065A3777");
+            entity.HasKey(e => e.StationScheduleId).HasName("PK__StationS__12BF61BEC9CF80C5");
 
             entity.ToTable("StationSchedule");
 
@@ -595,7 +599,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Vehicle>(entity =>
         {
-            entity.HasKey(e => e.Vin).HasName("PK__Vehicle__C5DF234D145F813B");
+            entity.HasKey(e => e.Vin).HasName("PK__Vehicle__C5DF234D17ECC187");
 
             entity.ToTable("Vehicle");
 
