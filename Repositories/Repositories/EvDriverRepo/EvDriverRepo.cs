@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repositories.Repositories.EvDriver
+namespace Repositories.Repositories.EvDriverRepo
 {
     public class EvDriverRepo: IEvDriverRepo
     {

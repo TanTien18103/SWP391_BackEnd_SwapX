@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using BusinessObjects.Constants;
 using BusinessObjects.Enums;
 using Microsoft.AspNetCore.Http;
-using Repositories.Repositories.Station;
+using Repositories.Repositories.StationRepo;
 using Services.ApiModels;
 using Services.ApiModels.Station;
 using System;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using BusinessObjects.TimeCoreHelper;
 using Services.ServicesHelpers;
 
-namespace Services.Services.Station
+namespace Services.Services.StationService
 {
     public class StationService : IStationService
     {

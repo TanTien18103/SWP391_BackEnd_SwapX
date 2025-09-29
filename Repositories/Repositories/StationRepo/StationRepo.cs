@@ -7,7 +7,7 @@ using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories.Repositories.Station
+namespace Repositories.Repositories.StationRepo
 {
     public class StationRepo: IStationRepo
     {
@@ -17,22 +17,22 @@ namespace Repositories.Repositories.Station
             _context = context;
         }
 
-        public async Task AddStation(BusinessObjects.Models.Station station)
+        public async Task AddStation(Station station)
         {
             _context.Stations.Add(station);
             await _context.SaveChangesAsync();
         }
-        public async Task<List<BusinessObjects.Models.Station>> GetAllStations()
+        public async Task<List<Station>> GetAllStations()
         {
             return await _context.Stations.ToListAsync();
         }
 
-        public async Task<BusinessObjects.Models.Station> GetStationById(string stationId)
+        public async Task<Station> GetStationById(string stationId)
         {
               return await _context.Stations.FirstOrDefaultAsync(s => s.StationId == stationId);
         }
 
-        public async Task<BusinessObjects.Models.Station> UpdateStation(BusinessObjects.Models.Station station)
+        public async Task<Station> UpdateStation(Station station)
         {
             _context.Stations.Update(station);
             await _context.SaveChangesAsync();

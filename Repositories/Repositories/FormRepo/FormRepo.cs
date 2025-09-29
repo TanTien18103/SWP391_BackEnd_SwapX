@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repositories.Repositories.Form
+namespace Repositories.Repositories.FormRepo
 {
     public class FormRepo : IFormRepo
     {
@@ -17,39 +17,39 @@ namespace Repositories.Repositories.Form
             _context = context;
         }
 
-        public async Task<BusinessObjects.Models.Form> Add(BusinessObjects.Models.Form form)
+        public async Task<Form> Add(Form form)
         {
             _context.Forms.Add(form);
             await _context.SaveChangesAsync();
             return form;
         }
 
-        public async Task<List<BusinessObjects.Models.Form>> GetAll()
+        public async Task<List<Form>> GetAll()
         {
             return await _context.Forms.ToListAsync();
         }
 
-        public async Task<List<BusinessObjects.Models.Form>> GetByAccountId(string accountId)
+        public async Task<List<Form>> GetByAccountId(string accountId)
         {
             return await _context.Forms
                 .Where(f => f.AccountId == accountId)
                 .ToListAsync();
         }
 
-        public async Task<BusinessObjects.Models.Form> GetById(string formId)
+        public async Task<Form> GetById(string formId)
         {
             return await _context.Forms
                  .FirstOrDefaultAsync(f => f.FormId == formId);
         }
 
-        public async Task<List<BusinessObjects.Models.Form>> GetByStationId(string stationId)
+        public async Task<List<Form>> GetByStationId(string stationId)
         {
             return await _context.Forms
                 .Where(f => f.StationId == stationId)
                 .ToListAsync();
         }
 
-        public async Task<BusinessObjects.Models.Form> Update(BusinessObjects.Models.Form form)
+        public async Task<Form> Update(Form form)
         {
             _context.Forms.Update(form);
             await _context.SaveChangesAsync();

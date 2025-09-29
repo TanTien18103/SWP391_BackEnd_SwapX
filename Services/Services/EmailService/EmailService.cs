@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Services.Email
+namespace Services.Services.EmailService
 {
     public class EmailService : IEmailService
     {

@@ -2,7 +2,7 @@
 using BusinessObjects.Enums;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
-using Repositories.Repositories.Battery;
+using Repositories.Repositories.BatteryRepo;
 using Services.ApiModels;
 using Services.ApiModels.Battery;
 using Services.ApiModels.Station;
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using BusinessObjects.Constants;
 using Microsoft.Extensions.Configuration;
 
-namespace Services.Services.Battery
+namespace Services.Services.BatteryService
 {
     public class BatteryService : IBatteryService
     {

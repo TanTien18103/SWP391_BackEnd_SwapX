@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Services.Account
+namespace Services.Services.AccountService
 {
     public interface IAccountService
     {

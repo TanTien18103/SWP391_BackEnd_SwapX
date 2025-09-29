@@ -7,7 +7,7 @@ using Services.ApiModels;
 using Services.ApiModels.Account;
 using Services.ApiModels.Station;
 
-namespace Services.Services.Station
+namespace Services.Services.StationService
 {
     public interface IStationService
     {
