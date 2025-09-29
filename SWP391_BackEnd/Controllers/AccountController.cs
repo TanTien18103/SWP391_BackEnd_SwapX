@@ -153,5 +153,13 @@ namespace Services.Controllers
             var res = await _accountService.UpdateCustomer(updateCustomerRequest);
             return StatusCode(res.StatusCode, res);
         }
+
+        [HttpPut("update_current_profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateCurrentProfile([FromForm] UpdateProfileRequest updateProfileRequest)
+        {
+            var res = await _accountService.UpdateCurrentProfile(updateProfileRequest);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

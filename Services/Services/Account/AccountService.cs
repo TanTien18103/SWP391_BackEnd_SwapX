@@ -785,6 +785,80 @@ namespace Services.Services.Account
                 };
             }
         }
+
+        public async Task<ResultModel> UpdateCurrentProfile(UpdateProfileRequest updateProfileRequest)
+        {
+            try
+            {
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                    || string.IsNullOrEmpty(authHeader)
+                    || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepository.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var existingAccount = await _accountRepository.GetAccountById(accountId);
+                if (existingAccount == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageIdentity.ACCOUNT_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                // Only update if the field is not null
+                if (updateProfileRequest.Name != null)
+                    existingAccount.Name = updateProfileRequest.Name;
+                if (updateProfileRequest.Phone != null)
+                    existingAccount.Phone = updateProfileRequest.Phone;
+                if (updateProfileRequest.Address != null)
+                    existingAccount.Address = updateProfileRequest.Address;
+                if (updateProfileRequest.Email != null)
+                    existingAccount.Email = updateProfileRequest.Email;
+
+                existingAccount.UpdateDate = TimeHepler.SystemTimeNow;
+                await _accountRepository.UpdateAccount(existingAccount);
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
+                    Data = existingAccount,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
     }
 }
 

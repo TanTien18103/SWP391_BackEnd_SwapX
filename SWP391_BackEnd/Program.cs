@@ -19,6 +19,8 @@ using Services.Helpers;
 using Account = CloudinaryDotNet.Account;
 using Repositories.Repositories.Station;
 using Services.Services.Station;
+using Repositories.Repositories.Form;
+using Services.Services.Form;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,6 +90,8 @@ builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IStationRepo, StationRepo>();
+builder.Services.AddScoped<IFormRepo, FormRepo>();
+
 
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -96,6 +100,7 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPayOSService, PayOSService>();
 builder.Services.AddScoped<IStationService, StationService>();
+builder.Services.AddScoped<IFormService, FormService>();
 
 
 //Register Helper

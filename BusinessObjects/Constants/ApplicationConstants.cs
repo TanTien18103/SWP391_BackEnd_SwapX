@@ -171,4 +171,25 @@ namespace BusinessObjects.Constants
         public const string NewPasswordSubject = "Mật khẩu mới của bạn";
         public const string NewPasswordBodyTemplate = "Mật khẩu mới của bạn là: <b>{0}</b>. Hãy đăng nhập và đổi mật khẩu ngay.";
     }
+
+    public static class ResponseMessageConstantsForm
+    {
+        public const string FORM_NOT_FOUND = "Không tìm thấy biểu mẫu";
+        public const string FORM_EXISTED = "Biểu mẫu đã tồn tại";
+        public const string ADD_FORM_SUCCESS = "Thêm biểu mẫu thành công";
+        public const string UPDATE_FORM_SUCCESS = "Cập nhật biểu mẫu thành công";
+        public const string DELETE_FORM_SUCCESS = "Xóa biểu mẫu thành công";
+        public const string FORM_INACTIVE = "Biểu mẫu đã bị ngừng hoạt động";
+        public const string GET_FORM_LIST_SUCCESS = "Lấy danh sách biểu mẫu thành công";
+        public const string GET_FORM_DETAIL_SUCCESS = "Lấy chi tiết biểu mẫu thành công";
+        public const string ADD_FORM_FAIL = "Thêm biểu mẫu thất bại";
+        public const string GET_ALL_FORM_FAIL = "Lấy danh sách biểu mẫu thất bại";
+        public const string FORM_LIST_EMPTY = "Lấy danh sách biểu mẫu thất bại";
+        public const string GET_ALL_FORM_SUCCESS = "Lấy danh sách biểu mẫu thành công";
+        public const string UPDATE_FORM_FAILED = "Cập nhật biểu mẫu thất bại";
+        public const string GET_FORM_FAIL = "Lấy biểu mẫu thất bại";
+        public const string GET_FORM_SUCCESS = "Lấy biểu mẫu thành công";
+        public const string DELETE_FORM_FAILED = "Xóa biểu mẫu thất bại";
+        public const string INVALID_FORM_DATE = "Ngày biểu mẫu không hợp lệ";
+    }
 }
