@@ -726,7 +726,7 @@ namespace Services.Services.Account
                 };
             }
         }
-        
+
         public async Task<ResultModel> UpdateCustomer(UpdateCustomerRequest updateCustomerRequest)
         {
             try
@@ -773,7 +773,7 @@ namespace Services.Services.Account
                 };
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new ResultModel
                 {
