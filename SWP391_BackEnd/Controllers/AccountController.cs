@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Repositories.Repositories.Account;
+using Repositories.Repositories.AccountRepo;
 using Services.ApiModels.Account;
-using Services.Services.Account;
+using Services.Services.AccountService;
 
 namespace Services.Controllers
 {
@@ -12,12 +12,10 @@ namespace Services.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        private readonly IAccountRepo _accountRepo;
 
-        public AccountController(IAccountService accountService, IAccountRepo accountRepo)
+        public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
-            _accountRepo = accountRepo;
         }
 
         [HttpPost("login")]

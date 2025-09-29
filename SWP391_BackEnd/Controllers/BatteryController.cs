@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Services.Services.Battery;
+using Services.Services.BatteryService;
 
 namespace SWP391_BackEnd.Controllers
 {

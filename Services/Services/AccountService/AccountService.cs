@@ -6,11 +6,11 @@ using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Repositories.Repositories.Account;
-using Repositories.Repositories.EvDriver;
+using Repositories.Repositories.AccountRepo;
+using Repositories.Repositories.EvDriverRepo;
 using Services.ApiModels;
 using Services.ApiModels.Account;
-using Services.Services.Email;
+using Services.Services.EmailService;
 using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Services.Account
+namespace Services.Services.AccountService
 {
     public class AccountService : IAccountService
     {

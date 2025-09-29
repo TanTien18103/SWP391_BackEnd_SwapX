@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Services.ApiModels.Battery;
 using Services.ApiModels;
 
-namespace Services.Services.Battery
+namespace Services.Services.BatteryService
 {
     public interface IBatteryService
     {

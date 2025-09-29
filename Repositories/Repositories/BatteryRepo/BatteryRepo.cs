@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repositories.Repositories.Battery
+namespace Repositories.Repositories.BatteryRepo
 {
     public class BatteryRepo : IBatteryRepo
     {
@@ -15,30 +15,30 @@ namespace Repositories.Repositories.Battery
         {
             _context = context;
         }
-        public async Task<BusinessObjects.Models.Battery> AddBattery(BusinessObjects.Models.Battery battery)
+        public async Task<Battery> AddBattery(Battery battery)
         {
             _context.Batteries.Add(battery);
             await _context.SaveChangesAsync();
             return battery;
         }
 
-        public async Task<List<BusinessObjects.Models.Battery>> GetAllBatteries()
+        public async Task<List<Battery>> GetAllBatteries()
         {
            return await _context.Batteries.ToListAsync();
 
         }
 
-        public async Task<BusinessObjects.Models.Battery> GetBatteriesByStationId(string stationId)
+        public async Task<Battery> GetBatteriesByStationId(string stationId)
         {
             return await _context.Batteries.FirstOrDefaultAsync(b => b.StationId == stationId);
         }
 
-        public async Task<BusinessObjects.Models.Battery> GetBatteryById(string batteryId)
+        public async Task<Battery> GetBatteryById(string batteryId)
         {
             return await _context.Batteries.FirstOrDefaultAsync(b => b.BatteryId == batteryId);
         }
 
-        public async Task<BusinessObjects.Models.Battery> UpdateBattery(BusinessObjects.Models.Battery battery)
+        public async Task<Battery> UpdateBattery(Battery battery)
         {
             _context.Batteries.Update(battery);
             await _context.SaveChangesAsync();

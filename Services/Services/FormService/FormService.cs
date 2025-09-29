@@ -4,7 +4,8 @@ using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Repositories.Repositories.Form;
+using Repositories.Repositories.FormRepo;
+using Repositories.Repositories.StationRepo;
 using Services.ApiModels;
 using Services.ApiModels.Form;
 using Services.ServicesHelpers;
@@ -14,7 +15,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Services.Form
+namespace Services.Services.FormService
 {
     public class FormService : IFormService
     {
@@ -22,15 +23,15 @@ namespace Services.Services.Form
         private readonly AccountHelper _accountHelper;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        private readonly IStationRepo _stationRepo;
+        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IStationRepo stationRepo)
         {
             _formRepo = formRepo;
             _accountHelper = accountHelper;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _stationRepo = stationRepo;
         }
-
         public async Task<ResultModel> AddForm(AddFormRequest addFormRequest)
         {
             try
@@ -45,8 +46,19 @@ namespace Services.Services.Form
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
+                var station = await _stationRepo.GetStationById(addFormRequest.StationId);
+                if (station == null) {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
 
-                var form = new BusinessObjects.Models.Form
+                var form = new Form
                 {
                     FormId = _accountHelper.GenerateShortGuid(),
                     AccountId = addFormRequest.AccountId,
