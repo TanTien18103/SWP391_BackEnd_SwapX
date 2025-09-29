@@ -22,6 +22,8 @@ using Services.ServicesHelpers;
 using System.Text;
 using System.Text.Json.Serialization;
 using Account = CloudinaryDotNet.Account;
+using Repositories.Repositories.Form;
+using Services.Services.Form;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -98,6 +100,7 @@ builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IStationRepo, StationRepo>();
+builder.Services.AddScoped<IFormRepo, FormRepo>();
 builder.Services.AddScoped<IBatteryRepo, BatteryRepo>();
 
 // Register Services
@@ -107,6 +110,7 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPayOSService, PayOSService>();
 builder.Services.AddScoped<IStationService, StationService>();
+builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IBatteryService, BatteryService>();
 
 
