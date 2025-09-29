@@ -180,8 +180,8 @@ namespace BusinessObjects.Constants
         public static string GET_BATTERY_FAIL = "Lấy pin thất bại";
         public static string GET_BATTERY_SUCCESS = "Lấy pin thành công";
         public static string DELETE_BATTERY_FAILED = "Xóa pin thất bại";
-
-        
+        public static string ADD_BATTERY_IN_STATION_FAILED = "Thêm pin vào trạm thất bại";
+        public static string ADD_BATTERY_IN_STATION_SUCCESS = "Thêm pin vào trạm thành công";
     }
     public static class EmailConstants
     {
