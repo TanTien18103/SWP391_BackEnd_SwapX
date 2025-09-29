@@ -161,6 +161,28 @@ namespace BusinessObjects.Constants
         public static string GET_STATION_SUCCESS = "Lấy trạm thành công";
         public static string DELETE_STATION_FAILED = "Xóa trạm thất bại";
     }
+    // For battery (0-0-1)
+    public class ResponseMessageConstantsBattery
+    {
+        public const string BATTERY_NOT_FOUND = "Không tìm thấy pin";
+        public const string BATTERY_EXISTED = "Pin đã tồn tại";
+        public const string ADD_BATTERY_SUCCESS = "Thêm pin thành công";
+        public const string UPDATE_BATTERY_SUCCESS = "Cập nhật pin thành công";
+        public const string DELETE_BATTERY_SUCCESS = "Xóa pin thành công";
+        public const string BATTERY_INACTIVE = "Pin đã bị ngừng hoạt động";
+        public const string GET_BATTERY_LIST_SUCCESS = "Lấy danh sách pin thành công";
+        public const string GET_BATTERY_DETAIL_SUCCESS = "Lấy chi tiết pin thành công";
+        public static string ADD_BATTERY_FAIL = "Thêm pin thất bại";
+        public static string GET_ALL_BATTERY_FAIL = "Lấy danh sách pin thất bại";
+        public static string BATTERY_LIST_EMPTY = "Lấy danh sách pin thất bại";
+        public static string GET_ALL_BATTERY_SUCCESS = "Lấy danh sách pin thành công";
+        public static string UPDATE_BATTERY_FAILED = "Cập nhật pin thất bại";
+        public static string GET_BATTERY_FAIL = "Lấy pin thất bại";
+        public static string GET_BATTERY_SUCCESS = "Lấy pin thành công";
+        public static string DELETE_BATTERY_FAILED = "Xóa pin thất bại";
+
+        
+    }
     public static class EmailConstants
     {
         // OTP
