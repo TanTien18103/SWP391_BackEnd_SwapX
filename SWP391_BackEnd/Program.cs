@@ -1,27 +1,37 @@
+using BusinessObjects.AppSettings;
 using BusinessObjects.Models;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Net.payOS;
 using Repositories.Repositories.Account;
+using Repositories.Repositories.Battery;
 using Repositories.Repositories.EvDriver;
+using Repositories.Repositories.OrderRepo;
+using Repositories.Repositories.Station;
+using Services;
+using Services.Helpers;
+using Services.Services;
 using Services.Services.Account;
+using Services.Services.Battery;
 using Services.Services.Email;
+using Services.Services.Station;
 using Services.ServicesHelpers;
 using System.Text;
-using BusinessObjects.AppSettings;
-using CloudinaryDotNet;
-using Net.payOS;
-using Repositories.Repositories.OrderRepo;
-using Services;
-using Services.Services;
-using Services.Helpers;
+using System.Text.Json.Serialization;
 using Account = CloudinaryDotNet.Account;
-using Repositories.Repositories.Station;
-using Services.Services.Station;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 //Add Cloud setting
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
@@ -88,6 +98,7 @@ builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IStationRepo, StationRepo>();
+builder.Services.AddScoped<IBatteryRepo, BatteryRepo>();
 
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -96,6 +107,7 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPayOSService, PayOSService>();
 builder.Services.AddScoped<IStationService, StationService>();
+builder.Services.AddScoped<IBatteryService, BatteryService>();
 
 
 //Register Helper

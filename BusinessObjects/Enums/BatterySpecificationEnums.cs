@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.Enums
 {
-    public enum BatteryCapacityEnums
+    public enum BatterySpecificationEnums
     {
         [Description("48V-12Ah")]
         V48_Ah12,
