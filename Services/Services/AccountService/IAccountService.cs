@@ -16,6 +16,7 @@ namespace Services.Services.AccountService
         Task<ResultModel> ForgotPasswordVerifyOtp(string email, string otp);
         Task<ResultModel> ChangePassword(ChangePasswordRequest request);
         Task<string> Register(RegisterRequest registerRequest);
+        Task<ResultModel> CreateAdmin(RegisterRequest registerRequest);
         Task<ResultModel> CreateStaff(RegisterRequest registerRequest);
         Task<ResultModel> UpdateStaff(UpdateStaffRequest updateStaffRequest);
         Task<ResultModel> GetAllAccounts();
@@ -27,6 +28,6 @@ namespace Services.Services.AccountService
         Task<ResultModel> GetCurrentUser();
         Task<ResultModel> UpdateCurrentProfile(UpdateProfileRequest updateProfileRequest);
         Task<ResultModel> UpdateCustomer(UpdateCustomerRequest updateCustomerRequest);
-
+        Task<ResultModel> UpdateStatus(UpdateStatusRequest updateStatusRequest);
     }
 }

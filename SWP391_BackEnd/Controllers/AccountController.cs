@@ -68,6 +68,22 @@ namespace Services.Controllers
             return StatusCode(res.StatusCode, res);
         }
 
+
+        [HttpPost("create_admin")]
+        public async Task<IActionResult> CreateAdmin([FromForm] RegisterRequest registerRequest)
+        {
+            var res = await _accountService.CreateAdmin(registerRequest);
+            return StatusCode(res.StatusCode, res);
+        }
+
+        [HttpPut("update_status")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateStatus([FromForm] UpdateStatusRequest updateStatusRequest)
+        {
+            var res = await _accountService.UpdateStatus(updateStatusRequest);
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpPost("create_staff_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStaffForAdmin([FromForm] RegisterRequest registerRequest)
