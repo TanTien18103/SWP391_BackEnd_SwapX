@@ -221,4 +221,26 @@ namespace BusinessObjects.Constants
         public const string DELETE_FORM_FAILED = "Xóa biểu mẫu thất bại";
         public const string INVALID_FORM_DATE = "Ngày biểu mẫu không hợp lệ";
     }
+    // For Package (0-0-1)
+    public static class ResponseMessageConstantsPackage
+    {
+        public const string PACKAGE_NOT_FOUND = "Không tìm thấy gói";
+        public const string PACKAGE_EXISTED = "Gói đã tồn tại";
+        public const string ADD_PACKAGE_SUCCESS = "Thêm gói thành công";
+        public const string UPDATE_PACKAGE_SUCCESS = "Cập nhật gói thành công";
+        public const string DELETE_PACKAGE_SUCCESS = "Xóa gói thành công";
+        public const string PACKAGE_INACTIVE = "Gói đã bị ngừng hoạt động";
+        public const string GET_PACKAGE_LIST_SUCCESS = "Lấy danh sách gói thành công";
+        public const string GET_PACKAGE_DETAIL_SUCCESS = "Lấy chi tiết gói thành công";
+        public const string ADD_PACKAGE_FAIL = "Thêm gói thất bại";
+        public const string GET_ALL_PACKAGE_FAIL = "Lấy danh sách gói thất bại";
+        public const string PACKAGE_LIST_EMPTY = "Lấy danh sách gói thất bại";
+        public const string GET_ALL_PACKAGE_SUCCESS = "Lấy danh sách gói thành công";
+        public const string UPDATE_PACKAGE_FAILED = "Cập nhật gói thất bại";
+        public const string GET_PACKAGE_FAIL = "Lấy gói thất bại";
+        public const string GET_PACKAGE_SUCCESS = "Lấy gói thành công";
+        public const string DELETE_PACKAGE_FAILED = "Xóa gói thất bại";
+
+
+    }
 }
