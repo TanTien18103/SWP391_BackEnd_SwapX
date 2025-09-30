@@ -10,7 +10,7 @@ namespace Services.ApiModels.Battery
     public class AddBatteryInStationRequest
     {
         
-        public string BatteryId { get; set; }
+        public string? BatteryId { get; set; }
         [Required]
         public string StationId { get; set; }
     }

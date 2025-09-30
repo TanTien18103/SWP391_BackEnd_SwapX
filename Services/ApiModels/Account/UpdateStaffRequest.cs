@@ -9,7 +9,7 @@ namespace Services.ApiModels.Account
 {
     public class UpdateStaffRequest
     {
-        public string AccountId { get; set; }
+        public string? AccountId { get; set; }
         [RegularExpression(@"^[\p{L} ]+$", ErrorMessage = "Tên không được chứa số và các ký tự đặc biệt")]
         public string? Name { get; set; }
         public string? Phone { get; set; }
