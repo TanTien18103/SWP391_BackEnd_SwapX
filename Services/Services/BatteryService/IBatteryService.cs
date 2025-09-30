@@ -15,5 +15,7 @@ namespace Services.Services.BatteryService
         Task<ResultModel> UpdateBattery(UpdateBatteryRequest updateBatteryRequest);
         Task<ResultModel> GetAllBatteries();
         Task<ResultModel> GetBatteriesByStationId(string stationId);
+        Task<ResultModel> DeleteBattery(string batteryId);
+        Task<ResultModel> addBatteryInStation(AddBatteryInStationRequest addBatteryInStationRequest);
     }
 }
