@@ -24,12 +24,12 @@ namespace Repositories.Repositories.StationRepo
         }
         public async Task<List<Station>> GetAllStations()
         {
-            return await _context.Stations.ToListAsync();
+            return await _context.Stations.Include(b=>b.Batteries).ToListAsync();
         }
 
         public async Task<Station> GetStationById(string stationId)
         {
-              return await _context.Stations.FirstOrDefaultAsync(s => s.StationId == stationId);
+              return await _context.Stations.Include(b=>b.Batteries).FirstOrDefaultAsync(s => s.StationId == stationId);
         }
 
         public async Task<Station> UpdateStation(Station station)
