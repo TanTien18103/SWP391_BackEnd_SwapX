@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ApiModels\Package\" />
     <Folder Include="Mapper\" />
   </ItemGroup>
 

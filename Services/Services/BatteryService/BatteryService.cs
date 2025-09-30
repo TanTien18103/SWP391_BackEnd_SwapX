@@ -82,12 +82,36 @@ namespace Services.Services.BatteryService
             try
             {
                 var batteries = await _batteryRepo.GetAllBatteries();
+
+                var response = batteries.Select(b => new
+                {
+                    BatteryId = b.BatteryId,
+                    Status = b.Status,
+                    Capacity = b.Capacity,
+                    BatteryType = b.BatteryType,
+                    Specification = b.Specification,
+                    BatteryQuality = b.BatteryQuality,
+                    StartDate = b.StartDate,
+                    UpdateDate = b.UpdateDate,
+                    Station = b.Station == null ? null : new
+                    {
+                        StationId = b.Station.StationId,
+                        Location = b.Station.Location,
+                        Status = b.Station.Status,
+                        Rating = b.Station.Rating,
+                        BatteryNumber = b.Station.BatteryNumber,
+                        StartDate = b.Station.StartDate,
+                        UpdateDate = b.Station.UpdateDate
+                        // KHÔNG có trường Batteries ở đây!
+                    }
+                }).ToList();
+
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsBattery.GET_BATTERY_LIST_SUCCESS,
-                    Data = batteries,
+                    Data = response,
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -150,8 +174,8 @@ namespace Services.Services.BatteryService
         {
             try
             {
-                var battery = await _batteryRepo.GetBatteryById(batteryId);
-                if (battery == null)
+                var b = await _batteryRepo.GetBatteryById(batteryId);
+                if (b == null)
                 {
                     return new ResultModel
                     {
@@ -162,15 +186,39 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+
+                // Map sang object mới, station chỉ chứa thông tin cơ bản, không có batteries
+                var response = new
+                {
+                    BatteryId = b.BatteryId,
+                    Status = b.Status,
+                    Capacity = b.Capacity,
+                    BatteryType = b.BatteryType,
+                    Specification = b.Specification,
+                    BatteryQuality = b.BatteryQuality,
+                    StartDate = b.StartDate,
+                    UpdateDate = b.UpdateDate,
+                    Station = b.Station == null ? null : new
+                    {
+                        StationId = b.Station.StationId,
+                        Location = b.Station.Location,
+                        Status = b.Station.Status,
+                        Rating = b.Station.Rating,
+                        BatteryNumber = b.Station.BatteryNumber,
+                        StartDate = b.Station.StartDate,
+                        UpdateDate = b.Station.UpdateDate
+                        // KHÔNG có trường Batteries ở đây!
+                    }
+                };
+
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsBattery.GET_BATTERY_SUCCESS,
-                    Data = battery,
+                    Data = response,
                     StatusCode = StatusCodes.Status200OK
                 };
-
             }
             catch (Exception ex)
             {
@@ -311,13 +359,41 @@ namespace Services.Services.BatteryService
                 }
                 existingBattery.StationId = addBatteryInStationRequest.StationId;
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
-                var updateStation = await _batteryRepo.UpdateBattery(existingBattery);
+                var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+
+                // Lấy lại battery đã cập nhật, include station
+                var batteryDetail = await _batteryRepo.GetBatteryById(updatedBattery.BatteryId);
+
+                // Map sang object giống GetBatteryById
+                var response = new
+                {
+                    BatteryId = batteryDetail.BatteryId,
+                    Status = batteryDetail.Status,
+                    Capacity = batteryDetail.Capacity,
+                    BatteryType = batteryDetail.BatteryType,
+                    Specification = batteryDetail.Specification,
+                    BatteryQuality = batteryDetail.BatteryQuality,
+                    StartDate = batteryDetail.StartDate,
+                    UpdateDate = batteryDetail.UpdateDate,
+                    Station = batteryDetail.Station == null ? null : new
+                    {
+                        StationId = batteryDetail.Station.StationId,
+                        Location = batteryDetail.Station.Location,
+                        Status = batteryDetail.Station.Status,
+                        Rating = batteryDetail.Station.Rating,
+                        BatteryNumber = batteryDetail.Station.BatteryNumber,
+                        StartDate = batteryDetail.Station.StartDate,
+                        UpdateDate = batteryDetail.Station.UpdateDate
+                        // KHÔNG có trường Batteries!
+                    }
+                };
+
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsBattery.ADD_BATTERY_IN_STATION_SUCCESS,
-                    Data = updateStation,
+                    Data = response,
                     StatusCode = StatusCodes.Status200OK
                 };
             }
