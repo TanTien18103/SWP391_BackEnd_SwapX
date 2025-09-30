@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Services.BatteryService;
 
@@ -20,13 +21,13 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get-battery-by-id")]
-        public async Task<IActionResult> GetBatteryById([FromQuery] string batteryId)
+        public async Task<IActionResult> GetBatteryById([FromQuery] string? batteryId)
         {
             var res = await _batteryService.GetBatteryById(batteryId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete-battery")]
-        public async Task<IActionResult> DeleteBattery([FromForm] string batteryId)
+        public async Task<IActionResult> DeleteBattery([FromForm] string? batteryId)
         {
             var res = await _batteryService.DeleteBattery(batteryId);
             return StatusCode(res.StatusCode, res);
@@ -44,6 +45,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get-all-batteries")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllBatteries()
         {
             var res = await _batteryService.GetAllBatteries();

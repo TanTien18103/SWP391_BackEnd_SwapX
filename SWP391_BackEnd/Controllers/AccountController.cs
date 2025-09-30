@@ -124,7 +124,7 @@ namespace Services.Controllers
 
         [HttpGet("get_account_by_id/{accountId}_for_admin")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAccountById(string accountId)
+        public async Task<IActionResult> GetAccountById(string? accountId)
         {
             var res = await _accountService.GetAccountById(accountId);
             return StatusCode(res.StatusCode, res);
@@ -148,14 +148,14 @@ namespace Services.Controllers
         }
         [HttpPut("delete_staff_for_admin/{accountId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteStaff(string accountId)
+        public async Task<IActionResult> DeleteStaff(string? accountId)
         {
             var res = await _accountService.DeleteStaff(accountId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete_customer_for_admin/{accountId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteCustomer(string accountId)
+        public async Task<IActionResult> DeleteCustomer(string? accountId)
         {
             var res = await _accountService.DeleteCustomer(accountId);
             return StatusCode(res.StatusCode, res);
