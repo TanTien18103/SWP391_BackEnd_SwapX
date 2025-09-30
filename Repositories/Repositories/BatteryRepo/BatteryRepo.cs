@@ -24,7 +24,7 @@ namespace Repositories.Repositories.BatteryRepo
 
         public async Task<List<Battery>> GetAllBatteries()
         {
-           return await _context.Batteries.ToListAsync();
+           return await _context.Batteries.Include(b=>b.Station).ToListAsync();
 
         }
 
@@ -35,7 +35,7 @@ namespace Repositories.Repositories.BatteryRepo
 
         public async Task<Battery> GetBatteryById(string batteryId)
         {
-            return await _context.Batteries.FirstOrDefaultAsync(b => b.BatteryId == batteryId);
+            return await _context.Batteries.Include(b=>b.Station).FirstOrDefaultAsync(b => b.BatteryId == batteryId);
         }
 
         public async Task<Battery> UpdateBattery(Battery battery)

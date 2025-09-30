@@ -1,18 +1,19 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Configuration;
 using BusinessObjects.Constants;
 using BusinessObjects.Enums;
+using BusinessObjects.Models;
+using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.StationRepo;
 using Services.ApiModels;
 using Services.ApiModels.Station;
+using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BusinessObjects.TimeCoreHelper;
-using Services.ServicesHelpers;
 
 namespace Services.Services.StationService
 {
@@ -74,7 +75,7 @@ namespace Services.Services.StationService
         {
             try
             {
-                var stations = _stationRepository.GetAllStations().Result;
+                var stations = await _stationRepository.GetAllStations();
                 if (stations == null || stations.Count == 0)
                 {
                     return new ResultModel
@@ -86,12 +87,37 @@ namespace Services.Services.StationService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+
+                // Map sang object mới, ẩn trường station trong từng battery
+                var response = stations.Select(station => new
+                {
+                    StationId = station.StationId,
+                    Location = station.Location,
+                    Status = station.Status,
+                    Rating = station.Rating,
+                    BatteryNumber = station.BatteryNumber,
+                    StartDate = station.StartDate,
+                    UpdateDate = station.UpdateDate,
+                    Batteries = station.Batteries.Select(b => new
+                    {
+                        BatteryId = b.BatteryId,
+                        Status = b.Status,
+                        Capacity = b.Capacity,
+                        BatteryType = b.BatteryType,
+                        Specification = b.Specification,
+                        BatteryQuality = b.BatteryQuality,
+                        StartDate = b.StartDate,
+                        UpdateDate = b.UpdateDate
+                        // KHÔNG có trường station ở đây!
+                    }).ToList()
+                }).ToList();
+
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsStation.GET_ALL_STATION_SUCCESS,
-                    Data = stations,
+                    Data = response,
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -111,7 +137,6 @@ namespace Services.Services.StationService
 
         public async Task<ResultModel> GetStationById(string stationId)
         {
-
             try
             {
                 var station = await _stationRepository.GetStationById(stationId);
@@ -126,12 +151,37 @@ namespace Services.Services.StationService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+
+                // Map sang object mới, ẩn trường station trong từng battery
+                var response = new
+                {
+                    StationId = station.StationId,
+                    Location = station.Location,
+                    Status = station.Status,
+                    Rating = station.Rating,
+                    BatteryNumber = station.BatteryNumber,
+                    StartDate = station.StartDate,
+                    UpdateDate = station.UpdateDate,
+                    Batteries = station.Batteries.Select(b => new
+                    {
+                        BatteryId = b.BatteryId,
+                        Status = b.Status,
+                        Capacity = b.Capacity,
+                        BatteryType = b.BatteryType,
+                        Specification = b.Specification,
+                        BatteryQuality = b.BatteryQuality,
+                        StartDate = b.StartDate,
+                        UpdateDate = b.UpdateDate
+                        // KHÔNG có trường station ở đây!
+                    }).ToList()
+                };
+
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsStation.GET_STATION_SUCCESS,
-                    Data = station,
+                    Data = response,
                     StatusCode = StatusCodes.Status200OK
                 };
             }
