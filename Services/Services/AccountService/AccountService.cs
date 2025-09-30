@@ -1029,6 +1029,16 @@ namespace Services.Services.AccountService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+                if (existingUser.Role == RoleEnums.Admin.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsUser.CANNOT_CHANGE_ADMIN_STATUS,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
 
                 if (existingUser.Status == updateStatusRequest.Status.ToString())
                 {

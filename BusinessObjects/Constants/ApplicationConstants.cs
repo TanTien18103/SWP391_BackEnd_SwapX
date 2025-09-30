@@ -138,6 +138,7 @@ namespace BusinessObjects.Constants
         public const string INVALID_STATUS = "Trạng thái không hợp lệ";
         public const string UPDATE_STATUS_SUCCESS = "Cập nhật trạng thái người dùng thành công";
         public const string STATUS_NOT_CHANGED = "Trạng thái người dùng không thay đổi";
+        public const string CANNOT_CHANGE_ADMIN_STATUS = "Không thể thay đổi trạng thái của quản trị viên";
     }
     public class ResponseMessageImage
     {
