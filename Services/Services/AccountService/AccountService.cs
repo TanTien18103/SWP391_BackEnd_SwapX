@@ -43,12 +43,30 @@ namespace Services.Services.AccountService
 
         public async Task<(string accessToken, string refreshToken)> Login(string username, string password)
         {
-            var user = await _accountRepository.GetAccountByUserName(username);
-            if (user == null)
-                throw new AppException(ResponseCodeConstants.NOT_FOUND, ResponseMessageConstantsUser.USER_NOT_FOUND, StatusCodes.Status404NotFound);
+            var users = await _accountRepository.GetAccountsByUserName(username);
+            if (users == null || !users.Any())
+            {
+                throw new AppException(ResponseCodeConstants.NOT_FOUND,
+                    ResponseMessageConstantsUser.USER_NOT_FOUND,
+                    StatusCodes.Status404NotFound);
+            }
+
+            // Nếu nhiều user trùng username -> lỗi
+            if (users.Count > 1)
+            {
+                throw new AppException(ResponseCodeConstants.BAD_REQUEST,
+                    ResponseMessageConstantsUser.USERNAME_DUPLICATED,
+                    StatusCodes.Status400BadRequest);
+            }
+
+            var user = users.First();
 
             if (!_accountHelper.VerifyPassword(password, user.Password))
-                throw new AppException(ResponseCodeConstants.BAD_REQUEST, ResponseMessageIdentity.PASSWORD_INVALID, StatusCodes.Status400BadRequest);
+            {
+                throw new AppException(ResponseCodeConstants.BAD_REQUEST,
+                    ResponseMessageIdentity.PASSWORD_INVALID,
+                    StatusCodes.Status400BadRequest);
+            }
             string accessToken = _accountHelper.CreateToken(user);
             string refreshToken = _accountHelper.GenerateRefreshToken();
 
@@ -63,13 +81,26 @@ namespace Services.Services.AccountService
 
         public async Task<string> Register(RegisterRequest registerRequest)
         {
-            var existingUser = await _accountRepository.GetAccountByUserName(registerRequest.Username);
-            if (existingUser != null)
-                throw new AppException(ResponseCodeConstants.EXISTED, ResponseMessageIdentity.EXISTED_USERNAME, StatusCodes.Status400BadRequest);
+            // Check username (chỉ cấm khi có user Active)
+            var usersWithSameUsername = await _accountRepository.GetAccountsByUserName(registerRequest.Username);
+            if (usersWithSameUsername.Any(u => u.Status == AccountStatusEnums.Active.ToString()))
+            {
+                throw new AppException(ResponseCodeConstants.EXISTED,
+                    ResponseMessageIdentity.EXISTED_USERNAME,
+                    StatusCodes.Status400BadRequest);
+            }
 
+            // Check email (chỉ cấm khi có user Active)
+            var usersWithSameEmail = await _accountRepository.GetAccountsByEmail(registerRequest.Email);
+            if (usersWithSameEmail.Any(u => u.Status == AccountStatusEnums.Active.ToString()))
+            {
+                throw new AppException(ResponseCodeConstants.EXISTED,
+                    ResponseMessageIdentity.EMAIL_IN_USE,
+                    StatusCodes.Status400BadRequest);
+            }
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
 
-            var newUser = new BusinessObjects.Models.Account
+            var newUser = new Account
             {
                 AccountId = _accountHelper.GenerateShortGuid(),
                 Username = registerRequest.Username,
@@ -113,13 +144,26 @@ namespace Services.Services.AccountService
         {
             try
             {
-                var existingUser = await _accountRepository.GetAccountByUserName(registerRequest.Username);
-                if (existingUser != null)
-                    throw new AppException(ResponseCodeConstants.EXISTED, ResponseMessageIdentity.EXISTED_USERNAME, StatusCodes.Status400BadRequest);
+                var usersWithSameUsername = await _accountRepository.GetAccountsByUserName(registerRequest.Username);
+                if (usersWithSameUsername.Any(u => u.Status == AccountStatusEnums.Active.ToString()))
+                {
+                    throw new AppException(ResponseCodeConstants.EXISTED,
+                        ResponseMessageIdentity.EXISTED_USERNAME,
+                        StatusCodes.Status400BadRequest);
+                }
+
+                // Check email (chỉ cấm khi có user Active)
+                var usersWithSameEmail = await _accountRepository.GetAccountsByEmail(registerRequest.Email);
+                if (usersWithSameEmail.Any(u => u.Status == AccountStatusEnums.Active.ToString()))
+                {
+                    throw new AppException(ResponseCodeConstants.EXISTED,
+                        ResponseMessageIdentity.EMAIL_IN_USE,
+                        StatusCodes.Status400BadRequest);
+                }
 
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
 
-                var newUser = new BusinessObjects.Models.Account
+                var newUser = new Account
                 {
                     AccountId = _accountHelper.GenerateShortGuid(),
                     Username = registerRequest.Username,
@@ -478,8 +522,9 @@ namespace Services.Services.AccountService
             var res = new ResultModel();
             try
             {
-                var user = await _accountRepository.GetAccountByEmail(email);
-                if (user == null)
+                var accounts = await _accountRepository.GetAccountsByEmail(email);
+
+                if (accounts == null || !accounts.Any())
                 {
                     res.IsSuccess = false;
                     res.ResponseCode = ResponseCodeConstants.NOT_FOUND;
@@ -487,13 +532,34 @@ namespace Services.Services.AccountService
                     res.StatusCode = StatusCodes.Status404NotFound;
                     return res;
                 }
+
+                var activeUser = accounts.FirstOrDefault(a => a.Status == AccountStatusEnums.Active.ToString());
+
+                if (activeUser == null)
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.NOT_FOUND;
+                    res.Message = ResponseMessageIdentity.INCORRECT_EMAIL;
+                    res.StatusCode = StatusCodes.Status404NotFound;
+                    return res;
+                }
+
+                if (accounts.Count(a => a.Status == AccountStatusEnums.Active.ToString()) > 1)
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.BAD_REQUEST;
+                    res.Message = ResponseMessageIdentity.DUPLICATED_EMAIL;
+                    res.StatusCode = StatusCodes.Status400BadRequest;
+                    return res;
+                }
+
                 var random = new Random();
                 string otp = random.Next(100000, 999999).ToString();
 
-                user.OtpCode = otp;
-                user.OtpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(5);
-                user.UpdateDate = TimeHepler.SystemTimeNow;
-                await _accountRepository.UpdateAccount(user);
+                activeUser.OtpCode = otp;
+                activeUser.OtpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(5);
+                activeUser.UpdateDate = TimeHepler.SystemTimeNow;
+                await _accountRepository.UpdateAccount(activeUser);
 
                 string subject = EmailConstants.OtpSubject;
                 string body = string.Format(EmailConstants.OtpBodyTemplate, otp);
@@ -521,8 +587,9 @@ namespace Services.Services.AccountService
             var res = new ResultModel();
             try
             {
-                var user = await _accountRepository.GetAccountByEmail(email);
-                if (user == null)
+                var accounts = await _accountRepository.GetAccountsByEmail(email);
+
+                if (accounts == null || !accounts.Any())
                 {
                     res.IsSuccess = false;
                     res.ResponseCode = ResponseCodeConstants.NOT_FOUND;
@@ -530,6 +597,28 @@ namespace Services.Services.AccountService
                     res.StatusCode = StatusCodes.Status404NotFound;
                     return res;
                 }
+
+                var activeUsers = accounts.Where(a => a.Status == AccountStatusEnums.Active.ToString()).ToList();
+
+                if (!activeUsers.Any())
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.NOT_FOUND;
+                    res.Message = ResponseMessageIdentity.INCORRECT_EMAIL;
+                    res.StatusCode = StatusCodes.Status404NotFound;
+                    return res;
+                }
+
+                if (activeUsers.Count > 1)
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.BAD_REQUEST;
+                    res.Message = ResponseMessageIdentity.DUPLICATED_EMAIL;
+                    res.StatusCode = StatusCodes.Status400BadRequest;
+                    return res;
+                }
+
+                var user = activeUsers.First();
 
                 if (user.OtpExpiredTime < TimeHepler.SystemTimeNow)
                 {
@@ -847,6 +936,165 @@ namespace Services.Services.AccountService
                     Data = existingAccount,
                     StatusCode = StatusCodes.Status200OK
                 };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> CreateAdmin(RegisterRequest registerRequest)
+        {
+            try
+            {
+                var usersByUsername = await _accountRepository.GetAccountsByUserName(registerRequest.Username);
+                if (usersByUsername.Any(u => u.Status == AccountStatusEnums.Active.ToString()))
+                {
+                    throw new AppException(
+                        ResponseCodeConstants.EXISTED,
+                        ResponseMessageIdentity.EXISTED_USERNAME,
+                        StatusCodes.Status400BadRequest
+                    );
+                }
+
+                var usersByEmail = await _accountRepository.GetAccountsByEmail(registerRequest.Email);
+                if (usersByEmail.Any(u => u.Status == AccountStatusEnums.Active.ToString()))
+                {
+                    throw new AppException(
+                        ResponseCodeConstants.EXISTED,
+                        ResponseMessageIdentity.EMAIL_IN_USE,
+                        StatusCodes.Status400BadRequest
+                    );
+                }
+
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
+
+                var newUser = new Account
+                {
+                    AccountId = _accountHelper.GenerateShortGuid(),
+                    Username = registerRequest.Username,
+                    Password = hashedPassword,
+                    Name = registerRequest.Name,
+                    Phone = registerRequest.Phone,
+                    Address = registerRequest.Address,
+                    Email = registerRequest.Email,
+                    Role = RoleEnums.Admin.ToString(),
+                    Status = AccountStatusEnums.Active.ToString(),
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
+                };
+
+                await _accountRepository.AddAccount(newUser);
+                var createdUser =
+                await _accountRepository.GetAccountById(newUser.AccountId);
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsUser.CREATE_ADMIN_SUCCESS,
+                    Data = createdUser,
+                    StatusCode = StatusCodes.Status201Created
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> UpdateStatus(UpdateStatusRequest updateStatusRequest)
+        {
+            try
+            {
+                var existingUser = await _accountRepository.GetAccountById(updateStatusRequest.AccountId);
+                if (existingUser == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                if (existingUser.Status == updateStatusRequest.Status.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsUser.STATUS_NOT_CHANGED,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                if (!Enum.IsDefined(typeof(AccountStatusEnums), updateStatusRequest.Status))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsUser.INVALID_STATUS,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                if (existingUser.Status == AccountStatusEnums.Inactive.ToString()
+                    && updateStatusRequest.Status == AccountStatusEnums.Active)
+                {
+                    var usersByUsername = await _accountRepository.GetAccountsByUserName(existingUser.Username);
+                    if (usersByUsername.Any(u => u.Status == AccountStatusEnums.Active.ToString()
+                                                 && u.AccountId != existingUser.AccountId))
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.EXISTED,
+                            Message = ResponseMessageIdentity.EXISTED_USERNAME,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
+                    var usersByEmail = await _accountRepository.GetAccountsByEmail(existingUser.Email);
+                    if (usersByEmail.Any(u => u.Status == AccountStatusEnums.Active.ToString()
+                                              && u.AccountId != existingUser.AccountId))
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.EXISTED,
+                            Message = ResponseMessageIdentity.EMAIL_IN_USE,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+                }
+
+                existingUser.Status = updateStatusRequest.Status.ToString();
+                existingUser.UpdateDate = TimeHepler.SystemTimeNow;
+                await _accountRepository.UpdateAccount(existingUser);
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsUser.UPDATE_STATUS_SUCCESS,
+                    Data = existingUser,
+                    StatusCode = StatusCodes.Status200OK
+                };
+
             }
             catch (Exception ex)
             {

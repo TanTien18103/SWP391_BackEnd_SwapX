@@ -94,6 +94,8 @@ namespace BusinessObjects.Constants
         public const string OTP_INVALID = "Mã OTP không hợp lệ. Vui lòng kiểm tra lại mã OTP bạn đã nhập.";
         public const string EXISTED_USERNAME = "Username đã tồn tại.";
         public const string LOGOUT_SUCCESS = "Đăng xuất thành công.";
+        public const string EMAIL_IN_USE = "Email đã được sử dụng bởi người dùng khác.";
+        public const string DUPLICATED_EMAIL = "Email này đang được sử dụng bởi nhiều tài khoản Active.";
     }
 
     //Auth-Account Controllers
@@ -131,7 +133,11 @@ namespace BusinessObjects.Constants
         public const string USER_NOT_STAFF = "Người dùng không phải là nhân viên";
         public const string CREATE_STAFF_SUCCESS = "Tạo nhân viên thành công";
         public const string USER_NOT_CUSTOMER = "Người dùng không phải là khách hàng";
-
+        public const string CREATE_ADMIN_SUCCESS = "Tạo quản trị viên thành công";
+        public const string USERNAME_DUPLICATED = "Trùng tên đăng nhập";
+        public const string INVALID_STATUS = "Trạng thái không hợp lệ";
+        public const string UPDATE_STATUS_SUCCESS = "Cập nhật trạng thái người dùng thành công";
+        public const string STATUS_NOT_CHANGED = "Trạng thái người dùng không thay đổi";
     }
     public class ResponseMessageImage
     {

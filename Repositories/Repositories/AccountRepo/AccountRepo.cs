@@ -28,10 +28,16 @@ namespace Repositories.Repositories.AccountRepo
 
 
 
-        public async Task<Account> GetAccountByUserName(string username)
+        public async Task<List<Account>> GetAccountsByUserName(string username)
         {
-            return await _context.Accounts.FirstOrDefaultAsync(a => a.Username == username);
+            return await _context.Accounts.Where(a => a.Username == username).ToListAsync();
         }
+
+        public async Task<List<Account>> GetAccountsByEmail(string email)
+        {
+            return await _context.Accounts.Where(a => a.Email == email).ToListAsync();
+        }
+
         public async Task<Account> GetAccountById(string accountId)
         {
             return await _context.Accounts
@@ -60,12 +66,7 @@ namespace Repositories.Repositories.AccountRepo
             return await _context.Accounts.Include(a => a.Evdrivers).
                 Where(a => a.Role == RoleEnums.EvDriver.ToString()).ToListAsync();
         }
-
-        public async Task<Account> GetAccountByEmail(string email)
-        {
-            return await _context.Accounts.FirstOrDefaultAsync(a => a.Email == email);
-        }
-
+        
         public async Task<string> GetAccountIdFromToken(string token)
         {
             try
