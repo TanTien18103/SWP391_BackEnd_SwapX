@@ -13,6 +13,8 @@ namespace Services.Services.FormService
         Task<ResultModel> AddForm(AddFormRequest addFormRequest);
         Task<ResultModel> GetFormById(string formId);
         Task<ResultModel> GetAllForms();
+        Task<ResultModel> GetFormByIdDriver(string formId);
+        Task<ResultModel> GetAllFormsDriver();
         Task<ResultModel> GetFormsByAccountId(string accountId);
         Task<ResultModel> GetFormsByStationId(string stationId);
         Task<ResultModel> UpdateForm(UpdateFormRequest updateFormRequest);
