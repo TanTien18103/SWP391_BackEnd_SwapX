@@ -10,7 +10,6 @@ namespace Services.ApiModels.Station
     public class AddStationRequest
     {
         [Required]
-        [Range(0, 50, ErrorMessage = "BatteryNumber must be between 0 and 50.")]
         public string Name { get; set; }
 
         [Range(0, 30, ErrorMessage = "BatteryNumber must be between 0 and 30.")]

@@ -12,10 +12,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BusinessObjects.Constants;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.StationRepo;
 using Services.Services.StationService;
+using BusinessObjects.Models;
 
 namespace Services.Services.BatteryService
 {
@@ -40,7 +40,7 @@ namespace Services.Services.BatteryService
         {
             try
             {
-                var battery = new BusinessObjects.Models.Battery
+                var battery = new Battery
                 {
                     BatteryId = _accountHelper.GenerateShortGuid(),
                     Capacity = addBatteryRequest.Capacity,
@@ -86,6 +86,7 @@ namespace Services.Services.BatteryService
                 var response = batteries.Select(b => new
                 {
                     BatteryId = b.BatteryId,
+                    BatteryName = b.BatteryName,
                     Status = b.Status,
                     Capacity = b.Capacity,
                     BatteryType = b.BatteryType,
@@ -96,6 +97,7 @@ namespace Services.Services.BatteryService
                     Station = b.Station == null ? null : new
                     {
                         StationId = b.Station.StationId,
+                        StationName = b.Station.StationName,
                         Location = b.Station.Location,
                         Status = b.Station.Status,
                         Rating = b.Station.Rating,
@@ -191,6 +193,7 @@ namespace Services.Services.BatteryService
                 var response = new
                 {
                     BatteryId = b.BatteryId,
+                    BatteryName = b.BatteryName,
                     Status = b.Status,
                     Capacity = b.Capacity,
                     BatteryType = b.BatteryType,
@@ -201,6 +204,7 @@ namespace Services.Services.BatteryService
                     Station = b.Station == null ? null : new
                     {
                         StationId = b.Station.StationId,
+                        StationName = b.Station.StationName,
                         Location = b.Station.Location,
                         Status = b.Station.Status,
                         Rating = b.Station.Rating,
@@ -263,6 +267,9 @@ namespace Services.Services.BatteryService
 
                 if (updateBatteryRequest.BatteryQuality.HasValue)
                     existingBattery.BatteryQuality = updateBatteryRequest.BatteryQuality.Value;
+
+                if (!string.IsNullOrEmpty(updateBatteryRequest.BatteryName))
+                    existingBattery.BatteryName = updateBatteryRequest.BatteryName;
 
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
@@ -368,6 +375,7 @@ namespace Services.Services.BatteryService
                 var response = new
                 {
                     BatteryId = batteryDetail.BatteryId,
+                    BatteryName = batteryDetail.BatteryName,
                     Status = batteryDetail.Status,
                     Capacity = batteryDetail.Capacity,
                     BatteryType = batteryDetail.BatteryType,
@@ -378,6 +386,7 @@ namespace Services.Services.BatteryService
                     Station = batteryDetail.Station == null ? null : new
                     {
                         StationId = batteryDetail.Station.StationId,
+                        StationName = batteryDetail.Station.StationName,
                         Location = batteryDetail.Station.Location,
                         Status = batteryDetail.Station.Status,
                         Rating = batteryDetail.Station.Rating,

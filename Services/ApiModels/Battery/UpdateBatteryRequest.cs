@@ -11,7 +11,8 @@ namespace Services.ApiModels.Battery
     public class UpdateBatteryRequest
     {
         public string? BatteryId { get; set; }
-        
+        public string? BatteryName { get; set; }
+
         [Range(0, 100, ErrorMessage = "Dung lượng pin cần nhập từ 0 đến 100")]
         public int? Capacity { get; set; }
 
