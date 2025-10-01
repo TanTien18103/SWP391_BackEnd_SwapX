@@ -35,8 +35,6 @@ public partial class Battery
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
-
     public virtual ICollection<Slot> Slots { get; set; } = new List<Slot>();
 
     public virtual Station Station { get; set; }

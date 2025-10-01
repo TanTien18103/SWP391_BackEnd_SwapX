@@ -9,8 +9,6 @@ public partial class Package
 {
     public string PackageId { get; set; }
 
-    public string BatteryId { get; set; }
-
     public decimal? Price { get; set; }
 
     public string Description { get; set; }
@@ -20,8 +18,6 @@ public partial class Package
     public DateTime? StartDate { get; set; }
 
     public DateTime? UpdateDate { get; set; }
-
-    public virtual Battery Battery { get; set; }
 
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 }

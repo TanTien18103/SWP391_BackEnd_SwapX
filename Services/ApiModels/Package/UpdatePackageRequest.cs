@@ -10,8 +10,6 @@ namespace Services.ApiModels.Package
     {
         public string? PackageId { get; set; }
 
-        public string? BatteryId { get; set; }
-
         public decimal? Price { get; set; }
 
         public string? Description { get; set; }
