@@ -21,6 +21,8 @@ public partial class Station
 
     public DateTime? UpdateDate { get; set; }
 
+    public string StationName { get; set; }
+
     public virtual ICollection<Battery> Batteries { get; set; } = new List<Battery>();
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();

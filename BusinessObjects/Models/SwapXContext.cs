@@ -415,9 +415,6 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.PackageId)
                 .HasMaxLength(100)
                 .HasColumnName("PackageID");
-            entity.Property(e => e.BatteryId)
-                .HasMaxLength(100)
-                .HasColumnName("BatteryID");
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
@@ -427,10 +424,6 @@ public partial class SwapXContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("status");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-
-            entity.HasOne(d => d.Battery).WithMany(p => p.Packages)
-                .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__Package__Battery__6A30C649");
         });
 
         modelBuilder.Entity<Rating>(entity =>
@@ -557,6 +550,9 @@ public partial class SwapXContext : DbContext
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("rating");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
+            entity.Property(e => e.StationName)
+                .HasMaxLength(50)
+                .HasColumnName("stationName");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .HasColumnName("status");

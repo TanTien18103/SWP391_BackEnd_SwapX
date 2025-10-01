@@ -40,6 +40,7 @@ namespace Services.Services.StationService
                 var station = new BusinessObjects.Models.Station
                 {
                     StationId = _accountHelper.GenerateShortGuid(),
+                    StationName = addStationRequest.Name,
                     Location = addStationRequest.Location,
                     Status = StationStatusEnum.Active.ToString(),
                     Rating = 0m,
@@ -226,6 +227,10 @@ namespace Services.Services.StationService
                 if (!string.IsNullOrEmpty(updateStationRequest.Location))
                 {
                     existingStation.Location = updateStationRequest.Location;
+                }
+                if (!string.IsNullOrEmpty(updateStationRequest.Name))
+                {
+                    existingStation.StationName = updateStationRequest.Name;
                 }
                 existingStation.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedStation = await _stationRepository.UpdateStation(existingStation);

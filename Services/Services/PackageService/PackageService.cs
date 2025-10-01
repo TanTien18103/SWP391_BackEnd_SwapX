@@ -39,24 +39,12 @@ namespace Services.Services.PackageService
                 var package = new BusinessObjects.Models.Package
                 {
                     PackageId = _accountHelper.GenerateShortGuid(),
-                    BatteryId = createPackageRequest.BatteryId,
                     Description = createPackageRequest.Description,
                     Price = createPackageRequest.Price,
                     Status = PackageStatusEnums.Active.ToString(),
                     StartDate = DateTime.UtcNow,
                     UpdateDate = DateTime.UtcNow
                 };
-                if (await _batteryRepo.GetBatteryById(createPackageRequest.BatteryId) == null)
-                {
-                    return new ResultModel
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
-                        Data = null
-                    };
-                }
 
                 await _packageRepo.AddPackage(package);
                 return new ResultModel
@@ -208,18 +196,7 @@ namespace Services.Services.PackageService
                         Data = null
                     };
                 }
-                if (await _batteryRepo.GetBatteryById(updatePackageRequest.BatteryId) == null)
-                {
-                    return new ResultModel
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
-                        Data = null
-                    };
-                }
-                package.BatteryId = updatePackageRequest.BatteryId;
+              
                 package.Description = updatePackageRequest.Description;
                 package.Price = updatePackageRequest.Price;
                 package.UpdateDate = DateTime.UtcNow;

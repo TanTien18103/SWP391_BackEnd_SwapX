@@ -23,11 +23,11 @@ namespace Repositories.Repositories.PackageRepo
         }
         public async Task<List<Package>> GetAllPackages()
         {
-            return await _context.Packages.Include(a=>a.Battery).ToListAsync();
+            return await _context.Packages.ToListAsync();
         }
         public async Task<Package> GetPackageById(string packageId)
         {
-            return await _context.Packages.Include(a=>a.Battery).FirstOrDefaultAsync(p => p.PackageId == packageId);
+            return await _context.Packages.FirstOrDefaultAsync(p => p.PackageId == packageId);
         }
         public async Task<Package> UpdatePackage(Package package)
         {

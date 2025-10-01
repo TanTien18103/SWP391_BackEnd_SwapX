@@ -9,8 +9,6 @@ namespace Services.ApiModels.Package
 {
     public class AddPackageRequest
     {
-        [Required]         
-        public string BatteryId { get; set; }
         [Required]
         public decimal Price { get; set; }
         [Required]
