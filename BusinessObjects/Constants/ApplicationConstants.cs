@@ -243,4 +243,24 @@ namespace BusinessObjects.Constants
 
 
     }
+    //for Vehicle (0-0-1)
+    public static class ResponseMessageConstantsVehicle
+    {
+        public const string VEHICLE_NOT_FOUND = "Không tìm thấy xe";
+        public const string VEHICLE_EXISTED = "Xe đã tồn tại";
+        public const string ADD_VEHICLE_SUCCESS = "Thêm xe thành công";
+        public const string UPDATE_VEHICLE_SUCCESS = "Cập nhật xe thành công";
+        public const string DELETE_VEHICLE_SUCCESS = "Xóa xe thành công";
+        public const string VEHICLE_INACTIVE = "Xe đã bị ngừng hoạt động";
+        public const string GET_VEHICLE_LIST_SUCCESS = "Lấy danh sách xe thành công";
+        public const string GET_VEHICLE_DETAIL_SUCCESS = "Lấy chi tiết xe thành công";
+        public const string ADD_VEHICLE_FAIL = "Thêm xe thất bại";
+        public const string GET_ALL_VEHICLE_FAIL = "Lấy danh sách xe thất bại";
+        public const string VEHICLE_LIST_EMPTY = "Lấy danh sách xe thất bại";
+        public const string GET_ALL_VEHICLE_SUCCESS = "Lấy danh sách xe thành công";
+        public const string UPDATE_VEHICLE_FAILED = "Cập nhật xe thất bại";
+        public const string GET_VEHICLE_FAIL = "Lấy xe thất bại";
+        public const string GET_VEHICLE_SUCCESS = "Lấy xe thành công";
+        public const string DELETE_VEHICLE_FAILED = "Xóa xe thất bại";
+    }
 }

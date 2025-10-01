@@ -25,11 +25,11 @@ namespace Repositories.Repositories.VehicleRepo
         }
         public async Task<List<Vehicle>> GetAllVehicles()
         {
-            return await _context.Vehicles.ToListAsync();
+            return await _context.Vehicles.Include(a=>a.Battery).Include(b=>b.Package).ToListAsync();
         }
         public async Task<Vehicle> GetVehicleById(string vehicleId)
         {
-            return await _context.Vehicles.FirstOrDefaultAsync(v => v.Vin == vehicleId);
+            return await _context.Vehicles.Include(a => a.Battery).Include(b => b.Package).FirstOrDefaultAsync(v => v.Vin == vehicleId);
         }
         public async Task<Vehicle> UpdateVehicle(Vehicle vehicle)
         {

@@ -15,9 +15,5 @@ namespace Services.ApiModels.Vehicle
 
         public VehicleTypeEnums? VehicleType { get; set; }
 
-        public string? BatteryId { get; set; }
-
-        public string? PackageId { get; set; }
-
     }
 }
