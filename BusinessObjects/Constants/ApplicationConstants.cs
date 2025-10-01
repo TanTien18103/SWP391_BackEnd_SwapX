@@ -263,4 +263,25 @@ namespace BusinessObjects.Constants
         public const string GET_VEHICLE_SUCCESS = "Lấy xe thành công";
         public const string DELETE_VEHICLE_FAILED = "Xóa xe thất bại";
     }
+    //for StationSchedule (0-0-1)
+    public static class ResponseMessageConstantsStationSchedule
+    {
+        public const string STATION_SCHEDULE_NOT_FOUND = "Không tìm thấy lịch trạm";
+        public const string STATION_SCHEDULE_EXISTED = "Lịch trạm đã tồn tại";
+        public const string ADD_STATION_SCHEDULE_SUCCESS = "Thêm lịch trạm thành công";
+        public const string UPDATE_STATION_SCHEDULE_SUCCESS = "Cập nhật lịch trạm thành công";
+        public const string DELETE_STATION_SCHEDULE_SUCCESS = "Xóa lịch trạm thành công";
+        public const string STATION_SCHEDULE_INACTIVE = "Lịch trạm đã bị ngừng hoạt động";
+        public const string GET_STATION_SCHEDULE_LIST_SUCCESS = "Lấy danh sách lịch trạm thành công";
+        public const string GET_STATION_SCHEDULE_DETAIL_SUCCESS = "Lấy chi tiết lịch trạm thành công";
+        public const string ADD_STATION_SCHEDULE_FAIL = "Thêm lịch trạm thất bại";
+        public const string GET_ALL_STATION_SCHEDULE_FAIL = "Lấy danh sách lịch trạm thất bại";
+        public const string STATION_SCHEDULE_LIST_EMPTY = "Lấy danh sách lịch trạm thất bại";
+        public const string GET_ALL_STATION_SCHEDULE_SUCCESS = "Lấy danh sách lịch trạm thành công";
+        public const string UPDATE_STATION_SCHEDULE_FAILED = "Cập nhật lịch trạm thất bại";
+        public const string GET_STATION_SCHEDULE_FAIL = "Lấy lịch trạm thất bại";
+        public const string GET_STATION_SCHEDULE_SUCCESS = "Lấy lịch trạm thành công";
+        public const string DELETE_STATION_SCHEDULE_FAILED = "Xóa lịch trạm thất bại";
+        public const string INVALID_TIME_RANGE = "Khoảng thời gian không hợp lệ";
+    }
 }
