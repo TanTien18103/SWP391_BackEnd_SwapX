@@ -25,6 +25,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpGet("get-form-by-id/{formId}")]
+        [Authorize]
         public async Task<IActionResult> GetFormById(string formId)
         {
             var res = await _formService.GetFormById(formId);
@@ -32,6 +33,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpGet("get-all-forms")]
+        [Authorize]
         public async Task<IActionResult> GetAllForms()
         {
             var res = await _formService.GetAllForms();
@@ -39,6 +41,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpGet("get-forms-by-account-id/{accountId}")]
+        [Authorize]
         public async Task<IActionResult> GetFormsByAccountId(string accountId)
         {
             var res = await _formService.GetFormsByAccountId(accountId);
@@ -46,6 +49,8 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpGet("get-forms-by-station-id/{stationId}")]
+        [Authorize]
+
         public async Task<IActionResult> GetFormsByStationId(string stationId)
         {
             var res = await _formService.GetFormsByStationId(stationId);
@@ -53,6 +58,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpPut("update-form")]
+        [Authorize]
         public async Task<IActionResult> UpdateForm([FromForm] UpdateFormRequest updateFormRequest)
         {
             var res = await _formService.UpdateForm(updateFormRequest);
@@ -60,10 +66,28 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpPut("delete-form/{formId}")]
+        [Authorize]
         public async Task<IActionResult> DeleteForm(string formId)
         {
             var res = await _formService.DeleteForm(formId);
             return StatusCode(res.StatusCode, res);
         }
+
+        [HttpGet("get-form-by-id-driver/{formId}")]
+        [Authorize(Roles = "EvDriver")]
+        public async Task<IActionResult> GetFormByIdDriver(string formId)
+        {
+            var res = await _formService.GetFormByIdDriver(formId);
+            return StatusCode(res.StatusCode, res);
+        }
+
+        [HttpGet("get-all-forms-driver")]
+        [Authorize(Roles = "EvDriver")]
+        public async Task<IActionResult> GetAllFormsDriver()
+        {
+            var res = await _formService.GetAllFormsDriver();
+            return StatusCode(res.StatusCode, res);
+        }
+
     }
 }

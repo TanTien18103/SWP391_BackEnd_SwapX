@@ -344,5 +344,82 @@ namespace Services.Services.FormService
                 };
             }
         }
+
+        public async Task<ResultModel> GetFormByIdDriver(string formId)
+        {
+            try
+            {
+                var form = await _formRepo.GetById(formId);
+                if (form == null || form.Status == FormStatusEnums.Deleted.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsForm.FORM_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsForm.GET_FORM_DETAIL_SUCCESS,
+                    Data = form,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsForm.GET_ALL_FORM_FAIL,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Data = ex.InnerException?.Message,
+                };
+            }
+        }
+        public async Task<ResultModel> GetAllFormsDriver()
+        {
+            try
+            {
+                var forms = await _formRepo.GetAll();
+                if (forms == null || forms.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsForm.FORM_LIST_EMPTY,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                var filteredForms = forms.Where(f => f.Status != FormStatusEnums.Deleted.ToString()).ToList();
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsForm.GET_ALL_FORM_SUCCESS,
+                    Data = filteredForms,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsForm.GET_ALL_FORM_FAIL,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Data = ex.InnerException?.Message,
+                };
+            }
+        }
     }
 }
