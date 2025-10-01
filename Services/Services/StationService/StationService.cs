@@ -37,7 +37,7 @@ namespace Services.Services.StationService
         {
             try
             {
-                var station = new BusinessObjects.Models.Station
+                var station = new Station
                 {
                     StationId = _accountHelper.GenerateShortGuid(),
                     StationName = addStationRequest.Name,
@@ -93,6 +93,7 @@ namespace Services.Services.StationService
                 var response = stations.Select(station => new
                 {
                     StationId = station.StationId,
+                    StationName = station.StationName,
                     Location = station.Location,
                     Status = station.Status,
                     Rating = station.Rating,
@@ -102,6 +103,7 @@ namespace Services.Services.StationService
                     Batteries = station.Batteries.Select(b => new
                     {
                         BatteryId = b.BatteryId,
+                        BatteryName = b.BatteryName,
                         Status = b.Status,
                         Capacity = b.Capacity,
                         BatteryType = b.BatteryType,
@@ -157,6 +159,7 @@ namespace Services.Services.StationService
                 var response = new
                 {
                     StationId = station.StationId,
+                    StationName = station.StationName,
                     Location = station.Location,
                     Status = station.Status,
                     Rating = station.Rating,
@@ -166,6 +169,7 @@ namespace Services.Services.StationService
                     Batteries = station.Batteries.Select(b => new
                     {
                         BatteryId = b.BatteryId,
+                        BatteryName = b.BatteryName,
                         Status = b.Status,
                         Capacity = b.Capacity,
                         BatteryType = b.BatteryType,

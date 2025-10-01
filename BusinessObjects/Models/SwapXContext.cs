@@ -93,6 +93,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.BatteryId)
                 .HasMaxLength(100)
                 .HasColumnName("BatteryID");
+            entity.Property(e => e.BatteryName)
+                .HasMaxLength(50)
+                .HasColumnName("batteryName");
             entity.Property(e => e.BatteryQuality)
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("batteryQuality");

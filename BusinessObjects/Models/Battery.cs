@@ -25,6 +25,8 @@ public partial class Battery
 
     public DateTime? UpdateDate { get; set; }
 
+    public string BatteryName { get; set; }
+
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
 
     public virtual ICollection<BatteryReport> BatteryReports { get; set; } = new List<BatteryReport>();
