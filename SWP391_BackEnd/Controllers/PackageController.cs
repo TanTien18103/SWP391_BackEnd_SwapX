@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Services.PackageService;
 
@@ -14,6 +15,7 @@ namespace SWP391_BackEnd.Controllers
             _packageService = packageService;
         }
         [HttpPost("add_package")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddPackage([FromForm] Services.ApiModels.Package.AddPackageRequest addPackageRequest)
         {
             var res = await _packageService.AddPackage(addPackageRequest);
@@ -26,12 +28,14 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete_package")]
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> DeletePackage([FromForm] string? packageId)
         {
             var res = await _packageService.DeletePackage(packageId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("update_package")]
+        [Authorize (Roles = "Admin")]
         public async Task<IActionResult> UpdatePackage([FromForm] Services.ApiModels.Package.UpdatePackageRequest updatePackageRequest)
         {
             var res = await _packageService.UpdatePackage(updatePackageRequest);
