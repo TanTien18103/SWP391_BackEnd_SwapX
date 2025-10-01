@@ -28,6 +28,8 @@ using Services.Services.PackageService;
 using Repositories.Repositories.PackageRepo;
 using Repositories.Repositories.VehicleRepo;
 using Services.Services.VehicleService;
+using Repositories.Repositories.StationScheduleRepo;
+using Services.Services.StationScheduleService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -108,6 +110,7 @@ builder.Services.AddScoped<IFormRepo, FormRepo>();
 builder.Services.AddScoped<IBatteryRepo, BatteryRepo>();
 builder.Services.AddScoped<IPackageRepo, PackageRepo>();
 builder.Services.AddScoped<IVehicleRepo, VehicleRepo>();
+builder.Services.AddScoped<IStationScheduleRepo, StationScheduleRepo>();
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -119,7 +122,7 @@ builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<IBatteryService, BatteryService>();
 builder.Services.AddScoped<IPackageService, PackageService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
-
+builder.Services.AddScoped<IStationScheduleService, StationScheduleService>();
 
 //Register Helper
 builder.Services.AddScoped<AccountHelper>();
