@@ -44,6 +44,7 @@ namespace Services.Services.BatteryService
                 {
                     BatteryId = _accountHelper.GenerateShortGuid(),
                     Capacity = addBatteryRequest.Capacity,
+                    BatteryName = addBatteryRequest.BatteryName,
                     Status = BatteryStatusEnums.Available.ToString(),
                     Specification = addBatteryRequest.Specification.ToString(),
                     BatteryType = addBatteryRequest.BatteryType.ToString(),
