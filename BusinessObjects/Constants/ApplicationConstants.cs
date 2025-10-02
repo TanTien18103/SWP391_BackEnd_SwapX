@@ -220,6 +220,7 @@ namespace BusinessObjects.Constants
         public const string GET_FORM_SUCCESS = "Lấy biểu mẫu thành công";
         public const string DELETE_FORM_FAILED = "Xóa biểu mẫu thất bại";
         public const string INVALID_FORM_DATE = "Ngày biểu mẫu không hợp lệ";
+        public const string INVALID_FORM_TIME = "Thời gian không nằm trong giờ hành chính (7h30–12h, 13h30–17h).";
     }
     // For Package (0-0-1)
     public static class ResponseMessageConstantsPackage

@@ -46,6 +46,31 @@ namespace Services.Services.FormService
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
+
+                // Validate giờ hành chính
+                var requestDate = addFormRequest.Date.GetValueOrDefault();
+                var requestTime = requestDate.TimeOfDay;
+
+                var morningStart = new TimeSpan(7, 30, 0);
+                var morningEnd = new TimeSpan(12, 0, 0);
+                var afternoonStart = new TimeSpan(13, 30, 0);
+                var afternoonEnd = new TimeSpan(17, 0, 0);
+
+                bool isInWorkingHours =
+                    (requestTime >= morningStart && requestTime <= morningEnd) ||
+                    (requestTime >= afternoonStart && requestTime <= afternoonEnd);
+
+                if (!isInWorkingHours)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsForm.INVALID_FORM_TIME,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
                 var station = await _stationRepo.GetStationById(addFormRequest.StationId);
                 if (station == null) {
                     return new ResultModel
@@ -58,6 +83,15 @@ namespace Services.Services.FormService
                     };
                 }
 
+                // Kiểm tra số form đã trả trước ở station này
+                var paidForms = await _formRepo.GetFormsByAccountAndStation(addFormRequest.AccountId, addFormRequest.StationId);
+                int prepaidCount = paidForms.Count(f => f.Status == FormStatusEnums.SubmittedPaidFirst.ToString()); 
+
+                // Nếu >= 3 lần thì approve luôn
+                string formStatus = prepaidCount >= 3
+                    ? FormStatusEnums.Approved.ToString()
+                    : FormStatusEnums.Submitted.ToString();
+
                 var form = new Form
                 {
                     FormId = _accountHelper.GenerateShortGuid(),
@@ -66,7 +100,7 @@ namespace Services.Services.FormService
                     Title = addFormRequest.Title,
                     Description = addFormRequest.Description,
                     Date = addFormRequest.Date,
-                    Status = FormStatusEnums.Submitted.ToString(),
+                    Status = formStatus,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
