@@ -9,6 +9,7 @@ namespace BusinessObjects.Enums
     public enum ReportStatusEnums
     {
         Active,
+        Pending,
         Inactive
     }
 }
