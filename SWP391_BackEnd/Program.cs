@@ -34,6 +34,8 @@ using Services.Services.RatingService;
 using Repositories.Repositories.RatingRepo;
 using Repositories.Repositories.ReportRepo;
 using Services.Services.ReportService;
+using Repositories.Repositories.BatteryReportRepo;
+using Services.Services.BatteryReportService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -117,6 +119,7 @@ builder.Services.AddScoped<IVehicleRepo, VehicleRepo>();
 builder.Services.AddScoped<IStationScheduleRepo, StationScheduleRepo>();
 builder.Services.AddScoped<IRatingRepo, RatingRepo>();
 builder.Services.AddScoped<IReportRepo, ReportRepo>();
+builder.Services.AddScoped<IBatteryReportRepo, BatteryReportRepo>();
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -131,6 +134,7 @@ builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IStationScheduleService, StationScheduleService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IBatteryReportService, BatteryReportService>();
 //Register Helper
 builder.Services.AddScoped<AccountHelper>();
 
