@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Repositories.Repositories.StationRepo;
+using Repositories.Repositories.AccountRepo;
 
 
 
@@ -23,12 +25,16 @@ namespace Services.Services.RatingService
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AccountHelper _accountHelper;
-        public RatingService(IRatingRepo ratingRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper)
+        private readonly IStationRepo _stationRepo;
+        private readonly IAccountRepo _accountRepo;
+        public RatingService(IRatingRepo ratingRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo, IAccountRepo accountRepo)
         {
             _ratingRepo = ratingRepo;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _accountHelper = accountHelper;
+            _stationRepo = stationRepo;
+            _accountRepo = accountRepo;
         }
 
         public async Task<ResultModel> AddRating(AddRatingRequest addRatingRequest)
@@ -48,7 +54,28 @@ namespace Services.Services.RatingService
                     StartDate = TimeHepler.SystemTimeNow,    
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
-                
+                if (await _stationRepo.GetStationById(addRatingRequest.StationId) == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if (await _accountRepo.GetAccountById(addRatingRequest.AccountId) == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        Data = null
+                    };
+                }
                 var createdRating = await _ratingRepo.AddRating(newRating);
                 return new ResultModel
                 {
