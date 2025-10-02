@@ -55,5 +55,12 @@ namespace Repositories.Repositories.FormRepo
             await _context.SaveChangesAsync();
             return form;
         }
+        public async Task<List<Form>> GetFormsByAccountAndStation(string accountId, string stationId)
+        {
+            return await _context.Forms
+                .Where(f => f.AccountId == accountId && f.StationId == stationId)
+                .ToListAsync();
+        }
+
     }
 }

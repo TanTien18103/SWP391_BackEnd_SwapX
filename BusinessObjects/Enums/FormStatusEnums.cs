@@ -10,6 +10,7 @@ namespace BusinessObjects.Enums
     {
         Draft,
         Submitted,
+        SubmittedPaidFirst,
         Pending,
         Approved,   
         Rejected,
