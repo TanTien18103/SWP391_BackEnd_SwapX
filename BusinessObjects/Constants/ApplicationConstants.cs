@@ -327,4 +327,24 @@ namespace BusinessObjects.Constants
         public const string GET_REPORT_SUCCESS = "Lấy báo cáo thành công";
         public const string DELETE_REPORT_FAILED = "Xóa báo cáo thất bại";
     }
+    //for BatteryReport (0-0-1)
+    public static class ResponseMessageConstantsBatteryReport
+    {
+        public const string BATTERY_REPORT_NOT_FOUND = "Không tìm thấy báo cáo pin";
+        public const string BATTERY_REPORT_EXISTED = "Báo cáo pin đã tồn tại";
+        public const string ADD_BATTERY_REPORT_SUCCESS = "Thêm báo cáo pin thành công";
+        public const string UPDATE_BATTERY_REPORT_SUCCESS = "Cập nhật báo cáo pin thành công";
+        public const string DELETE_BATTERY_REPORT_SUCCESS = "Xóa báo cáo pin thành công";
+        public const string BATTERY_REPORT_INACTIVE = "Báo cáo pin đã bị ngừng hoạt động";
+        public const string GET_BATTERY_REPORT_LIST_SUCCESS = "Lấy danh sách báo cáo pin thành công";
+        public const string GET_BATTERY_REPORT_DETAIL_SUCCESS = "Lấy chi tiết báo cáo pin thành công";
+        public const string ADD_BATTERY_REPORT_FAIL = "Thêm báo cáo pin thất bại";
+        public const string GET_ALL_BATTERY_REPORT_FAIL = "Lấy danh sách báo cáo pin thất bại";
+        public const string BATTERY_REPORT_LIST_EMPTY = "Lấy danh sách báo cáo pin thất bại";
+        public const string GET_ALL_BATTERY_REPORT_SUCCESS = "Lấy danh sách báo cáo pin thành công";
+        public const string UPDATE_BATTERY_REPORT_FAILED = "Cập nhật báo cáo pin thất bại";
+        public const string GET_BATTERY_REPORT_FAIL = "Lấy báo cáo pin thất bại";
+        public const string GET_BATTERY_REPORT_SUCCESS = "Lấy báo cáo pin thành công";
+        public const string DELETE_BATTERY_REPORT_FAILED = "Xóa báo cáo pin thất bại";
+    }
 }
