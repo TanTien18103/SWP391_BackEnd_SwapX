@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Repositories.Repositories.FormRepo;
+using BusinessObjects.TimeCoreHelper;
 
 namespace Services.Services.StationScheduleService
 {
@@ -71,8 +72,8 @@ namespace Services.Services.StationScheduleService
                     FormId = addStationScheduleRequest.FormId,
                     Description = addStationScheduleRequest.Description,
                     Status = StationScheduleStatusEnums.Active.ToString(),
-                    StartDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
                 };
                 await _stationScheduleRepo.AddStationSchedule(stationSchedule);
                 return new ResultModel
@@ -116,7 +117,7 @@ namespace Services.Services.StationScheduleService
                     };
                 }
                 stationSchedule.Status = StationScheduleStatusEnums.Inactive.ToString();
-                stationSchedule.UpdateDate = DateTime.UtcNow;
+                stationSchedule.UpdateDate = TimeHepler.SystemTimeNow;
                 await _stationScheduleRepo.UpdateStationSchedule(stationSchedule);
                 return new ResultModel
                 {
@@ -280,7 +281,7 @@ namespace Services.Services.StationScheduleService
                         stationSchedule.StationId = updateStationScheduleRequest.StationId;
                     }
                 }
-                stationSchedule.UpdateDate = DateTime.UtcNow;
+                stationSchedule.UpdateDate = TimeHepler.SystemTimeNow;
                 await _stationScheduleRepo.UpdateStationSchedule(stationSchedule);
                 return new ResultModel
                 {

@@ -167,6 +167,8 @@ namespace BusinessObjects.Constants
         public static string GET_STATION_FAIL = "Lấy trạm thất bại";
         public static string GET_STATION_SUCCESS = "Lấy trạm thành công";
         public static string DELETE_STATION_FAILED = "Xóa trạm thất bại";
+
+
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -283,5 +285,45 @@ namespace BusinessObjects.Constants
         public const string GET_STATION_SCHEDULE_SUCCESS = "Lấy lịch trạm thành công";
         public const string DELETE_STATION_SCHEDULE_FAILED = "Xóa lịch trạm thất bại";
         public const string INVALID_TIME_RANGE = "Khoảng thời gian không hợp lệ";
+    }
+    //for Rating (0-0-1)
+    public static class ResponseMessageConstantsRating
+    {
+        public const string RATING_NOT_FOUND = "Không tìm thấy đánh giá";
+        public const string RATING_EXISTED = "Đánh giá đã tồn tại";
+        public const string ADD_RATING_SUCCESS = "Thêm đánh giá thành công";
+        public const string UPDATE_RATING_SUCCESS = "Cập nhật đánh giá thành công";
+        public const string DELETE_RATING_SUCCESS = "Xóa đánh giá thành công";
+        public const string RATING_INACTIVE = "Đánh giá đã bị ngừng hoạt động";
+        public const string GET_RATING_LIST_SUCCESS = "Lấy danh sách đánh giá thành công";
+        public const string GET_RATING_DETAIL_SUCCESS = "Lấy chi tiết đánh giá thành công";
+        public const string ADD_RATING_FAIL = "Thêm đánh giá thất bại";
+        public const string GET_ALL_RATING_FAIL = "Lấy danh sách đánh giá thất bại";
+        public const string RATING_LIST_EMPTY = "Lấy danh sách đánh giá thất bại";
+        public const string GET_ALL_RATING_SUCCESS = "Lấy danh sách đánh giá thành công";
+        public const string UPDATE_RATING_FAILED = "Cập nhật đánh giá thất bại";
+        public const string GET_RATING_FAIL = "Lấy đánh giá thất bại";
+        public const string GET_RATING_SUCCESS = "Lấy đánh giá thành công";
+        public const string DELETE_RATING_FAILED = "Xóa đánh giá thất bại";
+    }
+    //for Report (0-0-1)
+    public static class ResponseMessageConstantsReport
+    {
+        public const string REPORT_NOT_FOUND = "Không tìm thấy báo cáo";
+        public const string REPORT_EXISTED = "Báo cáo đã tồn tại";
+        public const string ADD_REPORT_SUCCESS = "Thêm báo cáo thành công";
+        public const string UPDATE_REPORT_SUCCESS = "Cập nhật báo cáo thành công";
+        public const string DELETE_REPORT_SUCCESS = "Xóa báo cáo thành công";
+        public const string REPORT_INACTIVE = "Báo cáo đã bị ngừng hoạt động";
+        public const string GET_REPORT_LIST_SUCCESS = "Lấy danh sách báo cáo thành công";
+        public const string GET_REPORT_DETAIL_SUCCESS = "Lấy chi tiết báo cáo thành công";
+        public const string ADD_REPORT_FAIL = "Thêm báo cáo thất bại";
+        public const string GET_ALL_REPORT_FAIL = "Lấy danh sách báo cáo thất bại";
+        public const string REPORT_LIST_EMPTY = "Lấy danh sách báo cáo thất bại";
+        public const string GET_ALL_REPORT_SUCCESS = "Lấy danh sách báo cáo thành công";
+        public const string UPDATE_REPORT_FAILED = "Cập nhật báo cáo thất bại";
+        public const string GET_REPORT_FAIL = "Lấy báo cáo thất bại";
+        public const string GET_REPORT_SUCCESS = "Lấy báo cáo thành công";
+        public const string DELETE_REPORT_FAILED = "Xóa báo cáo thất bại";
     }
 }

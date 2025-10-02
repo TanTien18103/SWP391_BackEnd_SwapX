@@ -3,10 +3,9 @@ using BusinessObjects.Enums;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Repositories.Repositories.BatteryRepo;
-using Repositories.Repositories.PackageRepo;
+using Repositories.Repositories.RatingRepo;
 using Services.ApiModels;
-using Services.ApiModels.Package;
+using Services.ApiModels.Rating;
 using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
@@ -14,88 +13,91 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Services.PackageService
+
+
+namespace Services.Services.RatingService
 {
-    public class PackageService : IPackageService
+    public class RatingService : IRatingService
     {
-        private readonly IPackageRepo _packageRepo;
+        private readonly IRatingRepo _ratingRepo;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IBatteryRepo _batteryRepo;
         private readonly AccountHelper _accountHelper;
-        public PackageService(IPackageRepo packageRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IBatteryRepo batteryRepo)
+        public RatingService(IRatingRepo ratingRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper)
         {
-            _packageRepo = packageRepo;
+            _ratingRepo = ratingRepo;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _accountHelper = accountHelper;
-            _batteryRepo = batteryRepo;
         }
 
-        public async Task<ResultModel> AddPackage(AddPackageRequest createPackageRequest)
+        public async Task<ResultModel> AddRating(AddRatingRequest addRatingRequest)
         {
             try
             {
-                var package = new BusinessObjects.Models.Package
+
+                var userId = _accountHelper.GenerateShortGuid();
+                var newRating = new BusinessObjects.Models.Rating
                 {
-                    PackageId = _accountHelper.GenerateShortGuid(),
-                    Description = createPackageRequest.Description,
-                    Price = createPackageRequest.Price,
-                    Status = PackageStatusEnums.Active.ToString(),
-                    StartDate = TimeHepler.SystemTimeNow,
+                    RatingId = _accountHelper.GenerateShortGuid(),
+                    AccountId = addRatingRequest.AccountId,
+                    Rating1 = addRatingRequest.Rating1,
+                    Description = addRatingRequest.Description,
+                    StationId = addRatingRequest.StationId,
+                    Status = AccountStatusEnums.Active.ToString(),
+                    StartDate = TimeHepler.SystemTimeNow,    
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
-
-                await _packageRepo.AddPackage(package);
+                
+                var createdRating = await _ratingRepo.AddRating(newRating);
                 return new ResultModel
                 {
-                    StatusCode = StatusCodes.Status200OK,
+                    StatusCode = StatusCodes.Status201Created,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsPackage.ADD_PACKAGE_SUCCESS,
-                    Data = package
+                    Message = ResponseMessageConstantsRating.ADD_RATING_SUCCESS,
+                    Data = createdRating
                 };
-
             }
             catch (Exception ex)
             {
                 return new ResultModel
                 {
+
                     StatusCode = StatusCodes.Status500InternalServerError,
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageConstantsPackage.ADD_PACKAGE_FAIL,
+                    Message = ResponseMessageConstantsRating.ADD_RATING_FAIL,
                     Data = ex.Message
                 };
             }
         }
 
-        public async Task<ResultModel> DeletePackage(string packageId)
+        public async Task<ResultModel> DeleteRating(string ratingId)
         {
             try
             {
-                var package = await _packageRepo.GetPackageById(packageId);
-                if (package == null)
+                var existingRating = await _ratingRepo.GetRatingById(ratingId);
+                if (existingRating == null)
                 {
                     return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
-
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsRating.RATING_NOT_FOUND,
+                        Data = null
                     };
                 }
-                package.Status = BatteryStatusEnums.Decommissioned.ToString();
-                package.UpdateDate = TimeHepler.SystemTimeNow;
-                var deletedPackage = await _packageRepo.UpdatePackage(package);
+                existingRating.Status = AccountStatusEnums.Inactive.ToString();
+                existingRating.UpdateDate = TimeHepler.SystemTimeNow;
+                var deletedRating = await _ratingRepo.UpdateRating(existingRating);
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsPackage.DELETE_PACKAGE_SUCCESS,
-
+                    Message = ResponseMessageConstantsRating.DELETE_RATING_SUCCESS,
                 };
 
             }
@@ -106,53 +108,55 @@ namespace Services.Services.PackageService
                     StatusCode = StatusCodes.Status500InternalServerError,
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageConstantsPackage.DELETE_PACKAGE_FAILED,
-                };
-            }
-        }
-
-        public async Task<ResultModel> GetAllPackages()
-        {
-            try
-            {
-
-                var packages = await _packageRepo.GetAllPackages();
-                return new ResultModel
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    IsSuccess = true,
-                    ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsPackage.GET_ALL_PACKAGE_SUCCESS,
-                    Data = packages
-                };
-
-            }
-            catch (Exception ex)
-            {
-                return new ResultModel
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    IsSuccess = false,
-                    ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageConstantsPackage.GET_ALL_PACKAGE_FAIL,
+                    Message = ResponseMessageConstantsRating.DELETE_RATING_FAILED,
                     Data = ex.Message
                 };
             }
         }
 
-        public async Task<ResultModel> GetPackageById(string packageId)
+        public async Task<ResultModel> GetAllRatings()
         {
             try
             {
-                var package = await _packageRepo.GetPackageById(packageId);
-                if (package == null)
+
+                var ratings = await _ratingRepo.GetAllRatings();
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsRating.GET_ALL_RATING_SUCCESS,
+                    Data = ratings
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsRating.GET_ALL_RATING_FAIL,
+                    Data = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResultModel> GetRatingById(string ratingId)
+        {
+            try
+            {
+
+                var rating = await _ratingRepo.GetRatingById(ratingId);
+                if (rating == null)
                 {
                     return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsRating.RATING_NOT_FOUND,
                         Data = null
                     };
                 }
@@ -161,10 +165,9 @@ namespace Services.Services.PackageService
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsPackage.GET_PACKAGE_SUCCESS,
-                    Data = package
+                    Message = ResponseMessageConstantsRating.GET_ALL_RATING_SUCCESS,
+                    Data = rating
                 };
-
 
             }
             catch (Exception ex)
@@ -174,41 +177,48 @@ namespace Services.Services.PackageService
                     StatusCode = StatusCodes.Status500InternalServerError,
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageConstantsPackage.GET_PACKAGE_FAIL,
+                    Message = ResponseMessageConstantsRating.GET_ALL_RATING_FAIL,
                     Data = ex.Message
                 };
             }
         }
-        
-        public async Task<ResultModel> UpdatePackage(UpdatePackageRequest updatePackageRequest)
+
+        public async Task<ResultModel> UpdateRating(UpdateRatingRequest updateRatingRequest)
         {
             try
             {
-                var package = await _packageRepo.GetPackageById(updatePackageRequest.PackageId);
-                if (package == null)
+
+                var existingRating = await _ratingRepo.GetRatingById(updateRatingRequest.RatingId);
+                if (existingRating == null)
                 {
                     return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsRating.RATING_NOT_FOUND,
                         Data = null
                     };
                 }
-              
-                package.Description = updatePackageRequest.Description;
-                package.Price = updatePackageRequest.Price;
-                package.UpdateDate = TimeHepler.SystemTimeNow;
-                var updatedPackage = await _packageRepo.UpdatePackage(package);
+                if(updateRatingRequest.Rating1 != null)
+                {
+                    existingRating.Rating1 = updateRatingRequest.Rating1;
+                }
+                if (!string.IsNullOrEmpty(updateRatingRequest.Description))
+                {
+                    existingRating.Description = updateRatingRequest.Description;
+                }
+                existingRating.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedRating = await _ratingRepo.UpdateRating(existingRating);
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsPackage.UPDATE_PACKAGE_SUCCESS,
-                    Data = updatedPackage
+                    Message = ResponseMessageConstantsRating.UPDATE_RATING_SUCCESS,
+                    Data = updatedRating
                 };
+
             }
             catch (Exception ex)
             {
@@ -217,7 +227,7 @@ namespace Services.Services.PackageService
                     StatusCode = StatusCodes.Status500InternalServerError,
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageConstantsPackage.UPDATE_PACKAGE_FAILED,
+                    Message = ResponseMessageConstantsRating.UPDATE_RATING_FAILED,
                     Data = ex.Message
                 };
             }
