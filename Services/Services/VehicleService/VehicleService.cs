@@ -1,7 +1,10 @@
 ﻿using BusinessObjects.Constants;
 using BusinessObjects.Enums;
+using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Repositories.Repositories.BatteryRepo;
+using Repositories.Repositories.PackageRepo;
 using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
 using Services.ApiModels.Vehicle;
@@ -11,8 +14,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Repositories.Repositories.BatteryRepo;
-using Repositories.Repositories.PackageRepo;
 
 
 
@@ -49,8 +50,8 @@ namespace Services.Services.VehicleService
                     VehicleName = addVehicleRequest.VehicleName.ToString(),
                     PackageId = addVehicleRequest.PackageId,
                     BatteryId = addVehicleRequest.BatteryId,
-                    StartDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
                 };
                 if (await _batteryRepo.GetBatteryById(addVehicleRequest.BatteryId) == null)
                 {
@@ -187,7 +188,7 @@ namespace Services.Services.VehicleService
                 {
                     existingVehicle.VehicleName = updateVehicleRequest.VehicleName.ToString();
                 }
-                existingVehicle.UpdateDate = DateTime.UtcNow;
+                existingVehicle.UpdateDate = TimeHepler.SystemTimeNow;
                 await _vehicleRepo.UpdateVehicle(existingVehicle);
                 return new ResultModel
                 {
@@ -227,7 +228,7 @@ namespace Services.Services.VehicleService
                     });
                 }
                 existingVehicle.Status = VehicleStatusEnums.Inactive.ToString();
-                existingVehicle.UpdateDate = DateTime.UtcNow;
+                existingVehicle.UpdateDate = TimeHepler.SystemTimeNow;
                 _vehicleRepo.UpdateVehicle(existingVehicle);
                 return Task.FromResult(new ResultModel
                 {

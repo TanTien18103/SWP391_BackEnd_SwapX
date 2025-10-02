@@ -111,8 +111,8 @@ namespace Services.Services.AccountService
                 Email = registerRequest.Email,
                 Role = RoleEnums.EvDriver.ToString(),
                 Status = AccountStatusEnums.Active.ToString(),
-                StartDate = DateTime.UtcNow,
-                UpdateDate = DateTime.UtcNow,
+                StartDate = TimeHepler.SystemTimeNow,
+                UpdateDate = TimeHepler.SystemTimeNow,
             };
 
             var driver = new Evdriver
@@ -120,8 +120,8 @@ namespace Services.Services.AccountService
                 CustomerId = _accountHelper.GenerateShortGuid(),
                 AccountId = newUser.AccountId,
                 Account = newUser,
-                StartDate = DateTime.UtcNow,
-                UpdateDate = DateTime.UtcNow,
+                StartDate = TimeHepler.SystemTimeNow,
+                UpdateDate = TimeHepler.SystemTimeNow,
             };
 
             newUser.Evdrivers.Add(driver);
