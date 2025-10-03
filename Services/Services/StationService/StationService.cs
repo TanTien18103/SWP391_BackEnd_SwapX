@@ -5,6 +5,8 @@ using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Repositories.Repositories.AccountRepo;
+using Repositories.Repositories.BssStaffRepo;
 using Repositories.Repositories.StationRepo;
 using Services.ApiModels;
 using Services.ApiModels.Station;
@@ -22,14 +24,17 @@ namespace Services.Services.StationService
         private readonly IStationRepo _stationRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IBssStaffRepo _bssStaffRepository;
+        private readonly IAccountRepo _accountRepository;
         private readonly AccountHelper _accountHelper;
 
-
-        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper)
+        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBssStaffRepo bssStaffRepository, IAccountRepo accountRepository, AccountHelper accountHelper)
         {
             _stationRepository = stationRepository;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _bssStaffRepository = bssStaffRepository;
+            _accountRepository = accountRepository;
             _accountHelper = accountHelper;
         }
 
@@ -295,6 +300,235 @@ namespace Services.Services.StationService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsStation.DELETE_STATION_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResultModel> AddStaffToStation(AddStaffToStationRequest addStaffToStationRequest)
+        {
+            try
+            {
+                var station = await _stationRepository.GetStationById(addStaffToStationRequest.StationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                var account = await _accountRepository.GetAccountByStaffId(addStaffToStationRequest.StaffId);
+                if (account == null || account.Role != RoleEnums.Bsstaff.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                // Kiểm tra nếu nhân viên đã được gán cho một trạm khác
+                var existingStaffInOtherStation = await _bssStaffRepository.GetStationByStaffId(addStaffToStationRequest.StaffId);
+                if (existingStaffInOtherStation != null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.CONFLICT,
+                        Message = ResponseMessageConstantsStation.STAFF_ALREADY_ASSIGNED_TO_ANOTHER_STATION,
+                        Data = null,
+                        StatusCode = StatusCodes.Status409Conflict
+                    };
+                }
+                var staff = await _bssStaffRepository.GetBssStaffById(addStaffToStationRequest.StaffId);
+                // Gán nhân viên cho trạm
+                staff.StationId = station.StationId;
+                staff.UpdateDate = TimeHepler.SystemTimeNow;
+                await _bssStaffRepository.UpdateBssStaff(staff);
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.ADD_STAFF_TO_STATION_SUCCESS,
+                    Data = station,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.ADD_STAFF_TO_STATION_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResultModel> GetStaffsByStationId(string stationId)
+        {
+            try
+            {
+                var station = await _stationRepository.GetStationById(stationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                var staffs = await _bssStaffRepository.GetstaffsByStationId(stationId);
+                if (staffs == null || staffs.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STAFF_LIST_EMPTY,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.GET_STAFFS_BY_STATION_SUCCESS,
+                    Data = staffs,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.GET_STAFFS_BY_STATION_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResultModel> RemoveStaffFromStation(string stationId, string staffId)
+        {
+            try
+            {
+                var station = await _stationRepository.GetStationById(stationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                var staff = await _bssStaffRepository.GetBssStaffById(staffId);
+                if (staff == null || staff.StationId != stationId)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STAFF_NOT_FOUND_IN_STATION,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                // Gỡ bỏ nhân viên khỏi trạm
+                staff.StationId = null;
+                staff.UpdateDate = TimeHepler.SystemTimeNow;
+                await _bssStaffRepository.UpdateBssStaff(staff);
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.REMOVE_STAFF_FROM_STATION_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.REMOVE_STAFF_FROM_STATION_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResultModel> GetStationByStaffId(string staffId)
+        {
+            try
+            {
+                var staff = await _bssStaffRepository.GetBssStaffById(staffId);
+                if (staff == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                var station = await _stationRepository.GetStationById(staff.StationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STAFF_NOT_ASSIGNED_TO_ANY_STATION,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.GET_STATION_BY_STAFF_SUCCESS,
+                    Data = station,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.GET_STATION_BY_STAFF_FAILED,
                     Data = ex.Message
                 };
             }

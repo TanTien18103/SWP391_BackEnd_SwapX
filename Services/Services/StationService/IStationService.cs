@@ -16,7 +16,9 @@ namespace Services.Services.StationService
         Task<ResultModel> AddStation(AddStationRequest addStationRequest);
         Task<ResultModel> UpdateStation(UpdateStationRequest updateStationRequest);
         Task<ResultModel> DeleteStation(string stationId);
-        
-
+        Task<ResultModel> AddStaffToStation(AddStaffToStationRequest addStaffToStationRequest);
+        Task<ResultModel> GetStaffsByStationId(string stationId);
+        Task<ResultModel> RemoveStaffFromStation(string stationId, string staffId);
+        Task<ResultModel> GetStationByStaffId(string staffId);
     }
 }

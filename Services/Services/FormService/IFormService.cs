@@ -19,5 +19,6 @@ namespace Services.Services.FormService
         Task<ResultModel> GetFormsByStationId(string stationId);
         Task<ResultModel> UpdateForm(UpdateFormRequest updateFormRequest);
         Task<ResultModel> DeleteForm(string formId);
+        Task<ResultModel> UpdateFormStatusStaff(UpdateFormStatusStaffRequest updateFormStatusStaffRequest);
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.FormRepo;
 using Repositories.Repositories.StationRepo;
+using Repositories.Repositories.StationScheduleRepo;
 using Services.ApiModels;
 using Services.ApiModels.Form;
 using Services.ServicesHelpers;
@@ -24,13 +25,16 @@ namespace Services.Services.FormService
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IStationRepo _stationRepo;
-        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IStationRepo stationRepo)
+        private readonly IStationScheduleRepo _stationScheduleRepo;
+
+        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IStationRepo stationRepo, IStationScheduleRepo stationScheduleRepo)
         {
             _formRepo = formRepo;
             _accountHelper = accountHelper;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _stationRepo = stationRepo;
+            _stationScheduleRepo = stationScheduleRepo;
         }
         public async Task<ResultModel> AddForm(AddFormRequest addFormRequest)
         {
@@ -450,6 +454,94 @@ namespace Services.Services.FormService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsForm.GET_ALL_FORM_FAIL,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Data = ex.InnerException?.Message,
+                };
+            }
+        }
+
+        public async Task<ResultModel> UpdateFormStatusStaff(UpdateFormStatusStaffRequest updateFormStatusStaffRequest)
+        {
+            try
+            {
+                var existingForm = await _formRepo.GetById(updateFormStatusStaffRequest.FormId);
+                if (existingForm == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsForm.FORM_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                // Only allow status update from Submitted to Approved or Rejected
+                if (existingForm.Status != FormStatusEnums.Submitted.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsForm.INVALID_FORM_STATUS_UPDATE,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                if (updateFormStatusStaffRequest.Status != StaffUpdateFormEnums.Approved &&
+                    updateFormStatusStaffRequest.Status != StaffUpdateFormEnums.Rejected)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsForm.INVALID_FORM_STATUS_VALUE,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                existingForm.Status = updateFormStatusStaffRequest.Status.ToString();
+                existingForm.UpdateDate = TimeHepler.SystemTimeNow;
+
+                // If approved, set start date and create StationSchedule
+                if (updateFormStatusStaffRequest.Status == StaffUpdateFormEnums.Approved)
+                {
+                    existingForm.StartDate = TimeHepler.SystemTimeNow;
+
+                    // Create StationSchedule logic here
+                    var stationSchedule = new StationSchedule
+                    {
+                        StationScheduleId = _accountHelper.GenerateShortGuid(),
+                        FormId = existingForm.FormId,
+                        StationId = existingForm.StationId,
+                        Date = existingForm.Date,
+                        StartDate = existingForm.StartDate,
+                        Status = ScheduleStatusEnums.Pending.ToString(),
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+
+                    await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+                }
+
+                var updatedForm = await _formRepo.Update(existingForm);
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsForm.UPDATE_FORM_STATUS_SUCCESS,
+                    Data = updatedForm,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsForm.UPDATE_FORM_STATUS_FAILED,
                     StatusCode = StatusCodes.Status500InternalServerError,
                     Data = ex.InnerException?.Message,
                 };
