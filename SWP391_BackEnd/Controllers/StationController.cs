@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Services.Services.StationService;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Services.ApiModels.Station;
 
 namespace SWP391_BackEnd.Controllers;
@@ -54,6 +53,38 @@ public class StationController : ControllerBase
     public async Task<IActionResult> DeleteStationForAdmin([FromQuery] string? stationId)
     {
         var res = await _stationService.DeleteStation(stationId);
+        return StatusCode(res.StatusCode, res);
+    }
+
+    [HttpPost("add_staff_to_station_for_admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> AddStaffToStationForAdmin([FromBody] AddStaffToStationRequest addStaffToStationRequest)
+    {
+        var res = await _stationService.AddStaffToStation(addStaffToStationRequest);
+        return StatusCode(res.StatusCode, res);
+    }
+
+    [HttpGet("get_staffs_by_station_id_for_admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetStaffsByStationIdForAdmin([FromQuery] string? stationId)
+    {
+        var res = await _stationService.GetStaffsByStationId(stationId);
+        return StatusCode(res.StatusCode, res);
+    }
+    
+    [HttpDelete("remove_staff_from_station_for_admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RemoveStaffFromStationForAdmin([FromQuery] string? stationId, [FromQuery] string? staffId)
+    {
+        var res = await _stationService.RemoveStaffFromStation(stationId, staffId);
+        return StatusCode(res.StatusCode, res);
+    }
+
+    [HttpGet("get_station_by_staff_id_for_staff")]
+    [Authorize(Roles = "Staff")]
+    public async Task<IActionResult> GetStationByStaffIdForStaff([FromQuery] string? staffId)
+    {
+        var res = await _stationService.GetStationByStaffId(staffId);
         return StatusCode(res.StatusCode, res);
     }
 }

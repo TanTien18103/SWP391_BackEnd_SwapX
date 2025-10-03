@@ -26,8 +26,6 @@ namespace Repositories.Repositories.AccountRepo
             await _context.SaveChangesAsync();
         }
 
-
-
         public async Task<List<Account>> GetAccountsByUserName(string username)
         {
             return await _context.Accounts.Where(a => a.Username == username).ToListAsync();
@@ -80,6 +78,18 @@ namespace Repositories.Repositories.AccountRepo
             {
                 return string.Empty;
             }
+        }
+
+        public async Task<Account> GetAccountByStaffId(string staffId)
+        {
+            var bssStaff = await _context.BssStaffs.FirstOrDefaultAsync(s => s.StaffId == staffId);
+            if (bssStaff != null)
+            {
+                return await _context.Accounts
+                    .Include(a => a.BssStaffs).Include(a => a.Evdrivers)
+                    .FirstOrDefaultAsync(a => a.AccountId == bssStaff.AccountId);
+            }
+            return null;
         }
     }
 }
