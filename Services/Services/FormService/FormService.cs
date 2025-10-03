@@ -76,7 +76,8 @@ namespace Services.Services.FormService
                 }
 
                 var station = await _stationRepo.GetStationById(addFormRequest.StationId);
-                if (station == null) {
+                if (station == null)
+                {
                     return new ResultModel
                     {
                         IsSuccess = false,
@@ -89,7 +90,7 @@ namespace Services.Services.FormService
 
                 // Kiểm tra số form đã trả trước ở station này
                 var paidForms = await _formRepo.GetFormsByAccountAndStation(addFormRequest.AccountId, addFormRequest.StationId);
-                int prepaidCount = paidForms.Count(f => f.Status == FormStatusEnums.SubmittedPaidFirst.ToString()); 
+                int prepaidCount = paidForms.Count(f => f.Status == FormStatusEnums.SubmittedPaidFirst.ToString());
 
                 // Nếu >= 3 lần thì approve luôn
                 string formStatus = prepaidCount >= 3
@@ -110,6 +111,23 @@ namespace Services.Services.FormService
                 };
 
                 var addedForm = await _formRepo.Add(form);
+
+                // Create StationSchedule if approved
+                if (formStatus == FormStatusEnums.Approved.ToString())
+                {
+                    var stationSchedule = new StationSchedule
+                    {
+                        StationScheduleId = _accountHelper.GenerateShortGuid(),
+                        FormId = addedForm.FormId,
+                        StationId = addedForm.StationId,
+                        Date = addedForm.Date,
+                        StartDate = addedForm.StartDate,
+                        Status = ScheduleStatusEnums.Pending.ToString(),
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+
+                    await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+                }
 
                 return new ResultModel
                 {
