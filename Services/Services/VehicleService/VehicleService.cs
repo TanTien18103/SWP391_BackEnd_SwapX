@@ -437,5 +437,59 @@ namespace Services.Services.VehicleService
                 };
             }
         }
+
+        public Task<ResultModel> AddVehicleInPackage(AddVehicleInPackageRequest addVehicleInPackageRequest)
+        {
+            try
+            {
+                var vehicle = _vehicleRepo.GetVehicleById(addVehicleInPackageRequest.Vin).Result;
+                if (vehicle == null)
+                {
+                    return Task.FromResult(new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    });
+                }
+                var package = _packageRepo.GetPackageById(addVehicleInPackageRequest.PackageId).Result;
+                if (package == null)
+                {
+                    return Task.FromResult(new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
+                        Data = null
+                    });
+                }
+                vehicle.PackageId = addVehicleInPackageRequest.PackageId;
+                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+                _vehicleRepo.UpdateVehicle(vehicle);
+                return Task.FromResult(new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsVehicle.ADD_VEHICLE_IN_PACKAGE_SUCCESS,
+                    Data = vehicle
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsVehicle.ADD_VEHICLE_IN_PACKAGE_FAILED,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
     }
 }
