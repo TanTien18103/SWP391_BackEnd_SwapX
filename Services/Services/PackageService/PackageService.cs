@@ -23,6 +23,7 @@ namespace Services.Services.PackageService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBatteryRepo _batteryRepo;
         private readonly AccountHelper _accountHelper;
+        
         public PackageService(IPackageRepo packageRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IBatteryRepo batteryRepo)
         {
             _packageRepo = packageRepo;
@@ -179,7 +180,9 @@ namespace Services.Services.PackageService
                 };
             }
         }
-        
+
+
+
         public async Task<ResultModel> UpdatePackage(UpdatePackageRequest updatePackageRequest)
         {
             try
@@ -221,6 +224,7 @@ namespace Services.Services.PackageService
                     Data = ex.Message
                 };
             }
+
         }
     }
 }
