@@ -491,5 +491,47 @@ namespace Services.Services.VehicleService
                 });
             }
         }
+
+        public Task<ResultModel> DeleteVehicleInPackage(string vehicleId)
+        {
+            try
+            {
+                var vehicle = _vehicleRepo.GetVehicleById(vehicleId).Result;
+                if (vehicle == null)
+                {
+                    return Task.FromResult(new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    });
+                }
+                vehicle.PackageId = null;
+                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+                _vehicleRepo.UpdateVehicle(vehicle);
+                return Task.FromResult(new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsVehicle.DELETE_VEHICLE_IN_PACKAGE_SUCCESS,
+                    Data = null
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsVehicle.DELETE_VEHICLE_IN_PACKAGE_FAILED,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
     }
 }

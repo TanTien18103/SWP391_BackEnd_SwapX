@@ -20,5 +20,6 @@ namespace Services.Services.VehicleService
         Task<ResultModel> GetVehicleByName(VehicleNameEnums vehicleName);
         Task<ResultModel> LinkVehicle(LinkVehicleRequest linkVehicleRequest);
         Task<ResultModel> AddVehicleInPackage(AddVehicleInPackageRequest addVehicleInPackageRequest);
+        Task<ResultModel> DeleteVehicleInPackage(string vehicleId);
     }
 }

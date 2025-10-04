@@ -291,6 +291,9 @@ namespace BusinessObjects.Constants
 
         public static string ADD_VEHICLE_IN_PACKAGE_SUCCESS = "Thêm xe vào gói thành công";
         public static string ADD_VEHICLE_IN_PACKAGE_FAILED = "Thêm xe vào gói thất bại";
+
+        public static string DELETE_VEHICLE_IN_PACKAGE_FAILED = "Hủy xe khỏi gói thất bại";
+        public static string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule

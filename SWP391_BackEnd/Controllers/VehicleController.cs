@@ -69,5 +69,12 @@ namespace SWP391_BackEnd.Controllers
             var res = await _vehicleService.AddVehicleInPackage(addVehicleInPackageRequest);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpPut("delete_vehicle_in_package")]
+        public async Task<IActionResult> DeleteVehicleInPackage([FromForm] string? vehicleId)
+        {
+            var res = await _vehicleService.DeleteVehicleInPackage(vehicleId);
+            return StatusCode(res.StatusCode, res);
+        }
+
     }
 }
