@@ -10,5 +10,8 @@ namespace Repositories.Repositories.EvDriverRepo
     public interface IEvDriverRepo
     {
         Task AddDriver(Evdriver evdriver);
+        Task<Evdriver> GetDriverByCustomerId(string customerId);
+        Task<Evdriver> GetDriverByAccountId(string accountId);
+        Task<Evdriver> UpdateDriver(Evdriver evdriver);
     }
 }

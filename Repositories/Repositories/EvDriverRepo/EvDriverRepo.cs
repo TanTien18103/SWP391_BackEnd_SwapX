@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,23 @@ namespace Repositories.Repositories.EvDriverRepo
         {
             _context.Evdrivers.Add(evdriver);
             await _context.SaveChangesAsync();
+        }
+
+
+
+        public async Task<Evdriver> GetDriverByCustomerId(string customerId)
+        {
+            return await _context.Evdrivers.FirstOrDefaultAsync(b => b.CustomerId == customerId);
+        }
+        public async Task<Evdriver> GetDriverByAccountId(string accountId)
+        {
+            return await _context.Evdrivers.FirstOrDefaultAsync(e => e.AccountId == accountId);
+        }
+        public async Task<Evdriver> UpdateDriver(Evdriver evdriver)
+        {
+            _context.Evdrivers.Update(evdriver);
+            await _context.SaveChangesAsync();
+            return evdriver;
         }
     }
 }

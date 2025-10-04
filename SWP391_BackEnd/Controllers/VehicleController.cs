@@ -13,7 +13,8 @@ namespace SWP391_BackEnd.Controllers
         {
             _vehicleService = vehicleService;
         }
-        [HttpPost("add_vehicle")]
+        [HttpPost("add_package_for_vehicle")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddVehicle([FromForm] Services.ApiModels.Vehicle.AddVehicleRequest addVehicleRequest)
         {
             var res = await _vehicleService.AddVehicle(addVehicleRequest);
@@ -53,6 +54,13 @@ namespace SWP391_BackEnd.Controllers
         public async Task<IActionResult> GetPackageByVehicleName([FromQuery] BusinessObjects.Enums.VehicleNameEnums vehicleName)
         {
             var res = await _vehicleService.GetPackageByVehicleName(vehicleName);
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpPost("link_vehicle")]
+        [Authorize(Roles = "EvDriver")]
+        public async Task<IActionResult> LinkVehicle([FromForm] Services.ApiModels.Vehicle.LinkVehicleRequest linkVehicleRequest)
+        {
+            var res = await _vehicleService.LinkVehicle(linkVehicleRequest);
             return StatusCode(res.StatusCode, res);
         }
     }

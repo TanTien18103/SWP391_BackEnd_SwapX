@@ -59,5 +59,7 @@ namespace Services.ServicesHelpers
             string base64 = Convert.ToBase64String(guid.ToByteArray());
             return base64.Replace("/", "_").Replace("+", "-").Substring(0, 20);
         }
+        
+
     }
 }
