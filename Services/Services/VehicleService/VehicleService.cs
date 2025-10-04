@@ -256,9 +256,9 @@ namespace Services.Services.VehicleService
         {
             try
             {
-
-                var vehicle = _vehicleRepo.GetVehicleByName(vehicleName).Result;
-                if (vehicle == null)
+              
+                var vehicles = _vehicleRepo.GetVehiclesByName(vehicleName).Result;
+                if (vehicles == null || vehicles.Count == 0)
                 {
                     return Task.FromResult(new ResultModel
                     {
@@ -275,9 +275,8 @@ namespace Services.Services.VehicleService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsVehicle.GET_VEHICLE_SUCCESS,
-                    Data = vehicle
+                    Data = vehicles
                 });
-
             }
             catch (Exception ex)
             {
@@ -297,8 +296,8 @@ namespace Services.Services.VehicleService
             try
             {
 
-                var vehicle = _vehicleRepo.GetVehicleByName(vehicleName).Result;
-                if (vehicle == null)
+                var vehicles = _vehicleRepo.GetVehiclesByName(vehicleName).Result;
+                if (vehicles == null || vehicles.Count == 0)
                 {
                     return Task.FromResult(new ResultModel
                     {
@@ -309,26 +308,16 @@ namespace Services.Services.VehicleService
                         Data = null
                     });
                 }
-                var package = _packageRepo.GetPackageById(vehicle.PackageId).Result;
-                if (package == null)
-                {
-                    return Task.FromResult(new ResultModel
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
-                        Data = null
-                    });
-                }
+                var packages = vehicles.Select(v => v.Package).Distinct().ToList();
                 return Task.FromResult(new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsVehicle.GET_VEHICLE_SUCCESS,
-                    Data = package
+                    Data = packages
                 });
+
             }
             catch (Exception ex)
             {
