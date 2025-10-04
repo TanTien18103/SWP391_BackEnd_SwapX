@@ -1,9 +1,12 @@
 ﻿using BusinessObjects.Constants;
 using BusinessObjects.Enums;
+using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.BatteryRepo;
+using Repositories.Repositories.EvDriverRepo;
 using Repositories.Repositories.PackageRepo;
 using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
@@ -12,6 +15,7 @@ using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,24 +31,27 @@ namespace Services.Services.VehicleService
         private readonly AccountHelper _accountHelper;
         private readonly IBatteryRepo _batteryRepo;
         private readonly IPackageRepo _packageRepo;
+        private readonly IEvDriverRepo _evDriverRepo;
+        private readonly IAccountRepo _accountRepo;
 
-        public VehicleService(IVehicleRepo vehicleRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IBatteryRepo batteryRepo, IPackageRepo packageRepo)
+        public VehicleService(IVehicleRepo vehicleRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBatteryRepo batteryRepo, IPackageRepo packageRepo, IEvDriverRepo evDriverRepo, IAccountRepo accountRepo)
         {
             _vehicleRepo = vehicleRepo;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
-            _accountHelper = accountHelper;
+            _accountHelper = new AccountHelper(configuration);
             _batteryRepo = batteryRepo;
             _packageRepo = packageRepo;
+            _evDriverRepo = evDriverRepo;
+            _accountRepo = accountRepo;
         }
-
         public async Task<ResultModel> AddVehicle(AddVehicleRequest addVehicleRequest)
         {
             try
             {
                 var vehicle = new BusinessObjects.Models.Vehicle
                 {
-                    Vin = addVehicleRequest.VehicleId,
+                    Vin = _accountHelper.GenerateShortGuid(),
                     Status = VehicleStatusEnums.Active.ToString(),
                     VehicleType = addVehicleRequest.VehicleType.ToString(),
                     VehicleName = addVehicleRequest.VehicleName.ToString(),
@@ -256,7 +263,7 @@ namespace Services.Services.VehicleService
         {
             try
             {
-              
+
                 var vehicles = _vehicleRepo.GetVehiclesByName(vehicleName).Result;
                 if (vehicles == null || vehicles.Count == 0)
                 {
@@ -329,6 +336,105 @@ namespace Services.Services.VehicleService
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
                 });
+            }
+        }
+
+        public async Task<ResultModel> LinkVehicle(LinkVehicleRequest linkVehicleRequest)
+        {
+            try
+            {
+                // Lấy accountId từ claims của người dùng đang đăng nhập
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                 || string.IsNullOrEmpty(authHeader)
+                 || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepo.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+                // Kiểm tra battery
+                var battery = await _batteryRepo.GetBatteryById(linkVehicleRequest.BatteryId);
+                if (battery == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null
+                    };
+                }
+
+                // Tạo vehicle mới
+                var vehicle = new BusinessObjects.Models.Vehicle
+                {
+                    Vin = linkVehicleRequest.VIN,
+                    Status = VehicleStatusEnums.Active.ToString(),
+                    VehicleType = linkVehicleRequest.VehicleType.ToString(),
+                    VehicleName = linkVehicleRequest.VehicleName.ToString(),
+                    BatteryId = linkVehicleRequest.BatteryId,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
+                };
+
+                await _vehicleRepo.AddVehicle(vehicle);
+
+                // Lấy Evdriver theo accountId
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(accountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = "Evdriver not found.",
+                        Data = null
+                    };
+                }
+
+                // Gán VIN cho Evdriver
+                evDriver.Vin = vehicle.Vin;
+                evDriver.UpdateDate = TimeHepler.SystemTimeNow;
+                await _evDriverRepo.UpdateDriver(evDriver);
+
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsVehicle.LINK_VEHICLE_SUCCESS,
+                    Data = vehicle
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsVehicle.LINK_VEHICLE_FAILED,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
             }
         }
     }
