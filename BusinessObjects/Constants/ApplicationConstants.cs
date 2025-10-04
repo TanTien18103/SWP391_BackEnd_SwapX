@@ -29,6 +29,8 @@ namespace BusinessObjects.Constants
         public const string FORBIDDEN = "Forbidden!";
         public const string EXPIRED = "Expired!";
         public const string VALIDATION_FAIL = "Validation fail!";
+
+        public static string CONFLICT { get; set; }
     }
 
     //Controllers
@@ -159,16 +161,27 @@ namespace BusinessObjects.Constants
         public const string STATION_INACTIVE = "Trạm đã bị ngừng hoạt động";
         public const string GET_STATION_LIST_SUCCESS = "Lấy danh sách trạm thành công";
         public const string GET_STATION_DETAIL_SUCCESS = "Lấy chi tiết trạm thành công";
-        public static string ADD_STATION_FAIL = "Thêm trạm thất bại";
-        public static string GET_ALL_STATION_FAIL = "Lấy danh sách trạm thất bại";
-        public static string STATION_LIST_EMPTY = "Lấy danh sách trạm thất bại";
-        public static string GET_ALL_STATION_SUCCESS = "Lấy danh sách trạm thành công";
-        public static string UPDATE_STATION_FAILED = "Cập nhật trạm thất bại";
-        public static string GET_STATION_FAIL = "Lấy trạm thất bại";
-        public static string GET_STATION_SUCCESS = "Lấy trạm thành công";
-        public static string DELETE_STATION_FAILED = "Xóa trạm thất bại";
+        public const string ADD_STATION_FAIL = "Thêm trạm thất bại";
+        public const string GET_ALL_STATION_FAIL = "Lấy danh sách trạm thất bại";
+        public const string STATION_LIST_EMPTY = "Lấy danh sách trạm thất bại";
+        public const string GET_ALL_STATION_SUCCESS = "Lấy danh sách trạm thành công";
+        public const string UPDATE_STATION_FAILED = "Cập nhật trạm thất bại";
+        public const string GET_STATION_FAIL = "Lấy trạm thất bại";
+        public const string GET_STATION_SUCCESS = "Lấy trạm thành công";
+        public const string DELETE_STATION_FAILED = "Xóa trạm thất bại";
+        public const string STAFF_ALREADY_ASSIGNED_TO_ANOTHER_STATION = "Nhân viên đã được phân công cho một trạm khác.";
+        public const string ADD_STAFF_TO_STATION_SUCCESS = "Thêm nhân viên vào trạm thành công";
+        public const string ADD_STAFF_TO_STATION_FAILED = "Thêm nhân viên vào trạm thất bại";
+        public const string STAFF_LIST_EMPTY = "Trạm chưa có nhân viên nào";
+        public const string GET_STAFFS_BY_STATION_SUCCESS = "Lấy danh sách nhân viên của trạm thành công";
+        public const string GET_STAFFS_BY_STATION_FAILED = "Lấy danh sách nhân viên của trạm thất bại";
+        public const string STAFF_NOT_FOUND_IN_STATION = "Nhân viên không thuộc trạm này";
+        public const string REMOVE_STAFF_FROM_STATION_FAILED = "Xóa nhân viên khỏi trạm thất bại";
+        public const string REMOVE_STAFF_FROM_STATION_SUCCESS = "Xóa nhân viên khỏi trạm thành công";
 
-
+        public static string GET_STATION_BY_STAFF_SUCCESS { get; set; }
+        public static string STAFF_NOT_ASSIGNED_TO_ANY_STATION { get; set; }
+        public static string GET_STATION_BY_STAFF_FAILED { get; set; }
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -222,6 +235,12 @@ namespace BusinessObjects.Constants
         public const string GET_FORM_SUCCESS = "Lấy biểu mẫu thành công";
         public const string DELETE_FORM_FAILED = "Xóa biểu mẫu thất bại";
         public const string INVALID_FORM_DATE = "Ngày biểu mẫu không hợp lệ";
+        public const string INVALID_FORM_TIME = "Thời gian không nằm trong giờ hành chính (7h30–12h, 13h30–17h).";
+
+        public static string INVALID_FORM_STATUS_VALUE { get; set; }
+        public static string INVALID_FORM_STATUS_UPDATE { get; set; }
+        public static string UPDATE_FORM_STATUS_SUCCESS { get; set; }
+        public static string UPDATE_FORM_STATUS_FAILED { get; set; }
     }
     // For Package (0-0-1)
     public static class ResponseMessageConstantsPackage

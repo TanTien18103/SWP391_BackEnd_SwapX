@@ -15,5 +15,6 @@ namespace Repositories.Repositories.FormRepo
         Task<List<Form>> GetByAccountId(string accountId);
         Task<List<Form>> GetByStationId(string stationId);
         Task<Form> Update(Form form);
+        Task<List<Form>> GetFormsByAccountAndStation(string accountId, string stationId);
     }
 }

@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.Enums
 {
-    public enum FormStatusEnums
+    public enum ScheduleStatusEnums
     {
-        Draft,
-        Submitted,
-        SubmittedPaidFirst,
         Pending,
-        Approved,   
-        Rejected,
-        Cancelled,
-        Deleted
+        InProgress,
+        Completed,
+        Cancelled
     }
 }

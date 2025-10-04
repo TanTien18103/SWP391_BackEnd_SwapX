@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.FormRepo;
 using Repositories.Repositories.StationRepo;
+using Repositories.Repositories.StationScheduleRepo;
 using Services.ApiModels;
 using Services.ApiModels.Form;
 using Services.ServicesHelpers;
@@ -24,13 +25,16 @@ namespace Services.Services.FormService
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IStationRepo _stationRepo;
-        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IStationRepo stationRepo)
+        private readonly IStationScheduleRepo _stationScheduleRepo;
+
+        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IStationRepo stationRepo, IStationScheduleRepo stationScheduleRepo)
         {
             _formRepo = formRepo;
             _accountHelper = accountHelper;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _stationRepo = stationRepo;
+            _stationScheduleRepo = stationScheduleRepo;
         }
         public async Task<ResultModel> AddForm(AddFormRequest addFormRequest)
         {
@@ -46,8 +50,34 @@ namespace Services.Services.FormService
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
+
+                // Validate giờ hành chính
+                var requestDate = addFormRequest.Date.GetValueOrDefault();
+                var requestTime = requestDate.TimeOfDay;
+
+                var morningStart = new TimeSpan(7, 30, 0);
+                var morningEnd = new TimeSpan(12, 0, 0);
+                var afternoonStart = new TimeSpan(13, 30, 0);
+                var afternoonEnd = new TimeSpan(17, 0, 0);
+
+                bool isInWorkingHours =
+                    (requestTime >= morningStart && requestTime <= morningEnd) ||
+                    (requestTime >= afternoonStart && requestTime <= afternoonEnd);
+
+                if (!isInWorkingHours)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsForm.INVALID_FORM_TIME,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
                 var station = await _stationRepo.GetStationById(addFormRequest.StationId);
-                if (station == null) {
+                if (station == null)
+                {
                     return new ResultModel
                     {
                         IsSuccess = false,
@@ -58,6 +88,15 @@ namespace Services.Services.FormService
                     };
                 }
 
+                // Kiểm tra số form đã trả trước ở station này
+                var paidForms = await _formRepo.GetFormsByAccountAndStation(addFormRequest.AccountId, addFormRequest.StationId);
+                int prepaidCount = paidForms.Count(f => f.Status == FormStatusEnums.SubmittedPaidFirst.ToString());
+
+                // Nếu >= 3 lần thì approve luôn
+                string formStatus = prepaidCount >= 3
+                    ? FormStatusEnums.Approved.ToString()
+                    : FormStatusEnums.Submitted.ToString();
+
                 var form = new Form
                 {
                     FormId = _accountHelper.GenerateShortGuid(),
@@ -66,12 +105,29 @@ namespace Services.Services.FormService
                     Title = addFormRequest.Title,
                     Description = addFormRequest.Description,
                     Date = addFormRequest.Date,
-                    Status = FormStatusEnums.Submitted.ToString(),
+                    Status = formStatus,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
 
                 var addedForm = await _formRepo.Add(form);
+
+                // Create StationSchedule if approved
+                if (formStatus == FormStatusEnums.Approved.ToString())
+                {
+                    var stationSchedule = new StationSchedule
+                    {
+                        StationScheduleId = _accountHelper.GenerateShortGuid(),
+                        FormId = addedForm.FormId,
+                        StationId = addedForm.StationId,
+                        Date = addedForm.Date,
+                        StartDate = addedForm.StartDate,
+                        Status = ScheduleStatusEnums.Pending.ToString(),
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+
+                    await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+                }
 
                 return new ResultModel
                 {
@@ -416,6 +472,94 @@ namespace Services.Services.FormService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsForm.GET_ALL_FORM_FAIL,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Data = ex.InnerException?.Message,
+                };
+            }
+        }
+
+        public async Task<ResultModel> UpdateFormStatusStaff(UpdateFormStatusStaffRequest updateFormStatusStaffRequest)
+        {
+            try
+            {
+                var existingForm = await _formRepo.GetById(updateFormStatusStaffRequest.FormId);
+                if (existingForm == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsForm.FORM_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                // Only allow status update from Submitted to Approved or Rejected
+                if (existingForm.Status != FormStatusEnums.Submitted.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsForm.INVALID_FORM_STATUS_UPDATE,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                if (updateFormStatusStaffRequest.Status != StaffUpdateFormEnums.Approved &&
+                    updateFormStatusStaffRequest.Status != StaffUpdateFormEnums.Rejected)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsForm.INVALID_FORM_STATUS_VALUE,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                existingForm.Status = updateFormStatusStaffRequest.Status.ToString();
+                existingForm.UpdateDate = TimeHepler.SystemTimeNow;
+
+                // If approved, set start date and create StationSchedule
+                if (updateFormStatusStaffRequest.Status == StaffUpdateFormEnums.Approved)
+                {
+                    existingForm.StartDate = TimeHepler.SystemTimeNow;
+
+                    // Create StationSchedule logic here
+                    var stationSchedule = new StationSchedule
+                    {
+                        StationScheduleId = _accountHelper.GenerateShortGuid(),
+                        FormId = existingForm.FormId,
+                        StationId = existingForm.StationId,
+                        Date = existingForm.Date,
+                        StartDate = existingForm.StartDate,
+                        Status = ScheduleStatusEnums.Pending.ToString(),
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+
+                    await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+                }
+
+                var updatedForm = await _formRepo.Update(existingForm);
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsForm.UPDATE_FORM_STATUS_SUCCESS,
+                    Data = updatedForm,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsForm.UPDATE_FORM_STATUS_FAILED,
                     StatusCode = StatusCodes.Status500InternalServerError,
                     Data = ex.InnerException?.Message,
                 };
