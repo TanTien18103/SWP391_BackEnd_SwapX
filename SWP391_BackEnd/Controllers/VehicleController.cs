@@ -63,5 +63,11 @@ namespace SWP391_BackEnd.Controllers
             var res = await _vehicleService.LinkVehicle(linkVehicleRequest);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpPut("add_vehicle_in_package")]
+        public async Task<IActionResult> AddVehicleInPackage([FromForm] Services.ApiModels.Vehicle.AddVehicleInPackageRequest addVehicleInPackageRequest)
+        {
+            var res = await _vehicleService.AddVehicleInPackage(addVehicleInPackageRequest);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

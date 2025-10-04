@@ -288,6 +288,9 @@ namespace BusinessObjects.Constants
 
         public static string LINK_VEHICLE_FAILED = "Liên kết xe thất bại";
         public static string LINK_VEHICLE_SUCCESS = "Liên kết xe thành công";
+
+        public static string ADD_VEHICLE_IN_PACKAGE_SUCCESS = "Thêm xe vào gói thành công";
+        public static string ADD_VEHICLE_IN_PACKAGE_FAILED = "Thêm xe vào gói thất bại";
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule
