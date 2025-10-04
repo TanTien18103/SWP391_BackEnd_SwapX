@@ -37,9 +37,13 @@ namespace Repositories.Repositories.VehicleRepo
             await _context.SaveChangesAsync();
             return vehicle;
         }
-        public async Task<Vehicle> GetVehicleByName(VehicleNameEnums vehicleName)
+        public async Task<List<Vehicle>> GetVehiclesByName(VehicleNameEnums vehicleName)
         {
-            return await _context.Vehicles.Include(a => a.Battery).Include(b => b.Package).FirstOrDefaultAsync(v => v.VehicleName == vehicleName.ToString());
+            return await _context.Vehicles
+                .Include(a => a.Battery)
+                .Include(b => b.Package)
+                .Where(v => v.VehicleName == vehicleName.ToString())
+                .ToListAsync();
         }
     }
 }
