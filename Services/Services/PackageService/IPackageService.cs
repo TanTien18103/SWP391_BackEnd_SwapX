@@ -16,5 +16,6 @@ namespace Services.Services.PackageService
         Task<ResultModel> AddPackage(AddPackageRequest createPackageRequest);
         Task<ResultModel> UpdatePackage(UpdatePackageRequest updatePackageRequest);
         Task<ResultModel> DeletePackage(string packageId);
+  
     }
 }

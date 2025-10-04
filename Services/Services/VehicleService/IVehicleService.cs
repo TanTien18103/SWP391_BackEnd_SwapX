@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Services.ApiModels;
 using Services.ApiModels.Vehicle;
+using BusinessObjects.Enums;
 
 namespace Services.Services.VehicleService
 {
@@ -15,5 +16,7 @@ namespace Services.Services.VehicleService
         Task<ResultModel> AddVehicle(AddVehicleRequest addVehicleRequest);
         Task<ResultModel> UpdateVehicle(UpdateVehicleRequest updateVehicleRequest);
         Task<ResultModel> DeleteVehicle(string vehicleId);
+        Task<ResultModel> GetPackageByVehicleName(VehicleNameEnums vehicleName);
+        Task<ResultModel> GetVehicleByName(VehicleNameEnums vehicleName);
     }
 }

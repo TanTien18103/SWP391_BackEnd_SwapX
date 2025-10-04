@@ -264,6 +264,8 @@ namespace BusinessObjects.Constants
         public const string GET_VEHICLE_FAIL = "Lấy xe thất bại";
         public const string GET_VEHICLE_SUCCESS = "Lấy xe thành công";
         public const string DELETE_VEHICLE_FAILED = "Xóa xe thất bại";
+        public static string GET_VEHICLES_BY_PACKAGE_ID_FAILED = "Lấy xe theo gói thất bại";
+        public static string GET_VEHICLES_BY_PACKAGE_ID_SUCCESS = "Lấy xe theo gói thành công";
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule

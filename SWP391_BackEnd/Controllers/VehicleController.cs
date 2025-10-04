@@ -43,5 +43,17 @@ namespace SWP391_BackEnd.Controllers
             var res = await _vehicleService.GetAllVehicles();
             return StatusCode(res.StatusCode, res);
         }
+        [HttpGet("get_vehicle_by_name")]
+        public async Task<IActionResult> GetVehicleByName([FromQuery] BusinessObjects.Enums.VehicleNameEnums vehicleName)
+        {
+            var res = await _vehicleService.GetVehicleByName(vehicleName);
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpGet("get_package_by_vehicle_name")]
+        public async Task<IActionResult> GetPackageByVehicleName([FromQuery] BusinessObjects.Enums.VehicleNameEnums vehicleName)
+        {
+            var res = await _vehicleService.GetPackageByVehicleName(vehicleName);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

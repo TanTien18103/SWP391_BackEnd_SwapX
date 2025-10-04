@@ -12,6 +12,8 @@ namespace Services.ApiModels.Vehicle
     public class AddVehicleRequest
     {
         [Required]
+        public string VehicleId { get; set; }
+        [Required]
         public VehicleNameEnums VehicleName { get; set; }
         [Required]
         public VehicleTypeEnums VehicleType { get; set; }
