@@ -29,5 +29,6 @@ namespace Services.Services.AccountService
         Task<ResultModel> UpdateCurrentProfile(UpdateProfileRequest updateProfileRequest);
         Task<ResultModel> UpdateCustomer(UpdateCustomerRequest updateCustomerRequest);
         Task<ResultModel> UpdateStatus(UpdateStatusRequest updateStatusRequest);
+        Task<ResultModel> GetAllCustomerHasPackage();
     }
 }

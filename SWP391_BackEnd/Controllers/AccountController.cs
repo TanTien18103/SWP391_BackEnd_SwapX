@@ -175,5 +175,12 @@ namespace Services.Controllers
             var res = await _accountService.UpdateCurrentProfile(updateProfileRequest);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpGet("get_customer_has_package")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> GetCustomerHasPackage()
+        {
+            var res = await _accountService.GetAllCustomerHasPackage();
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

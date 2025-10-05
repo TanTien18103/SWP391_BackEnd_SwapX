@@ -1117,6 +1117,34 @@ namespace Services.Services.AccountService
                 };
             }
         }
+
+        public async Task<ResultModel> GetAllCustomerHasPackage()
+        {
+            try
+            {
+                var customers = await _accountRepository.GetAllCustomerHasPackage();
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
+                    Data = customers,
+                    StatusCode = StatusCodes.Status200OK
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+
+        }
     }
 }
 

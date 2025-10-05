@@ -16,7 +16,15 @@ namespace BusinessObjects.Enums
         V60_Ah22,
         [Description("72V-38Ah")]
         V72_Ah38,
-        [Description("72V-54Ah")]
-        V72_Ah54
+        [Description("72V-50Ah")]
+        V72_Ah50,
+        [Description("48V-22Ah")]
+        V48_Ah22,
+        [Description("72V-30Ah")]
+        V72_Ah30,
+        [Description("72V-22Ah")]
+        V72_Ah22,
+        [Description("60V-20Ah")]
+        V60_Ah20
     }
 }

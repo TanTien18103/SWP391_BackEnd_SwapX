@@ -9,7 +9,7 @@ namespace BusinessObjects.Enums
     public enum BatteryTypeEnums
     {
         Lithium,
-        Accumulator,
+        Graphene_TTFAR_Accumulator,
         LFP
     }
 }

@@ -64,7 +64,7 @@ namespace Repositories.Repositories.AccountRepo
             return await _context.Accounts.Include(a => a.Evdrivers).
                 Where(a => a.Role == RoleEnums.EvDriver.ToString()).ToListAsync();
         }
-        
+
         public async Task<string> GetAccountIdFromToken(string token)
         {
             try
@@ -90,6 +90,17 @@ namespace Repositories.Repositories.AccountRepo
                     .FirstOrDefaultAsync(a => a.AccountId == bssStaff.AccountId);
             }
             return null;
+        }
+
+        public async Task<List<Account>> GetAllCustomerHasPackage()
+        {
+            return await _context.Accounts
+                   .Include(a => a.Evdrivers)
+                   .ThenInclude(e => e.VinNavigation) // Giả sử EVDriver có navigation tới Vehicle
+                    .ThenInclude(v => v.Package)   // Và Vehicle có navigation tới Package
+                    .Where(a => a.Role == RoleEnums.EvDriver.ToString()
+                    && a.Evdrivers.Any(e => e.VinNavigation.Package != null))
+                    .ToListAsync();
         }
     }
 }
