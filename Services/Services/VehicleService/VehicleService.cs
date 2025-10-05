@@ -218,125 +218,139 @@ namespace Services.Services.VehicleService
                 };
             }
         }
-        public Task<ResultModel> DeleteVehicle(string vehicleId)
+        public async Task<ResultModel> DeleteVehicle(string vehicleId)
         {
             try
             {
-                var existingVehicle = _vehicleRepo.GetVehicleById(vehicleId).Result;
+
+                var existingVehicle = await _vehicleRepo.GetVehicleById(vehicleId);
                 if (existingVehicle == null)
                 {
-                    return Task.FromResult(new ResultModel
+                    return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
                         Data = null
-                    });
+                    };
                 }
                 existingVehicle.Status = VehicleStatusEnums.Inactive.ToString();
                 existingVehicle.UpdateDate = TimeHepler.SystemTimeNow;
-                _vehicleRepo.UpdateVehicle(existingVehicle);
-                return Task.FromResult(new ResultModel
+                await _vehicleRepo.UpdateVehicle(existingVehicle);
+                return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsVehicle.DELETE_VEHICLE_SUCCESS,
-                    Data = existingVehicle
-                });
+                    Data = null
+                };
+
             }
             catch (Exception ex)
             {
-                return Task.FromResult(new ResultModel
+                return new ResultModel
                 {
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsVehicle.DELETE_VEHICLE_FAILED,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
-                });
+                };
             }
+
         }
 
-        public Task<ResultModel> GetVehicleByName(VehicleNameEnums vehicleName)
+        public async Task<ResultModel> GetVehicleByName(VehicleNameEnums vehicleName)
         {
             try
             {
-
-                var vehicles = _vehicleRepo.GetVehiclesByName(vehicleName).Result;
+                var vehicles = await _vehicleRepo.GetVehiclesByName(vehicleName);
                 if (vehicles == null || vehicles.Count == 0)
                 {
-                    return Task.FromResult(new ResultModel
+                    return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
                         Data = null
-                    });
+                    };
                 }
-                return Task.FromResult(new ResultModel
+                return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsVehicle.GET_VEHICLE_SUCCESS,
                     Data = vehicles
-                });
+                };
             }
             catch (Exception ex)
             {
-                return Task.FromResult(new ResultModel
+                return new ResultModel
                 {
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsVehicle.GET_VEHICLE_FAIL,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
-                });
+                };
             }
+
         }
 
-        public Task<ResultModel> GetPackageByVehicleName(VehicleNameEnums vehicleName)
+        public async Task<ResultModel> GetPackageByVehicleName(VehicleNameEnums vehicleName)
         {
             try
             {
 
-                var vehicles = _vehicleRepo.GetVehiclesByName(vehicleName).Result;
+                var vehicles = await _vehicleRepo.GetVehiclesByName(vehicleName);
                 if (vehicles == null || vehicles.Count == 0)
                 {
-                    return Task.FromResult(new ResultModel
+                    return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
                         Data = null
-                    });
+                    };
                 }
-                var packages = vehicles.Select(v => v.Package).Distinct().ToList();
-                return Task.FromResult(new ResultModel
+                var packages = vehicles.Where(v => v.Package != null).Select(v => v.Package).Distinct().ToList();
+                if (packages == null || packages.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsVehicle.GET_VEHICLE_SUCCESS,
+                    Message = ResponseMessageConstantsPackage.GET_PACKAGE_SUCCESS,
                     Data = packages
-                });
-
+                };
             }
             catch (Exception ex)
             {
-                return Task.FromResult(new ResultModel
+                return new ResultModel
                 {
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsVehicle.GET_VEHICLE_FAIL,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
-                });
+                };
             }
+
         }
 
         public async Task<ResultModel> LinkVehicle(LinkVehicleRequest linkVehicleRequest)
@@ -438,100 +452,101 @@ namespace Services.Services.VehicleService
             }
         }
 
-        public Task<ResultModel> AddVehicleInPackage(AddVehicleInPackageRequest addVehicleInPackageRequest)
+        public async Task<ResultModel> AddVehicleInPackage(AddVehicleInPackageRequest addVehicleInPackageRequest)
         {
             try
             {
-                var vehicle = _vehicleRepo.GetVehicleById(addVehicleInPackageRequest.Vin).Result;
+                var vehicle = await _vehicleRepo.GetVehicleById(addVehicleInPackageRequest.Vin);
                 if (vehicle == null)
                 {
-                    return Task.FromResult(new ResultModel
+                    return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
                         Data = null
-                    });
+                    };
                 }
-                var package = _packageRepo.GetPackageById(addVehicleInPackageRequest.PackageId).Result;
+                var package = await _packageRepo.GetPackageById(addVehicleInPackageRequest.PackageId);
                 if (package == null)
                 {
-                    return Task.FromResult(new ResultModel
+                    return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
                         Data = null
-                    });
+                    };
                 }
                 vehicle.PackageId = addVehicleInPackageRequest.PackageId;
                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
-                _vehicleRepo.UpdateVehicle(vehicle);
-                return Task.FromResult(new ResultModel
+                await _vehicleRepo.UpdateVehicle(vehicle);
+                return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsVehicle.ADD_VEHICLE_IN_PACKAGE_SUCCESS,
                     Data = vehicle
-                });
-
+                };
             }
             catch (Exception ex)
             {
-                return Task.FromResult(new ResultModel
+                return new ResultModel
                 {
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsVehicle.ADD_VEHICLE_IN_PACKAGE_FAILED,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
-                });
+                };
             }
+
         }
 
-        public Task<ResultModel> DeleteVehicleInPackage(string vehicleId)
+        public async Task<ResultModel> DeleteVehicleInPackage(string vehicleId)
         {
             try
             {
-                var vehicle = _vehicleRepo.GetVehicleById(vehicleId).Result;
+                var vehicle = await _vehicleRepo.GetVehicleById(vehicleId);
                 if (vehicle == null)
                 {
-                    return Task.FromResult(new ResultModel
+                    return new ResultModel
                     {
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
                         Data = null
-                    });
+                    };
                 }
                 vehicle.PackageId = null;
                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
-                _vehicleRepo.UpdateVehicle(vehicle);
-                return Task.FromResult(new ResultModel
+                await _vehicleRepo.UpdateVehicle(vehicle);
+                return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsVehicle.DELETE_VEHICLE_IN_PACKAGE_SUCCESS,
-                    Data = null
-                });
+                    Data = vehicle
+                };
 
             }
             catch (Exception ex)
             {
-                return Task.FromResult(new ResultModel
+                return new ResultModel
                 {
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsVehicle.DELETE_VEHICLE_IN_PACKAGE_FAILED,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
-                });
+                };
             }
+
         }
     }
 }
