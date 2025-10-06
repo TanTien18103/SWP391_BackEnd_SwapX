@@ -23,11 +23,13 @@ public partial class Vehicle
 
     public DateTime? UpdateDate { get; set; }
 
+    public string CustomerId { get; set; }
+
     public virtual Battery Battery { get; set; }
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
 
-    public virtual ICollection<Evdriver> Evdrivers { get; set; } = new List<Evdriver>();
+    public virtual Evdriver Customer { get; set; }
 
     public virtual ICollection<ExchangeBattery> ExchangeBatteries { get; set; } = new List<ExchangeBattery>();
 
