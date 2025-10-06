@@ -300,6 +300,7 @@ namespace BusinessObjects.Constants
         public static string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
         public static string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";
 
+        public static string VEHICLE_ALREADY_IN_PACKAGE = "Xe đã có gói";
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule

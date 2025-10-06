@@ -488,6 +488,70 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
+                // Kiểm tra trước khi gán
+                if (vehicle.PackageId != null && vehicle.PackageId != "")
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_ALREADY_IN_PACKAGE,
+                        Data = null
+                    };
+                }
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                  || string.IsNullOrEmpty(authHeader)
+                  || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepo.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                // Get Evdriver by accountId
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(accountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = "Evdriver not found.",
+                        Data = null
+                    };
+                }
+
+                // Check if the vehicle belongs to the user
+                if (vehicle.CustomerId != evDriver.CustomerId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FORBIDDEN,
+                        Message = "You do not own this vehicle.",
+                        Data = null
+                    };
+                }
                 vehicle.PackageId = addVehicleInPackageRequest.PackageId;
                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
                 await _vehicleRepo.UpdateVehicle(vehicle);
@@ -527,6 +591,58 @@ namespace Services.Services.VehicleService
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                  || string.IsNullOrEmpty(authHeader)
+                  || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepo.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                // Get Evdriver by accountId
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(accountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = "Evdriver not found.",
+                        Data = null
+                    };
+                }
+
+                // Check if the vehicle belongs to the user
+                if (vehicle.CustomerId != evDriver.CustomerId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FORBIDDEN,
+                        Message = "You do not own this vehicle.",
                         Data = null
                     };
                 }
