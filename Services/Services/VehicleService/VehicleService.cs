@@ -396,21 +396,6 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
-
-                // Tạo vehicle mới
-                var vehicle = new BusinessObjects.Models.Vehicle
-                {
-                    Vin = linkVehicleRequest.VIN,
-                    Status = VehicleStatusEnums.Active.ToString(),
-                    VehicleType = linkVehicleRequest.VehicleType.ToString(),
-                    VehicleName = linkVehicleRequest.VehicleName.ToString(),
-                    BatteryId = linkVehicleRequest.BatteryId,
-                    StartDate = TimeHepler.SystemTimeNow,
-                    UpdateDate = TimeHepler.SystemTimeNow
-                };
-
-                await _vehicleRepo.AddVehicle(vehicle);
-
                 // Lấy Evdriver theo accountId
                 var evDriver = await _evDriverRepo.GetDriverByAccountId(accountId);
                 if (evDriver == null)
@@ -424,11 +409,34 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
+                // Tạo vehicle mới
+                var vehicle = new BusinessObjects.Models.Vehicle
+                {
+                    Vin = linkVehicleRequest.VIN,
+                    Status = VehicleStatusEnums.Active.ToString(),
+                    VehicleType = linkVehicleRequest.VehicleType.ToString(),
+                    VehicleName = linkVehicleRequest.VehicleName.ToString(),
+                    BatteryId = linkVehicleRequest.BatteryId,
+                    CustomerId = evDriver.CustomerId,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
+                };
+                if (await _vehicleRepo.GetVehicleById(linkVehicleRequest.VIN) != null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_ALREADY_EXISTS,
+                        Data = null
+                    };
+                }
 
-                // Gán VIN cho Evdriver
-                evDriver.Vin = vehicle.Vin;
-                evDriver.UpdateDate = TimeHepler.SystemTimeNow;
-                await _evDriverRepo.UpdateDriver(evDriver);
+                await _vehicleRepo.AddVehicle(vehicle);
+
+
+
 
                 return new ResultModel
                 {
@@ -547,6 +555,102 @@ namespace Services.Services.VehicleService
                 };
             }
 
+        }
+
+        public async Task<ResultModel> UnlinkVehicle(string vehicleId)
+        {
+            try
+            {
+                var vehicle = await _vehicleRepo.GetVehicleById(vehicleId);
+                if (vehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                    || string.IsNullOrEmpty(authHeader)
+                    || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepo.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                // Get Evdriver by accountId
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(accountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = "Evdriver not found.",
+                        Data = null
+                    };
+                }
+
+                // Check if the vehicle belongs to the user
+                if (vehicle.CustomerId != evDriver.CustomerId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FORBIDDEN,
+                        Message = "You do not own this vehicle.",
+                        Data = null
+                    };
+                }
+
+                // Unlink logic here (for example, set CustomerId to null)
+                vehicle.CustomerId = null;
+                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+                await _vehicleRepo.UpdateVehicle(vehicle);
+
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsVehicle.UNLINK_VEHICLE_SUCCESS,
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsVehicle.UNLINK_VEHICLE_FAILED,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
         }
     }
 }

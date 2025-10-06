@@ -75,6 +75,12 @@ namespace SWP391_BackEnd.Controllers
             var res = await _vehicleService.DeleteVehicleInPackage(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
-
+        [HttpPut("unlink_vehicle")]
+        [Authorize(Roles = "EvDriver")]
+        public async Task<IActionResult> UnlinkVehicle([FromForm] string? vehicleId)
+        {
+            var res = await _vehicleService.UnlinkVehicle(vehicleId);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

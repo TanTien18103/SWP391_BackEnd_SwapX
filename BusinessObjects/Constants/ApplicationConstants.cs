@@ -294,6 +294,12 @@ namespace BusinessObjects.Constants
 
         public static string DELETE_VEHICLE_IN_PACKAGE_FAILED = "Hủy xe khỏi gói thất bại";
         public static string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
+
+        public static string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống";
+
+        public static string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
+        public static string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";
+
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule

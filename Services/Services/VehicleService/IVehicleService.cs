@@ -21,6 +21,7 @@ namespace Services.Services.VehicleService
         Task<ResultModel> LinkVehicle(LinkVehicleRequest linkVehicleRequest);
         Task<ResultModel> AddVehicleInPackage(AddVehicleInPackageRequest addVehicleInPackageRequest);
         Task<ResultModel> DeleteVehicleInPackage(string vehicleId);
-        
+        Task<ResultModel> UnlinkVehicle(string vehicleId);
+
     }
 }
