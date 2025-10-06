@@ -43,6 +43,7 @@ namespace Services.Services.PackageService
                     Description = createPackageRequest.Description,
                     Price = createPackageRequest.Price,
                     Status = PackageStatusEnums.Active.ToString(),
+                    PackageName = createPackageRequest.PackageName,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
@@ -199,9 +200,19 @@ namespace Services.Services.PackageService
                         Data = null
                     };
                 }
-              
-                package.Description = updatePackageRequest.Description;
-                package.Price = updatePackageRequest.Price;
+                if(updatePackageRequest.Description != null)
+                {
+                    package.Description = updatePackageRequest.Description;
+                }
+                if(updatePackageRequest.Price != null)
+                {
+                    package.Price = updatePackageRequest.Price;
+                }
+                if(updatePackageRequest.PackageName != null)
+                {
+                    package.PackageName = updatePackageRequest.PackageName;
+                }
+
                 package.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedPackage = await _packageRepo.UpdatePackage(package);
                 return new ResultModel

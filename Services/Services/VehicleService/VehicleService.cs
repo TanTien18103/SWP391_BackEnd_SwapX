@@ -768,5 +768,10 @@ namespace Services.Services.VehicleService
                 };
             }
         }
+
+        public Task<ResultModel> GetAllVehicleByCustomerId(string customerId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

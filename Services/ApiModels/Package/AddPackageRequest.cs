@@ -12,6 +12,9 @@ namespace Services.ApiModels.Package
         [Required]
         public decimal Price { get; set; }
         [Required]
+        public string PackageName { get; set; }
+        [Required]
         public string Description { get; set; }
+        
     }
 }
