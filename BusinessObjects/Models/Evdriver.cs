@@ -9,8 +9,6 @@ public partial class Evdriver
 {
     public string CustomerId { get; set; }
 
-    public string Vin { get; set; }
-
     public string AccountId { get; set; }
 
     public string Status { get; set; }
@@ -21,5 +19,5 @@ public partial class Evdriver
 
     public virtual Account Account { get; set; }
 
-    public virtual Vehicle VinNavigation { get; set; }
+    public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 }

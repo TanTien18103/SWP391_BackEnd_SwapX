@@ -19,5 +19,7 @@ public partial class Package
 
     public DateTime? UpdateDate { get; set; }
 
+    public string PackageName { get; set; }
+
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 }

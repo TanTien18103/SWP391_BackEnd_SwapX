@@ -260,17 +260,10 @@ public partial class SwapXContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("status");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-            entity.Property(e => e.Vin)
-                .HasMaxLength(100)
-                .HasColumnName("VIN");
 
             entity.HasOne(d => d.Account).WithMany(p => p.Evdrivers)
                 .HasForeignKey(d => d.AccountId)
                 .HasConstraintName("FK__EVDriver__accoun__5DCAEF64");
-
-            entity.HasOne(d => d.VinNavigation).WithMany(p => p.Evdrivers)
-                .HasForeignKey(d => d.Vin)
-                .HasConstraintName("FK__EVDriver__VIN__5EBF139D");
         });
 
         modelBuilder.Entity<ExchangeBattery>(entity =>
@@ -421,6 +414,7 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
+            entity.Property(e => e.PackageName).HasMaxLength(100);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.Status)
@@ -608,6 +602,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.BatteryId)
                 .HasMaxLength(100)
                 .HasColumnName("BatteryID");
+            entity.Property(e => e.CustomerId)
+                .HasMaxLength(100)
+                .HasColumnName("CustomerID");
             entity.Property(e => e.PackageId)
                 .HasMaxLength(100)
                 .HasColumnName("PackageID");
@@ -626,6 +623,10 @@ public partial class SwapXContext : DbContext
             entity.HasOne(d => d.Battery).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.BatteryId)
                 .HasConstraintName("FK__Vehicle__Battery__72C60C4A");
+
+            entity.HasOne(d => d.Customer).WithMany(p => p.Vehicles)
+                .HasForeignKey(d => d.CustomerId)
+                .HasConstraintName("FK__Vehicle__Custome__01142BA1");
 
             entity.HasOne(d => d.Package).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.PackageId)
