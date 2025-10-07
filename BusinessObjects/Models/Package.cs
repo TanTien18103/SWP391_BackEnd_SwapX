@@ -21,5 +21,7 @@ public partial class Package
 
     public string PackageName { get; set; }
 
+    public string BatteryType { get; set; }
+
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 }
