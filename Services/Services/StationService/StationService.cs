@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Services.Services.StationService
 {
     public class StationService : IStationService
@@ -171,7 +172,7 @@ namespace Services.Services.StationService
                     StationName = station.StationName,
                     Location = station.Location,
                     Status = station.Status,
-                    Rating = station.Rating,
+                    Rating =station.Rating,
                     BatteryNumber = station.BatteryNumber,
                     StartDate = station.StartDate,
                     UpdateDate = station.UpdateDate,

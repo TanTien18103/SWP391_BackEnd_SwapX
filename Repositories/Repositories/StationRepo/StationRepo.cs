@@ -25,6 +25,7 @@ namespace Repositories.Repositories.StationRepo
         }
         public async Task<List<Station>> GetAllStations()
         {
+          await UpdateAllStationsAverageRating();
             return await _context.Stations
                 .Include(b=>b.Batteries)
                 .Include(s => s.BssStaffs)
@@ -33,7 +34,8 @@ namespace Repositories.Repositories.StationRepo
 
         public async Task<Station> GetStationById(string stationId)
         {
-              return await _context.Stations.Include(b=>b.Batteries).FirstOrDefaultAsync(s => s.StationId == stationId);
+            await UpdateAllStationsAverageRating();
+            return await _context.Stations.Include(b=>b.Batteries).FirstOrDefaultAsync(s => s.StationId == stationId);
         }
 
        
@@ -43,6 +45,26 @@ namespace Repositories.Repositories.StationRepo
             _context.Stations.Update(station);
             await _context.SaveChangesAsync();
             return station;
+        }
+        
+        public async Task UpdateAllStationsAverageRating()
+        {
+            var stations = await _context.Stations.ToListAsync();
+            foreach (var station in stations)
+            {
+                var ratings = await _context.Ratings
+                    .Where(r => r.StationId == station.StationId && r.Rating1 != null)
+                    .ToListAsync();
+
+                decimal avg = 0m;
+                if (ratings.Count > 0)
+                {
+                    avg = ratings.Average(r => r.Rating1.Value);
+                }
+
+                station.Rating = avg;
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }
