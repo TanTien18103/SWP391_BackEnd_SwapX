@@ -769,9 +769,69 @@ namespace Services.Services.VehicleService
             }
         }
 
-        public Task<ResultModel> GetAllVehicleByCustomerId(string customerId)
+        public async Task<ResultModel> GetAllVehicleByCustomerId()
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+               || string.IsNullOrEmpty(authHeader)
+               || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepo.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(accountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = "Evdriver not found.",
+                        Data = null
+                    };
+                }
+                var vehicles = await _vehicleRepo.GetAllVehicleByCustomerId(evDriver.CustomerId);
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsVehicle.GET_ALL_VEHICLE_SUCCESS,
+                    Data = vehicles
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsVehicle.GET_ALL_VEHICLE_FAIL,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
         }
     }
 }

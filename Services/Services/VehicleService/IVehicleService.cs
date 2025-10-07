@@ -22,7 +22,7 @@ namespace Services.Services.VehicleService
         Task<ResultModel> AddVehicleInPackage(AddVehicleInPackageRequest addVehicleInPackageRequest);
         Task<ResultModel> DeleteVehicleInPackage(string vehicleId);
         Task<ResultModel> UnlinkVehicle(string vehicleId);
-        Task<ResultModel> GetAllVehicleByCustomerId(string customerId);
+        Task<ResultModel> GetAllVehicleByCustomerId();
 
     }
 }

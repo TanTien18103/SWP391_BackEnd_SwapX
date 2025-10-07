@@ -82,5 +82,13 @@ namespace SWP391_BackEnd.Controllers
             var res = await _vehicleService.UnlinkVehicle(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpGet("get_all_vehicle_by_customer_id")]
+        [Authorize(Roles = "EvDriver")]
+        public async Task<IActionResult> GetAllVehicleByCustomerId()
+        {
+            var res = await _vehicleService.GetAllVehicleByCustomerId();
+            return StatusCode(res.StatusCode, res);
+        }
     }
+    
 }

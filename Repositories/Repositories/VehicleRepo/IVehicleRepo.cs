@@ -16,6 +16,7 @@ namespace Repositories.Repositories.VehicleRepo
         Task<Vehicle> AddVehicle(Vehicle vehicle);
         Task<Vehicle> UpdateVehicle(Vehicle vehicle);
         Task<List<Vehicle>> GetVehiclesByName(VehicleNameEnums vehicleName);
+        Task<List<Vehicle>> GetAllVehicleByCustomerId(string customerId);
 
     }
 }

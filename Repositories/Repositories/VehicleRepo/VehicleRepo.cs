@@ -45,5 +45,13 @@ namespace Repositories.Repositories.VehicleRepo
                 .Where(v => v.VehicleName == vehicleName.ToString())
                 .ToListAsync();
         }
+        public async Task<List<Vehicle>> GetAllVehicleByCustomerId(string customerId)
+        {
+            return await _context.Vehicles
+                .Include(a => a.Battery)
+                .Include(b => b.Package)
+                .Where(v => v.CustomerId == customerId)
+                .ToListAsync();
+        }
     }
 }
