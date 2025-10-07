@@ -10,6 +10,7 @@ namespace BusinessObjects.Enums
     {
         Lithium,
         Graphene_TTFAR_Accumulator,
-        LFP
+        LFP,
+        Accumulator
     }
 }

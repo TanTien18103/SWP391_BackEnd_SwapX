@@ -23,6 +23,7 @@ namespace Services.Services.VehicleService
         Task<ResultModel> DeleteVehicleInPackage(string vehicleId);
         Task<ResultModel> UnlinkVehicle(string vehicleId);
         Task<ResultModel> GetAllVehicleByCustomerId();
+        
 
     }
 }

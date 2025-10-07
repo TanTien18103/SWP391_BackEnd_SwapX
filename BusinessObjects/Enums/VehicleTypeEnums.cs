@@ -9,6 +9,7 @@ namespace BusinessObjects.Enums
     public enum VehicleTypeEnums
     {
         electric_bike,
-        electric_motorbike
+        electric_motorbike,
+        electric_assist_bicycle
     }
 }

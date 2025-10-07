@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repositories.Repositories.VehicleRepo
 {
-    public class VehicleRepo: IVehicleRepo
+    public class VehicleRepo : IVehicleRepo
     {
 
         private readonly SwapXContext _context;
@@ -19,13 +19,13 @@ namespace Repositories.Repositories.VehicleRepo
         }
         public async Task<Vehicle> AddVehicle(Vehicle vehicle)
         {
-             _context.Vehicles.Add(vehicle);
+            _context.Vehicles.Add(vehicle);
             await _context.SaveChangesAsync();
             return vehicle;
         }
         public async Task<List<Vehicle>> GetAllVehicles()
         {
-            return await _context.Vehicles.Include(a=>a.Battery).Include(b=>b.Package).ToListAsync();
+            return await _context.Vehicles.Include(a => a.Battery).Include(b => b.Package).ToListAsync();
         }
         public async Task<Vehicle> GetVehicleById(string vehicleId)
         {
@@ -53,5 +53,7 @@ namespace Repositories.Repositories.VehicleRepo
                 .Where(v => v.CustomerId == customerId)
                 .ToListAsync();
         }
+
+
     }
 }

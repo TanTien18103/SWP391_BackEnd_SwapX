@@ -14,10 +14,7 @@ namespace Services.ApiModels.Vehicle
         public string VIN { get; set; }
         [Required]
         public VehicleNameEnums VehicleName { get; set; }
-        [Required]
-        public VehicleTypeEnums VehicleType { get; set; }
-        [Required]
-        public string BatteryId { get; set; }
+
 
     }
 }

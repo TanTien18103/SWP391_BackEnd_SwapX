@@ -12,7 +12,7 @@ namespace BusinessObjects.Enums
         YADEA_VELAX,
         YADEA_VOLTGUARD_U,
         YADEA_VOLTGUARD_P,
-        YADEA_ORLA,
+        YADEA_ORLA_P,
         YADEA_ORIS,
         YADEA_OSSY,
         YADEA_OCEAN,
