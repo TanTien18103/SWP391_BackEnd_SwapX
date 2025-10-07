@@ -411,6 +411,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.PackageId)
                 .HasMaxLength(100)
                 .HasColumnName("PackageID");
+            entity.Property(e => e.BatteryType)
+                .HasMaxLength(25)
+                .HasColumnName("Battery_type");
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
