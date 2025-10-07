@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
+using BusinessObjects.Enums;
 
 namespace Repositories.Repositories.PackageRepo
 {
@@ -21,6 +22,9 @@ namespace Repositories.Repositories.PackageRepo
             await _context.SaveChangesAsync();
             return package;
         }
+
+
+
         public async Task<List<Package>> GetAllPackages()
         {
             return await _context.Packages.ToListAsync();
@@ -34,6 +38,11 @@ namespace Repositories.Repositories.PackageRepo
             _context.Packages.Update(package);
             await _context.SaveChangesAsync();
             return package;
+        }
+        public async Task<List<Package>> GetAllPackageByBatteryType(string batteryType)
+        {
+            _context.Packages.Where(p => p.BatteryType == batteryType);
+            return await _context.Packages.Where(p => p.BatteryType == batteryType).ToListAsync();
         }
     }
 }

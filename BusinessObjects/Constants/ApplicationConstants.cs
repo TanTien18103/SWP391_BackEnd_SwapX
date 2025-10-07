@@ -262,7 +262,8 @@ namespace BusinessObjects.Constants
         public const string GET_PACKAGE_SUCCESS = "Lấy gói thành công";
         public const string DELETE_PACKAGE_FAILED = "Xóa gói thất bại";
 
-
+        public static string GET_PACKAGE_BY_BATTERY_TYPE_FAIL =" Lấy gói theo loại pin thất bại";
+        public static string GET_PACKAGE_BY_BATTERY_TYPE_SUCCESS = "Lấy gói theo loại pin thành công";
     }
     //for Vehicle (0-0-1)
     public static class ResponseMessageConstantsVehicle

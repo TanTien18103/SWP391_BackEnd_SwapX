@@ -22,6 +22,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_package_by_id")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetPackageById([FromQuery] string? packageId)
         {
             var res = await _packageService.GetPackageById(packageId);
@@ -42,9 +43,16 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_all_packages")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllPackages()
         {
             var res = await _packageService.GetAllPackages();
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpGet("get_package_by_battery_type")]
+        public async Task<IActionResult> GetPackageByBatteryType([FromQuery] BusinessObjects.Enums.BatterySpecificationEnums batterySpecificationEnums)
+        {
+            var res = await _packageService.GetPackageByBatteryType(batterySpecificationEnums);
             return StatusCode(res.StatusCode, res);
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BusinessObjects.Models;
 using Services.ApiModels.Package;
 using Services.ApiModels;
+using BusinessObjects.Enums;
 
 namespace Services.Services.PackageService
 {
@@ -16,6 +17,7 @@ namespace Services.Services.PackageService
         Task<ResultModel> AddPackage(AddPackageRequest createPackageRequest);
         Task<ResultModel> UpdatePackage(UpdatePackageRequest updatePackageRequest);
         Task<ResultModel> DeletePackage(string packageId);
+        Task<ResultModel> GetPackageByBatteryType(BatterySpecificationEnums batterySpecificationEnums);
   
     }
 }

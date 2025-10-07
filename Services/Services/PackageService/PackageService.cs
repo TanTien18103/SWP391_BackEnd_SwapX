@@ -23,7 +23,7 @@ namespace Services.Services.PackageService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBatteryRepo _batteryRepo;
         private readonly AccountHelper _accountHelper;
-        
+
         public PackageService(IPackageRepo packageRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IBatteryRepo batteryRepo)
         {
             _packageRepo = packageRepo;
@@ -44,6 +44,7 @@ namespace Services.Services.PackageService
                     Price = createPackageRequest.Price,
                     Status = PackageStatusEnums.Active.ToString(),
                     PackageName = createPackageRequest.PackageName,
+                    BatteryType = createPackageRequest.BatteryType.ToString(),
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
@@ -142,6 +143,8 @@ namespace Services.Services.PackageService
             }
         }
 
+
+
         public async Task<ResultModel> GetPackageById(string packageId)
         {
             try
@@ -200,17 +203,21 @@ namespace Services.Services.PackageService
                         Data = null
                     };
                 }
-                if(updatePackageRequest.Description != null)
+                if (updatePackageRequest.Description != null)
                 {
                     package.Description = updatePackageRequest.Description;
                 }
-                if(updatePackageRequest.Price != null)
+                if (updatePackageRequest.Price != null)
                 {
                     package.Price = updatePackageRequest.Price;
                 }
-                if(updatePackageRequest.PackageName != null)
+                if (updatePackageRequest.PackageName != null)
                 {
                     package.PackageName = updatePackageRequest.PackageName;
+                }
+                if (updatePackageRequest.BatteryType != null)
+                {
+                    package.BatteryType = updatePackageRequest.BatteryType.ToString();
                 }
 
                 package.UpdateDate = TimeHepler.SystemTimeNow;
@@ -237,5 +244,45 @@ namespace Services.Services.PackageService
             }
 
         }
+        public async Task<ResultModel> GetPackageByBatteryType(BatterySpecificationEnums batterySpecificationEnums)
+        {
+            try
+            {
+                var packages = await _packageRepo.GetAllPackageByBatteryType(batterySpecificationEnums.ToString());
+                if (packages == null || !packages.Any())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsPackage.GET_PACKAGE_BY_BATTERY_TYPE_SUCCESS,
+                    Data = packages
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsPackage.GET_PACKAGE_BY_BATTERY_TYPE_FAIL,
+                    Data = ex.Message
+                };
+            }
+        }
+
     }
 }
+

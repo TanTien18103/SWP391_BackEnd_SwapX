@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessObjects.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,6 @@ namespace Services.ApiModels.Package
         public decimal? Price { get; set; }
 
         public string? Description { get; set; }
+        public BatterySpecificationEnums? BatteryType { get; set; }
     }
 }
