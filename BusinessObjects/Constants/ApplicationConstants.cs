@@ -29,8 +29,7 @@ namespace BusinessObjects.Constants
         public const string FORBIDDEN = "Forbidden!";
         public const string EXPIRED = "Expired!";
         public const string VALIDATION_FAIL = "Validation fail!";
-
-        public static string CONFLICT { get; set; }
+        public const string CONFLICT = "Conflict!";
     }
 
     //Controllers
@@ -179,9 +178,10 @@ namespace BusinessObjects.Constants
         public const string REMOVE_STAFF_FROM_STATION_FAILED = "Xóa nhân viên khỏi trạm thất bại";
         public const string REMOVE_STAFF_FROM_STATION_SUCCESS = "Xóa nhân viên khỏi trạm thành công";
 
-        public static string GET_STATION_BY_STAFF_SUCCESS { get; set; }
-        public static string STAFF_NOT_ASSIGNED_TO_ANY_STATION { get; set; }
-        public static string GET_STATION_BY_STAFF_FAILED { get; set; }
+        public const string GET_STATION_BY_STAFF_SUCCESS = "Lấy trạm theo nhân viên thành công";
+        public const string STAFF_NOT_ASSIGNED_TO_ANY_STATION = "Nhân viên chưa được phân công cho trạm nào.";
+        public const string GET_STATION_BY_STAFF_FAILED = "Lấy trạm theo nhân viên thất bại";
+        public const string STAFF_ALREADY_ASSIGNED_TO_THIS_STATION = "Nhân viên đã được phân công cho trạm này.";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
