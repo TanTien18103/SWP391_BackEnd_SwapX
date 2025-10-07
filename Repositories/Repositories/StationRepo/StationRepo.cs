@@ -25,7 +25,10 @@ namespace Repositories.Repositories.StationRepo
         }
         public async Task<List<Station>> GetAllStations()
         {
-            return await _context.Stations.Include(b=>b.Batteries).ToListAsync();
+            return await _context.Stations
+                .Include(b=>b.Batteries)
+                .Include(s => s.BssStaffs)
+                .ToListAsync();
         }
 
         public async Task<Station> GetStationById(string stationId)

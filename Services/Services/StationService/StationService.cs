@@ -105,6 +105,10 @@ namespace Services.Services.StationService
                     BatteryNumber = station.BatteryNumber,
                     StartDate = station.StartDate,
                     UpdateDate = station.UpdateDate,
+                    BssStaffs = station.BssStaffs.Select(s => new
+                    {
+                        StaffId= s.StaffId,
+                    }).ToList(),
                     Batteries = station.Batteries.Select(b => new
                     {
                         BatteryId = b.BatteryId,
@@ -171,6 +175,10 @@ namespace Services.Services.StationService
                     BatteryNumber = station.BatteryNumber,
                     StartDate = station.StartDate,
                     UpdateDate = station.UpdateDate,
+                    BssStaffs = station.BssStaffs.Select(s => new
+                    {
+                        StaffId = s.StaffId,
+                    }).ToList(),
                     Batteries = station.Batteries.Select(b => new
                     {
                         BatteryId = b.BatteryId,
@@ -335,9 +343,10 @@ namespace Services.Services.StationService
                     };
                 }
 
+                var staff = await _bssStaffRepository.GetBssStaffById(addStaffToStationRequest.StaffId);
+
                 // Kiểm tra nếu nhân viên đã được gán cho một trạm khác
-                var existingStaffInOtherStation = await _bssStaffRepository.GetStationByStaffId(addStaffToStationRequest.StaffId);
-                if (existingStaffInOtherStation != null)
+                if (staff.StationId != null && staff.StationId != addStaffToStationRequest.StationId)
                 {
                     return new ResultModel
                     {
@@ -348,7 +357,19 @@ namespace Services.Services.StationService
                         StatusCode = StatusCodes.Status409Conflict
                     };
                 }
-                var staff = await _bssStaffRepository.GetBssStaffById(addStaffToStationRequest.StaffId);
+
+                if (staff.StationId == addStaffToStationRequest.StationId)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.CONFLICT,
+                        Message = ResponseMessageConstantsStation.STAFF_ALREADY_ASSIGNED_TO_THIS_STATION,
+                        Data = null,
+                        StatusCode = StatusCodes.Status409Conflict
+                    };
+                }
+
                 // Gán nhân viên cho trạm
                 staff.StationId = station.StationId;
                 staff.UpdateDate = TimeHepler.SystemTimeNow;
