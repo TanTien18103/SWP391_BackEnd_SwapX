@@ -5,20 +5,12 @@ using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.EvDriverRepo;
 using Services.ApiModels;
 using Services.ApiModels.Account;
 using Services.Services.EmailService;
 using Services.ServicesHelpers;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Services.AccountService
 {
@@ -197,7 +189,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.CREATE_STAFF_SUCCESS,
-                    Data = createdUser,
+                    Data = createdUser.Map<AccountInfomation>(),
                     StatusCode = StatusCodes.Status201Created
                 };
             }
@@ -255,7 +247,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
-                    Data = existingUser,
+                    Data = existingUser.Map<AccountInfomation>(),
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -283,7 +275,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = accounts,
+                    Data = accounts.Map<List<AccountInfomation>>(),
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -319,7 +311,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = account,
+                    Data = account.Map<AccountInfomation>(),
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -335,7 +327,7 @@ namespace Services.Services.AccountService
             }
         }
 
-        public async Task<ApiModels.ResultModel> GetAllStaff()
+        public async Task<ResultModel> GetAllStaff()
         {
             var res = new ResultModel();
             try
@@ -346,7 +338,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = staffs,
+                    Data = staffs.Map<List<AccountInfomation>>(),
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -365,7 +357,7 @@ namespace Services.Services.AccountService
 
 
         }
-        public async Task<ApiModels.ResultModel> GetAllCustomer()
+        public async Task<ResultModel> GetAllCustomer()
         {
             var res = new ResultModel();
             try
@@ -376,7 +368,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = customers,
+                    Data = customers.Map<List<AccountInfomation>>(),
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -801,7 +793,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = existingAccount,
+                    Data = existingAccount.Map<AccountInfomation>(),
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -858,7 +850,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
-                    Data = existingUser,
+                    Data = existingUser.Map<AccountInfomation>(),
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -933,7 +925,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
-                    Data = existingAccount,
+                    Data = existingAccount.Map<AccountInfomation>(),
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -998,7 +990,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.CREATE_ADMIN_SUCCESS,
-                    Data = createdUser,
+                    Data = createdUser.Map<AccountInfomation>(),
                     StatusCode = StatusCodes.Status201Created
                 };
             }
@@ -1101,7 +1093,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.UPDATE_STATUS_SUCCESS,
-                    Data = existingUser,
+                    Data = existingUser.Map<AccountInfomation>(),
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -1128,7 +1120,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = customers,
+                    Data = customers.Map<List<AccountInfomation>>(),
                     StatusCode = StatusCodes.Status200OK
                 };
 
