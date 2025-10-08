@@ -140,6 +140,7 @@ namespace BusinessObjects.Constants
         public const string UPDATE_STATUS_SUCCESS = "Cập nhật trạng thái người dùng thành công";
         public const string STATUS_NOT_CHANGED = "Trạng thái người dùng không thay đổi";
         public const string CANNOT_CHANGE_ADMIN_STATUS = "Không thể thay đổi trạng thái của quản trị viên";
+        public const string EVDRIVER_NOT_FOUND = "Không tìm thấy tài xế";
     }
     public class ResponseMessageImage
     {
@@ -194,16 +195,18 @@ namespace BusinessObjects.Constants
         public const string BATTERY_INACTIVE = "Pin đã bị ngừng hoạt động";
         public const string GET_BATTERY_LIST_SUCCESS = "Lấy danh sách pin thành công";
         public const string GET_BATTERY_DETAIL_SUCCESS = "Lấy chi tiết pin thành công";
-        public static string ADD_BATTERY_FAIL = "Thêm pin thất bại";
-        public static string GET_ALL_BATTERY_FAIL = "Lấy danh sách pin thất bại";
-        public static string BATTERY_LIST_EMPTY = "Lấy danh sách pin thất bại";
-        public static string GET_ALL_BATTERY_SUCCESS = "Lấy danh sách pin thành công";
-        public static string UPDATE_BATTERY_FAILED = "Cập nhật pin thất bại";
-        public static string GET_BATTERY_FAIL = "Lấy pin thất bại";
-        public static string GET_BATTERY_SUCCESS = "Lấy pin thành công";
-        public static string DELETE_BATTERY_FAILED = "Xóa pin thất bại";
-        public static string ADD_BATTERY_IN_STATION_FAILED = "Thêm pin vào trạm thất bại";
-        public static string ADD_BATTERY_IN_STATION_SUCCESS = "Thêm pin vào trạm thành công";
+        public const string ADD_BATTERY_FAIL = "Thêm pin thất bại";
+        public const string GET_ALL_BATTERY_FAIL = "Lấy danh sách pin thất bại";
+        public const string BATTERY_LIST_EMPTY = "Lấy danh sách pin thất bại";
+        public const string GET_ALL_BATTERY_SUCCESS = "Lấy danh sách pin thành công";
+        public const string UPDATE_BATTERY_FAILED = "Cập nhật pin thất bại";
+        public const string GET_BATTERY_FAIL = "Lấy pin thất bại";
+        public const string GET_BATTERY_SUCCESS = "Lấy pin thành công";
+        public const string DELETE_BATTERY_FAILED = "Xóa pin thất bại";
+        public const string ADD_BATTERY_IN_STATION_FAILED = "Thêm pin vào trạm thất bại";
+        public const string ADD_BATTERY_IN_STATION_SUCCESS = "Thêm pin vào trạm thành công";
+        public const string DefaultBatterySuffix = "'s Battery";
+
     }
     public static class EmailConstants
     {
@@ -236,11 +239,10 @@ namespace BusinessObjects.Constants
         public const string DELETE_FORM_FAILED = "Xóa biểu mẫu thất bại";
         public const string INVALID_FORM_DATE = "Ngày biểu mẫu không hợp lệ";
         public const string INVALID_FORM_TIME = "Thời gian không nằm trong giờ hành chính (7h30–12h, 13h30–17h).";
-
-        public static string INVALID_FORM_STATUS_VALUE { get; set; }
-        public static string INVALID_FORM_STATUS_UPDATE { get; set; }
-        public static string UPDATE_FORM_STATUS_SUCCESS { get; set; }
-        public static string UPDATE_FORM_STATUS_FAILED { get; set; }
+        public const string INVALID_FORM_STATUS_VALUE = "Trạng thái biểu mẫu không hợp lệ";
+        public const string INVALID_FORM_STATUS_UPDATE = "Không thể cập nhật trạng thái biểu mẫu";
+        public const string UPDATE_FORM_STATUS_SUCCESS = " Cập nhật trạng thái biểu mẫu thành công";
+        public const string UPDATE_FORM_STATUS_FAILED = " Cập nhật trạng thái biểu mẫu thất bại";
     }
     // For Package (0-0-1)
     public static class ResponseMessageConstantsPackage
@@ -284,27 +286,29 @@ namespace BusinessObjects.Constants
         public const string GET_VEHICLE_FAIL = "Lấy xe thất bại";
         public const string GET_VEHICLE_SUCCESS = "Lấy xe thành công";
         public const string DELETE_VEHICLE_FAILED = "Xóa xe thất bại";
-        public static string GET_VEHICLES_BY_PACKAGE_ID_FAILED = "Lấy xe theo gói thất bại";
-        public static string GET_VEHICLES_BY_PACKAGE_ID_SUCCESS = "Lấy xe theo gói thành công";
+        public const string GET_VEHICLES_BY_PACKAGE_ID_FAILED = "Lấy xe theo gói thất bại";
+        public const string GET_VEHICLES_BY_PACKAGE_ID_SUCCESS = "Lấy xe theo gói thành công";
 
-        public static string LINK_VEHICLE_FAILED = "Liên kết xe thất bại";
-        public static string LINK_VEHICLE_SUCCESS = "Liên kết xe thành công";
+        public const string LINK_VEHICLE_FAILED = "Liên kết xe thất bại";
+        public const string LINK_VEHICLE_SUCCESS = "Liên kết xe thành công";
 
-        public static string ADD_VEHICLE_IN_PACKAGE_SUCCESS = "Thêm xe vào gói thành công";
-        public static string ADD_VEHICLE_IN_PACKAGE_FAILED = "Thêm xe vào gói thất bại";
+        public const string ADD_VEHICLE_IN_PACKAGE_SUCCESS = "Thêm xe vào gói thành công";
+        public const string ADD_VEHICLE_IN_PACKAGE_FAILED = "Thêm xe vào gói thất bại";
 
-        public static string DELETE_VEHICLE_IN_PACKAGE_FAILED = "Hủy xe khỏi gói thất bại";
-        public static string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
+        public const string DELETE_VEHICLE_IN_PACKAGE_FAILED = "Hủy xe khỏi gói thất bại";
+        public const string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
 
-        public static string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống";
+        public const string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống";
 
-        public static string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
-        public static string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";
+        public const string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
+        public const string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";
 
-        public static string VEHICLE_ALREADY_IN_PACKAGE = "Xe đã có gói";
+        public const string VEHICLE_ALREADY_IN_PACKAGE = "Xe đã có gói";
 
-        public static string GET_PACKAGE_BY_VEHICLE_ID_SUCCESS =" Lấy gói theo xe thành công";
-        public static string GET_PACKAGE_BY_VEHICLE_ID_FAILED = "Lấy gói theo xe thất bại";
+        public const string GET_PACKAGE_BY_VEHICLE_ID_SUCCESS =" Lấy gói theo xe thành công";
+        public const string GET_PACKAGE_BY_VEHICLE_ID_FAILED = "Lấy gói theo xe thất bại";
+
+        public const string VEHICLE_NOT_OWNED = "Xe không thuộc sở hữu của khách hàng";
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule

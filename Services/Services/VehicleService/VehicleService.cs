@@ -49,7 +49,7 @@ namespace Services.Services.VehicleService
         {
             try
             {
-                var vehicle = new BusinessObjects.Models.Vehicle
+                var vehicle = new Vehicle
                 {
                     Vin = _accountHelper.GenerateShortGuid(),
                     Status = VehicleStatusEnums.Active.ToString(),
@@ -392,12 +392,12 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = "Evdriver not found.",
-                        Data = null
+                        Message = ResponseMessageConstantsUser.CUSTOMER_NOT_FOUND,
                     };
                 }
+                var account = await _accountRepo.GetAccountById(accountId);
                 // Tạo vehicle mới
-                var vehicle = new BusinessObjects.Models.Vehicle
+                var vehicle = new Vehicle
                 {
                     Vin = linkVehicleRequest.VIN,
                     Status = VehicleStatusEnums.Active.ToString(),
@@ -420,14 +420,14 @@ namespace Services.Services.VehicleService
                 // Kiểm tra battery
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_I6_Lithium_Battery.ToString())
                 {
-                    var battery = new BusinessObjects.Models.Battery
+                    var battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -438,14 +438,14 @@ namespace Services.Services.VehicleService
                 }
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_I6_Accumulator.ToString())
                 {
-                    var battery = new BusinessObjects.Models.Battery
+                    var battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Accumulator.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -463,7 +463,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -481,7 +481,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah12.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -499,7 +499,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V36_Ah10_4.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -517,7 +517,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V36_Ah7_8.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -536,7 +536,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.LFP.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V72_Ah30.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -555,7 +555,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.LFP.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V72_Ah50.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -574,7 +574,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V72_Ah38.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -594,7 +594,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V60_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -613,7 +613,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V72_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -633,7 +633,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = "Battery",
+                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -840,7 +840,7 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = "Evdriver not found.",
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
                         Data = null
                     };
                 }
@@ -853,7 +853,7 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status403Forbidden,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FORBIDDEN,
-                        Message = "You do not own this vehicle.",
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_OWNED,
                         Data = null
                     };
                 }
