@@ -418,7 +418,7 @@ namespace Services.Services.VehicleService
                     };
                 }
                 // Kiểm tra battery
-                if (vehicle.VehicleName==VehicleNameEnums.YADEA_I6_Lithium_Battery.ToString())
+                if (vehicle.VehicleName == VehicleNameEnums.YADEA_I6_Lithium_Battery.ToString())
                 {
                     var battery = new BusinessObjects.Models.Battery
                     {
@@ -436,7 +436,7 @@ namespace Services.Services.VehicleService
                     vehicle.BatteryId = battery.BatteryId;
                     vehicle.VehicleType = VehicleTypeEnums.electric_bike.ToString();
                 }
-                if(vehicle.VehicleName == VehicleNameEnums.YADEA_I6_Accumulator.ToString())
+                if (vehicle.VehicleName == VehicleNameEnums.YADEA_I6_Accumulator.ToString())
                 {
                     var battery = new BusinessObjects.Models.Battery
                     {
@@ -454,19 +454,19 @@ namespace Services.Services.VehicleService
                     vehicle.BatteryId = battery.BatteryId;
                     vehicle.VehicleType = VehicleTypeEnums.electric_bike.ToString();
                 }
-                if(vehicle.VehicleName == VehicleNameEnums.YADEA_I8_VINTAGE.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_I8.ToString())
+                if (vehicle.VehicleName == VehicleNameEnums.YADEA_I8_VINTAGE.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_I8.ToString())
                 {
                     var battery = new Battery
                     {
-                        BatteryId= _accountHelper.GenerateShortGuid(),
-                        Status= BatteryStatusEnums.Available.ToString(),
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
                         Capacity = 100,
-                        BatteryQuality=100.00m,
-                        BatteryType= BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName= "Battery",
-                        Specification=BatterySpecificationEnums.V48_Ah22.ToString(),
-                        StartDate=TimeHepler.SystemTimeNow,
-                        UpdateDate=TimeHepler.SystemTimeNow
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
+                        BatteryName = "Battery",
+                        Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
                     };
                     await _batteryRepo.AddBattery(battery);
                     vehicle.BatteryId = battery.BatteryId;
@@ -527,7 +527,7 @@ namespace Services.Services.VehicleService
                     vehicle.VehicleType = VehicleTypeEnums.electric_assist_bicycle.ToString();
                 }
 
-                if (vehicle.VehicleName == VehicleNameEnums.YADEA_VELAX.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_VELAX_SOOBIN.ToString())
+                if (vehicle.VehicleName == VehicleNameEnums.YADEA_VELAX.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_VELAX_SOOBIN.ToString())
                 {
                     var battery = new Battery
                     {
@@ -584,8 +584,8 @@ namespace Services.Services.VehicleService
                     vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                 }
 
-                if (vehicle.VehicleName == VehicleNameEnums.YADEA_ORLA_P.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_OCEAN.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_ODORA_S.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_ODORA_S2.ToString()
-                    ||vehicle.VehicleName==VehicleNameEnums.YADEA_M6I.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_VIGOR.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_X_MEN_NEO.ToString())
+                if (vehicle.VehicleName == VehicleNameEnums.YADEA_ORLA_P.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_OCEAN.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_ODORA_S.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_ODORA_S2.ToString()
+                    || vehicle.VehicleName == VehicleNameEnums.YADEA_M6I.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_VIGOR.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_X_MEN_NEO.ToString())
                 {
                     var battery = new Battery
                     {
@@ -604,7 +604,7 @@ namespace Services.Services.VehicleService
                     vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                 }
 
-                if (vehicle.VehicleName == VehicleNameEnums.YADEA_ORIS.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_ORIS_SOOBIN.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_OSSY.ToString())
+                if (vehicle.VehicleName == VehicleNameEnums.YADEA_ORIS.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_ORIS_SOOBIN.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_OSSY.ToString())
                 {
                     var battery = new Battery
                     {
@@ -623,8 +623,8 @@ namespace Services.Services.VehicleService
                     vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                 }
 
-                if (vehicle.VehicleName == VehicleNameEnums.YADEA_ICUTE.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_X_ZONE.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_VEKOO.ToString()
-                    ||vehicle.VehicleName==VehicleNameEnums.YADEA_VEKOO_SOOBIN.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_X_SKY.ToString()||vehicle.VehicleName==VehicleNameEnums.YADEA_X_BULL.ToString())
+                if (vehicle.VehicleName == VehicleNameEnums.YADEA_ICUTE.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_X_ZONE.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_VEKOO.ToString()
+                    || vehicle.VehicleName == VehicleNameEnums.YADEA_VEKOO_SOOBIN.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_X_SKY.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_X_BULL.ToString())
                 {
                     var battery = new Battery
                     {
@@ -1045,6 +1045,55 @@ namespace Services.Services.VehicleService
             }
         }
 
-
+        public async Task<ResultModel> GetPackageByVehicleId(string vehicleId)
+        {
+            try
+            {
+                   
+                var vehicle = await _vehicleRepo.GetVehicleById(vehicleId);
+                if (vehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var package = await _vehicleRepo.GetPackageByVehicleId(vehicleId);
+                if (package == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsVehicle.GET_PACKAGE_BY_VEHICLE_ID_SUCCESS,
+                    Data = package
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsVehicle.GET_PACKAGE_BY_VEHICLE_ID_FAILED,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
     }
 }
