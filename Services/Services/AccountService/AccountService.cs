@@ -189,7 +189,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.CREATE_STAFF_SUCCESS,
-                    Data = createdUser.Map<AccountInfomation>(),
+                    Data = createdUser,
                     StatusCode = StatusCodes.Status201Created
                 };
             }
@@ -247,7 +247,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
-                    Data = existingUser.Map<AccountInfomation>(),
+                    Data = existingUser,
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -275,7 +275,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = accounts.Map<List<AccountInfomation>>(),
+                    Data = accounts,
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -311,7 +311,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = account.Map<AccountInfomation>(),
+                    Data = account,
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -338,7 +338,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = staffs.Map<List<AccountInfomation>>(),
+                    Data = staffs,
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -368,7 +368,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = customers.Map<List<AccountInfomation>>(),
+                    Data = customers,
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -793,7 +793,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = existingAccount.Map<AccountInfomation>(),
+                    Data = existingAccount,
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -850,7 +850,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
-                    Data = existingUser.Map<AccountInfomation>(),
+                    Data = existingUser,
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -925,7 +925,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.UPDATE_USER_SUCCESS,
-                    Data = existingAccount.Map<AccountInfomation>(),
+                    Data = existingAccount,
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -990,7 +990,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.CREATE_ADMIN_SUCCESS,
-                    Data = createdUser.Map<AccountInfomation>(),
+                    Data = createdUser,
                     StatusCode = StatusCodes.Status201Created
                 };
             }
@@ -1093,7 +1093,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.UPDATE_STATUS_SUCCESS,
-                    Data = existingUser.Map<AccountInfomation>(),
+                    Data = existingUser,
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -1120,7 +1120,7 @@ namespace Services.Services.AccountService
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = customers.Map<List<AccountInfomation>>(),
+                    Data = customers,
                     StatusCode = StatusCodes.Status200OK
                 };
 
