@@ -1049,7 +1049,7 @@ namespace Services.Services.VehicleService
         {
             try
             {
-                   
+
                 var vehicle = await _vehicleRepo.GetVehicleById(vehicleId);
                 if (vehicle == null)
                 {
@@ -1090,6 +1090,57 @@ namespace Services.Services.VehicleService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsVehicle.GET_PACKAGE_BY_VEHICLE_ID_FAILED,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> GetBatteryByVehicleId(string vehicleId)
+        {
+            try
+            {
+                var vehicle = await _vehicleRepo.GetVehicleById(vehicleId);
+                if (vehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var battery = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
+                if (battery == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBattery.GET_BATTERY_DETAIL_SUCCESS,
+                    Data = battery
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsBattery.GET_BATTERY_FAIL,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
                 };

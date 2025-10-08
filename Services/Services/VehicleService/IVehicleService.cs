@@ -24,6 +24,7 @@ namespace Services.Services.VehicleService
         Task<ResultModel> UnlinkVehicle(string vehicleId);
         Task<ResultModel> GetAllVehicleByCustomerId();
         Task<ResultModel> GetPackageByVehicleId(string vehicleId);
+        Task<ResultModel> GetBatteryByVehicleId(string vehicleId);
 
 
     }

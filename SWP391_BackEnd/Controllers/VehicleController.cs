@@ -97,6 +97,13 @@ namespace SWP391_BackEnd.Controllers
             var res = await _vehicleService.GetPackageByVehicleId(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpGet("get_battery_by_vehicle_id")]
+        [Authorize(Roles = "EvDriver")]
+        public async Task<IActionResult> GetBatteryByVehicleId([FromQuery] string? vehicleId)
+        {
+            var res = await _vehicleService.GetBatteryByVehicleId(vehicleId);
+            return StatusCode(res.StatusCode, res);
+        }
     }
     
 }
