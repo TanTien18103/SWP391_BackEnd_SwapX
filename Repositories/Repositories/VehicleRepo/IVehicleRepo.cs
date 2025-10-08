@@ -18,5 +18,6 @@ namespace Repositories.Repositories.VehicleRepo
         Task<List<Vehicle>> GetVehiclesByName(VehicleNameEnums vehicleName);
         Task<List<Vehicle>> GetAllVehicleByCustomerId(string customerId);
         Task<Package> GetPackageByVehicleId(string vehicleId);
+        
     }
 }

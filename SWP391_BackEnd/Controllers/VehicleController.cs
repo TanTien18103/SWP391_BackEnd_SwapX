@@ -39,6 +39,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_all_vehicles")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllVehicles()
         {
             var res = await _vehicleService.GetAllVehicles();
