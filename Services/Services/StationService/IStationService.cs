@@ -20,5 +20,6 @@ namespace Services.Services.StationService
         Task<ResultModel> GetStaffsByStationId(string stationId);
         Task<ResultModel> RemoveStaffFromStation(string stationId, string staffId);
         Task<ResultModel> GetStationByStaffId(string staffId);
+        Task<ResultModel> UpdateStationStatus(UpdateStationStatusRequest updateStationStatusRequest);
     }
 }

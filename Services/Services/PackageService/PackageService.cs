@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.BatteryRepo;
 using Repositories.Repositories.PackageRepo;
+using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
 using Services.ApiModels.Package;
 using Services.ServicesHelpers;
@@ -22,15 +23,17 @@ namespace Services.Services.PackageService
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBatteryRepo _batteryRepo;
+        private readonly IVehicleRepo _vehicleRepo;
         private readonly AccountHelper _accountHelper;
 
-        public PackageService(IPackageRepo packageRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IBatteryRepo batteryRepo)
+        public PackageService(IPackageRepo packageRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IBatteryRepo batteryRepo, IVehicleRepo vehicleRepo)
         {
             _packageRepo = packageRepo;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _accountHelper = accountHelper;
             _batteryRepo = batteryRepo;
+            _vehicleRepo = vehicleRepo;
         }
 
         public async Task<ResultModel> AddPackage(AddPackageRequest createPackageRequest)
@@ -283,6 +286,75 @@ namespace Services.Services.PackageService
             }
         }
 
+        public async Task<ResultModel> UpdatePackageStatus(UpdatePackageStatusRequest updatePackageStatusRequest)
+        {
+            try
+            {
+                var package = await _packageRepo.GetPackageById(updatePackageStatusRequest.PackageId);
+                if (package == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if (package.Status == updatePackageStatusRequest.Status.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_STATUS_SAME,
+                        Data = null
+                    };
+                }
+
+                if (updatePackageStatusRequest.Status == PackageStatusEnums.Inactive)
+                {
+                    var vehicles = await _vehicleRepo.GetVehiclesByPackageId(package.PackageId);
+                    if (vehicles != null)
+                    {
+                        return new ResultModel
+                        {
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsPackage.PACKAGE_IN_USE_CANNOT_INACTIVE,
+                            Data = null
+                        };
+                    }
+                }
+
+                package.Status = updatePackageStatusRequest.Status.ToString();
+                package.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedPackage = await _packageRepo.UpdatePackage(package);
+                
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsPackage.UPDATE_PACKAGE_STATUS_SUCCESS,
+                    Data = updatedPackage
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsPackage.UPDATE_PACKAGE_STATUS_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
     }
 }
 

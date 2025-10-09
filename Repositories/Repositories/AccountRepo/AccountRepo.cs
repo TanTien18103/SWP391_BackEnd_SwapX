@@ -39,7 +39,9 @@ namespace Repositories.Repositories.AccountRepo
         public async Task<Account> GetAccountById(string accountId)
         {
             return await _context.Accounts
-                 .Include(a => a.BssStaffs).Include(a => a.Evdrivers)
+                 .Include(a => a.BssStaffs)
+                 .Include(a => a.Evdrivers)
+                 .ThenInclude(v => v.Vehicles)
                  .FirstOrDefaultAsync(a => a.AccountId == accountId);
         }
         public async Task<List<Account>> GetAll()

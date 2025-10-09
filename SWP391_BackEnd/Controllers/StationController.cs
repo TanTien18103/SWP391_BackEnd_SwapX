@@ -87,4 +87,12 @@ public class StationController : ControllerBase
         var res = await _stationService.GetStationByStaffId(staffId);
         return StatusCode(res.StatusCode, res);
     }
+
+    [HttpPut("update_station_status")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateStationStatus([FromForm] UpdateStationStatusRequest updateStationStatusRequest)
+    {
+        var res = await _stationService.UpdateStationStatus(updateStationStatusRequest);
+        return StatusCode(res.StatusCode, res);
+    }
 }

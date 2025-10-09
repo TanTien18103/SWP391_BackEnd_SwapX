@@ -62,5 +62,14 @@ namespace Repositories.Repositories.VehicleRepo
                 .Select(v => v.Package)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<List<Vehicle>> GetVehiclesByPackageId(string packageid)
+        {
+            return await _context.Vehicles
+                .Include(a => a.Battery)
+                .Include(b => b.Package)
+                .Where(v => v.PackageId == packageid)
+                .ToListAsync();
+        }
     }
 }

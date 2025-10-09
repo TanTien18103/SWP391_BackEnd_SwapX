@@ -339,7 +339,7 @@ namespace Services.Services.BatteryService
             }
         }
         //--------------------------------------------------------------
-        public async Task<ResultModel> addBatteryInStation(AddBatteryInStationRequest addBatteryInStationRequest)
+        public async Task<ResultModel> AddBatteryInStation(AddBatteryInStationRequest addBatteryInStationRequest)
         {
             try
             {
@@ -414,6 +414,96 @@ namespace Services.Services.BatteryService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsBattery.ADD_BATTERY_IN_STATION_FAILED,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> UpdateBatteryStatusInStation(UpdateBatteryStatusRequest updateBatteryStatusRequest)
+        {
+            try
+            {
+                var existingBattery = await _batteryRepo.GetBatteryById(updateBatteryStatusRequest.BatteryId);
+                if (existingBattery == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                if (existingBattery.Status == updateBatteryStatusRequest.Status.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_STATUS_ALREADY_EXISTS,
+                        Data = null
+                    };
+                }
+                if (existingBattery.Status == BatteryStatusEnums.Decommissioned.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_DECOMMISSIONED_CANNOT_UPDATE_STATUS,
+                        Data = null
+                    };
+                }
+
+                existingBattery.Status = updateBatteryStatusRequest.Status.ToString();
+                existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+
+                var batteryDetail = await _batteryRepo.GetBatteryById(updatedBattery.BatteryId);
+
+                var response = new
+                {
+                    BatteryId = batteryDetail.BatteryId,
+                    BatteryName = batteryDetail.BatteryName,
+                    Status = batteryDetail.Status,
+                    Capacity = batteryDetail.Capacity,
+                    BatteryType = batteryDetail.BatteryType,
+                    Specification = batteryDetail.Specification,
+                    BatteryQuality = batteryDetail.BatteryQuality,
+                    StartDate = batteryDetail.StartDate,
+                    UpdateDate = batteryDetail.UpdateDate,
+                    Station = batteryDetail.Station == null ? null : new
+                    {
+                        StationId = batteryDetail.Station.StationId,
+                        StationName = batteryDetail.Station.StationName,
+                        Location = batteryDetail.Station.Location,
+                        Status = batteryDetail.Station.Status,
+                        Rating = batteryDetail.Station.Rating,
+                        BatteryNumber = batteryDetail.Station.BatteryNumber,
+                        StartDate = batteryDetail.Station.StartDate,
+                        UpdateDate = batteryDetail.Station.UpdateDate
+                    }
+                };
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBattery.UPDATE_BATTERY_STATUS_IN_STATION_SUCCESS,
+                    Data = response,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsBattery.UPDATE_BATTERY_STATUS_IN_STATION_FAILED,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
