@@ -183,6 +183,12 @@ namespace BusinessObjects.Constants
         public const string STAFF_NOT_ASSIGNED_TO_ANY_STATION = "Nhân viên chưa được phân công cho trạm nào.";
         public const string GET_STATION_BY_STAFF_FAILED = "Lấy trạm theo nhân viên thất bại";
         public const string STAFF_ALREADY_ASSIGNED_TO_THIS_STATION = "Nhân viên đã được phân công cho trạm này.";
+
+        public static string CANNOT_CHANGE_STATUS_DUE_TO_TODAY_SCHEDULE { get; set; }
+        public static string STATION_ALREADY_IN_THIS_STATUS { get; set; }
+        public static string INVALID_STATION_STATUS { get; set; }
+        public static string UPDATE_STATION_STATUS_SUCCESS { get; set; }
+        public static string UPDATE_STATION_STATUS_FAILED { get; set; }
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -206,7 +212,10 @@ namespace BusinessObjects.Constants
         public const string ADD_BATTERY_IN_STATION_FAILED = "Thêm pin vào trạm thất bại";
         public const string ADD_BATTERY_IN_STATION_SUCCESS = "Thêm pin vào trạm thành công";
         public const string DefaultBatterySuffix = "'s Battery";
-
+        public const string BATTERY_STATUS_ALREADY_EXISTS = "Trạng thái pin không thay đổi";
+        public const string UPDATE_BATTERY_STATUS_IN_STATION_SUCCESS = "Cập nhật trạng thái pin trong trạm thành công";
+        public const string UPDATE_BATTERY_STATUS_IN_STATION_FAILED = "Cập nhật trạng thái pin trong trạm thất bại";
+        public const string BATTERY_DECOMMISSIONED_CANNOT_UPDATE_STATUS = "Pin đã ngừng hoạt động, không thể cập nhật trạng thái";
     }
     public static class EmailConstants
     {
@@ -264,8 +273,13 @@ namespace BusinessObjects.Constants
         public const string GET_PACKAGE_SUCCESS = "Lấy gói thành công";
         public const string DELETE_PACKAGE_FAILED = "Xóa gói thất bại";
 
-        public static string GET_PACKAGE_BY_BATTERY_TYPE_FAIL =" Lấy gói theo loại pin thất bại";
-        public static string GET_PACKAGE_BY_BATTERY_TYPE_SUCCESS = "Lấy gói theo loại pin thành công";
+        public const string GET_PACKAGE_BY_BATTERY_TYPE_FAIL =" Lấy gói theo loại pin thất bại";
+        public const string GET_PACKAGE_BY_BATTERY_TYPE_SUCCESS = "Lấy gói theo loại pin thành công";
+
+        public const string PACKAGE_STATUS_SAME = "Trạng thái gói không thay đổi";
+        public const string UPDATE_PACKAGE_STATUS_SUCCESS = "Cập nhật trạng thái gói thành công";
+        public const string PACKAGE_IN_USE_CANNOT_INACTIVE = "Gói đang được sử dụng, không thể ngừng hoạt động";
+        public const string UPDATE_PACKAGE_STATUS_FAILED = "Cập nhật trạng thái gói thất bại";
     }
     //for Vehicle (0-0-1)
     public static class ResponseMessageConstantsVehicle

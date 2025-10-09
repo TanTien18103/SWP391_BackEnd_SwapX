@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Services.ApiModels.Battery;
+using Services.ApiModels.Station;
 using Services.Services.BatteryService;
 
 namespace SWP391_BackEnd.Controllers
@@ -41,7 +43,7 @@ namespace SWP391_BackEnd.Controllers
         [HttpPut("add-battery-in-station")]
         public async Task<IActionResult> addBatteryInStation([FromForm] Services.ApiModels.Battery.AddBatteryInStationRequest addBatteryInStationRequest)
         {
-            var res = await _batteryService.addBatteryInStation(addBatteryInStationRequest);
+            var res = await _batteryService.AddBatteryInStation(addBatteryInStationRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get-all-batteries")]
@@ -49,6 +51,14 @@ namespace SWP391_BackEnd.Controllers
         public async Task<IActionResult> GetAllBatteries()
         {
             var res = await _batteryService.GetAllBatteries();
+            return StatusCode(res.StatusCode, res);
+        }
+
+        [HttpPut("update_battery_in_station_status")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateBatteryStatus([FromForm] UpdateBatteryStatusRequest updateBatteryStatusRequest)
+        {
+            var res = await _batteryService.UpdateBatteryStatusInStation(updateBatteryStatusRequest);
             return StatusCode(res.StatusCode, res);
         }
     }

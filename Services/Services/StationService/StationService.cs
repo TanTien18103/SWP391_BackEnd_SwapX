@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.BssStaffRepo;
 using Repositories.Repositories.StationRepo;
+using Repositories.Repositories.StationScheduleRepo;
 using Services.ApiModels;
 using Services.ApiModels.Station;
 using Services.ServicesHelpers;
@@ -27,9 +28,10 @@ namespace Services.Services.StationService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBssStaffRepo _bssStaffRepository;
         private readonly IAccountRepo _accountRepository;
+        private readonly IStationScheduleRepo _stationScheduleRepository;
         private readonly AccountHelper _accountHelper;
 
-        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBssStaffRepo bssStaffRepository, IAccountRepo accountRepository, AccountHelper accountHelper)
+        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBssStaffRepo bssStaffRepository, IAccountRepo accountRepository, AccountHelper accountHelper,IStationScheduleRepo stationScheduleRepo)
         {
             _stationRepository = stationRepository;
             _configuration = configuration;
@@ -37,6 +39,7 @@ namespace Services.Services.StationService
             _bssStaffRepository = bssStaffRepository;
             _accountRepository = accountRepository;
             _accountHelper = accountHelper;
+            _stationScheduleRepository = stationScheduleRepo;
         }
 
         public async Task<ResultModel> AddStation(AddStationRequest addStationRequest)
@@ -551,6 +554,103 @@ namespace Services.Services.StationService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsStation.GET_STATION_BY_STAFF_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResultModel> UpdateStationStatus(UpdateStationStatusRequest updateStationStatusRequest)
+        {
+            try
+            {
+                var existingStation = await _stationRepository.GetStationById(updateStationStatusRequest.StationId);
+                if (existingStation == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                if(existingStation.Status == updateStationStatusRequest.Status.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.CONFLICT,
+                        Message = ResponseMessageConstantsStation.STATION_ALREADY_IN_THIS_STATUS,
+                        Data = null,
+                        StatusCode = StatusCodes.Status409Conflict
+                    };
+                }
+
+                if (updateStationStatusRequest.Status == StationStatusEnum.Inactive
+                    || updateStationStatusRequest.Status == StationStatusEnum.Maintenance)
+                {
+                    var today = TimeHepler.SystemTimeNow.Date;
+
+                    var schedules = await _stationScheduleRepository.GetStationSchedulesByStationId(existingStation.StationId);
+
+                    // Chỉ chặn nếu có lịch hôm nay mà chưa bị hủy
+                    bool hasTodaySchedule = schedules.Any(s =>
+                        s.Date.HasValue &&
+                        s.Date.Value.Date == today &&
+                        !string.Equals(s.Status, ScheduleStatusEnums.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase)
+                    );
+
+                    if (hasTodaySchedule)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.CONFLICT,
+                            Message = ResponseMessageConstantsStation.CANNOT_CHANGE_STATUS_DUE_TO_TODAY_SCHEDULE,
+                            Data = null,
+                            StatusCode = StatusCodes.Status409Conflict
+                        };
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(updateStationStatusRequest.Status.ToString()) &&
+                    Enum.TryParse<StationStatusEnum>(updateStationStatusRequest.Status.ToString(), out var statusEnum))
+                {
+                    existingStation.Status = statusEnum.ToString();
+                }
+                else
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsStation.INVALID_STATION_STATUS,
+                        Data = null,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                existingStation.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedStation = await _stationRepository.UpdateStation(existingStation);
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.UPDATE_STATION_STATUS_SUCCESS,
+                    Data = updatedStation,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.UPDATE_STATION_STATUS_FAILED,
                     Data = ex.Message
                 };
             }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Services.ApiModels.Package;
 using Services.Services.PackageService;
 
 namespace SWP391_BackEnd.Controllers
@@ -53,6 +54,14 @@ namespace SWP391_BackEnd.Controllers
         public async Task<IActionResult> GetPackageByBatteryType([FromQuery] BusinessObjects.Enums.BatterySpecificationEnums batterySpecificationEnums)
         {
             var res = await _packageService.GetPackageByBatteryType(batterySpecificationEnums);
+            return StatusCode(res.StatusCode, res);
+        }
+
+        [HttpPut("update_package_status")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdatePackageStatus([FromForm] UpdatePackageStatusRequest updatePackageStatusRequest)
+        {
+            var res = await _packageService.UpdatePackageStatus(updatePackageStatusRequest);
             return StatusCode(res.StatusCode, res);
         }
     }

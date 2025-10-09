@@ -29,6 +29,16 @@ namespace Repositories.Repositories.StationScheduleRepo
         {
             return _context.StationSchedules.Include(b=>b.Station).Include(a=>a.Form).FirstOrDefault(ss => ss.StationScheduleId == stationScheduleId);
         }
+
+        public async Task<List<StationSchedule>> GetStationSchedulesByStationId(string stationId)
+        {
+            return await _context.StationSchedules
+                .Include(b => b.Station)
+                .Include(a => a.Form)
+                .Where(ss => ss.StationId == stationId)
+                .ToListAsync();
+        }
+
         public async Task<StationSchedule> UpdateStationSchedule(StationSchedule stationSchedule)
         {
             _context.StationSchedules.Update(stationSchedule);
