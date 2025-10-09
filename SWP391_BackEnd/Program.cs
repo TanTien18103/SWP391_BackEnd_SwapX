@@ -47,6 +47,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+//*************** I KNEW YOU WERE HERE ***************//
 
 //Add Cloud setting
 builder.Services.Configure<CloudinarySettings>(
@@ -64,14 +65,17 @@ builder.Services.AddSingleton<Cloudinary>(sp =>
 
     return new Cloudinary(account);
 });
+//*************** I KNEW YOU WERE HERE ***************//
 
 //Add config PayOS
 // Bind config
 builder.Services.Configure<PayOSConfig>(builder.Configuration.GetSection("PayOS"));
 var payOSConfig = builder.Configuration.GetSection("PayOS").Get<PayOSConfig>();
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Đăng ký PayOS SDK
 builder.Services.AddSingleton(new PayOS(payOSConfig.ClientId, payOSConfig.ApiKey, payOSConfig.ChecksumKey));
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Đăng ký helper verify
 builder.Services.AddSingleton<PayOSHelper>(new PayOSHelper(payOSConfig));
@@ -81,14 +85,16 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
-
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Add DbContext
 builder.Services.AddDbContext<SwapXContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Add Session
 builder.Services.AddDistributedMemoryCache();
@@ -98,6 +104,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+//*************** I KNEW YOU WERE HERE ***************//
+
 // CORS Policy
 builder.Services.AddCors(options =>
 {
@@ -109,6 +117,8 @@ builder.Services.AddCors(options =>
                        .AllowAnyHeader();
         });
 });
+//*************** I KNEW YOU WERE HERE ***************//
+
 // Register Repositories
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IEvDriverRepo, EvDriverRepo>();
@@ -123,6 +133,7 @@ builder.Services.AddScoped<IRatingRepo, RatingRepo>();
 builder.Services.AddScoped<IReportRepo, ReportRepo>();
 builder.Services.AddScoped<IBatteryReportRepo, BatteryReportRepo>();
 builder.Services.AddScoped<IBssStaffRepo, BssStaffRepo>();
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Register Services
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -139,10 +150,13 @@ builder.Services.AddScoped<IStationScheduleService, StationScheduleService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IBatteryReportService, BatteryReportService>();
+//*************** I KNEW YOU WERE HERE ***************//
+
 //Register Helper
 builder.Services.AddScoped<AccountHelper>();
 
 builder.Services.AddControllers();
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -169,6 +183,7 @@ builder.Services.AddSwaggerGen(c =>
         { securityScheme, Array.Empty<string>() }
     });
 });
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Authentication
 builder.Services.AddAuthentication(options =>
@@ -199,6 +214,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+//*************** I KNEW YOU WERE HERE ***************//
 
 // Middleware
 if (app.Environment.IsDevelopment())
@@ -206,18 +222,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+//*************** I KNEW YOU WERE HERE ***************//
 
 app.UseHttpsRedirection();
+//*************** I KNEW YOU WERE HERE ***************//
 
 app.UseCors("AllowAll");
 app.UseCors("AllowAllOrigins");
+//*************** I KNEW YOU WERE HERE ***************//
 
 app.UseSession();
+//*************** I KNEW YOU WERE HERE ***************//
 
 app.UseAuthentication();
 app.UseAuthorization();
+//*************** I KNEW YOU WERE HERE ***************//
 
 app.MapControllers();
+//*************** I KNEW YOU WERE HERE ***************//
 
 app.Run();
 //*************** I KNEW YOU WERE HERE ***************//
