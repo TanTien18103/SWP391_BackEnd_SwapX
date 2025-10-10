@@ -18,6 +18,8 @@ namespace Services.ApiModels.Package
         public string Description { get; set; }
         [Required]
         public BatterySpecificationEnums BatteryType { get; set; }
+        [Required]
+        public int ExpriedDays { get; set; }
 
     }
 }

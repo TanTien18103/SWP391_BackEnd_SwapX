@@ -42,5 +42,12 @@ namespace SWP391_BackEnd.Controllers
             var res = await _stationScheduleService.GetAllStationSchedules();
             return StatusCode(res.StatusCode, res);
         }
+        [HttpGet("get_station_schedules_by_station_id")]
+        public async Task<IActionResult> GetStationSchedulesByStationId([FromQuery] string? stationId)
+        {
+            var res = await _stationScheduleService.GetStationScheduleByStationId(stationId);
+            return StatusCode(res.StatusCode, res);
+        }
+
     }
 }

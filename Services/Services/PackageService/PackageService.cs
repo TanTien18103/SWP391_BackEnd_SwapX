@@ -48,6 +48,7 @@ namespace Services.Services.PackageService
                     Status = PackageStatusEnums.Active.ToString(),
                     PackageName = createPackageRequest.PackageName,
                     BatteryType = createPackageRequest.BatteryType.ToString(),
+                    ExpiredDate = createPackageRequest.ExpriedDays,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };

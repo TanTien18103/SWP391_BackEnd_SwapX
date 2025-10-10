@@ -19,6 +19,7 @@ namespace Services.Services.PackageService
         Task<ResultModel> DeletePackage(string packageId);
         Task<ResultModel> GetPackageByBatteryType(BatterySpecificationEnums batterySpecificationEnums);
         Task<ResultModel> UpdatePackageStatus(UpdatePackageStatusRequest updatePackageStatusRequest);
+        
 
     }
 }

@@ -16,7 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.StationRepo;
 using Services.Services.StationService;
 using BusinessObjects.Models;
-
+using Repositories.Repositories.VehicleRepo;
 namespace Services.Services.BatteryService
 {
     public class BatteryService : IBatteryService
@@ -26,14 +26,16 @@ namespace Services.Services.BatteryService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AccountHelper _accountHelper;
         private readonly IStationRepo _stationRepo;
+        private readonly IVehicleRepo _vehicleRepo;
         //--------------------------------------------------------------
-        public BatteryService(IBatteryRepo batteryRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo)
+        public BatteryService(IBatteryRepo batteryRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo, IVehicleRepo vehicleRepo)
         {
             _batteryRepo = batteryRepo;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
             _accountHelper = accountHelper;
             _stationRepo = stationRepo;
+            _vehicleRepo = vehicleRepo;
         }
         //--------------------------------------------------------------
         public async Task<ResultModel> AddBattery(AddBatteryRequest addBatteryRequest)
@@ -83,31 +85,42 @@ namespace Services.Services.BatteryService
             try
             {
                 var batteries = await _batteryRepo.GetAllBatteries();
+                var response = new List<object>();
 
-                var response = batteries.Select(b => new
+                foreach (var b in batteries)
                 {
-                    BatteryId = b.BatteryId,
-                    BatteryName = b.BatteryName,
-                    Status = b.Status,
-                    Capacity = b.Capacity,
-                    BatteryType = b.BatteryType,
-                    Specification = b.Specification,
-                    BatteryQuality = b.BatteryQuality,
-                    StartDate = b.StartDate,
-                    UpdateDate = b.UpdateDate,
-                    Station = b.Station == null ? null : new
+                    var vehicle = await _vehicleRepo.GetVehicleByBatteryId(b.BatteryId);
+
+                    response.Add(new
                     {
-                        StationId = b.Station.StationId,
-                        StationName = b.Station.StationName,
-                        Location = b.Station.Location,
-                        Status = b.Station.Status,
-                        Rating = b.Station.Rating,
-                        BatteryNumber = b.Station.BatteryNumber,
-                        StartDate = b.Station.StartDate,
-                        UpdateDate = b.Station.UpdateDate
-                        // KHÔNG có trường Batteries ở đây!
-                    }
-                }).ToList();
+                        BatteryId = b.BatteryId,
+                        BatteryName = b.BatteryName,
+                        Status = b.Status,
+                        Capacity = b.Capacity,
+                        BatteryType = b.BatteryType,
+                        Specification = b.Specification,
+                        BatteryQuality = b.BatteryQuality,
+                        StartDate = b.StartDate,
+                        UpdateDate = b.UpdateDate,
+                        Station = b.Station == null ? null : new
+                        {
+                            StationId = b.Station.StationId,
+                            StationName = b.Station.StationName,
+                            Location = b.Station.Location,
+                            Status = b.Station.Status,
+                            Rating = b.Station.Rating,
+                            BatteryNumber = b.Station.BatteryNumber,
+                            StartDate = b.Station.StartDate,
+                            UpdateDate = b.Station.UpdateDate
+                        },
+                        Vehicle = vehicle == null ? null : new
+                        {
+                            Vin = vehicle.Vin,
+                            VehicleName = vehicle.VehicleName,
+                            CustomerId = vehicle.CustomerId
+                        }
+                    });
+                }
 
                 return new ResultModel
                 {
@@ -189,6 +202,7 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+                var vehicle = await _vehicleRepo.GetVehicleByBatteryId(b.BatteryId);
 
                 // Map sang object mới, station chỉ chứa thông tin cơ bản, không có batteries
                 var response = new
@@ -213,8 +227,15 @@ namespace Services.Services.BatteryService
                         StartDate = b.Station.StartDate,
                         UpdateDate = b.Station.UpdateDate
                         // KHÔNG có trường Batteries ở đây!
+                    },
+                    Vehicle = b.Vehicles == null ? null : new
+                    {
+                        Vin = vehicle.Vin,
+                        VehicleName = vehicle.VehicleName,
+                        CustomerId= vehicle.CustomerId,
                     }
                 };
+            
 
                 return new ResultModel
                 {

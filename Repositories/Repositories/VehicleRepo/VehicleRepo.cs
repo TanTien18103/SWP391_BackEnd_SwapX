@@ -56,11 +56,11 @@ namespace Repositories.Repositories.VehicleRepo
 
         public async Task<Package> GetPackageByVehicleId(string vehicleId)
         {
-           return await _context.Vehicles
-                .Include(v => v.Package)
-                .Where(v => v.Vin == vehicleId)
-                .Select(v => v.Package)
-                .FirstOrDefaultAsync();
+            return await _context.Vehicles
+                 .Include(v => v.Package)
+                 .Where(v => v.Vin == vehicleId)
+                 .Select(v => v.Package)
+                 .FirstOrDefaultAsync();
         }
 
         public async Task<List<Vehicle>> GetVehiclesByPackageId(string packageid)
@@ -70,6 +70,13 @@ namespace Repositories.Repositories.VehicleRepo
                 .Include(b => b.Package)
                 .Where(v => v.PackageId == packageid)
                 .ToListAsync();
+        }
+        public async Task<Vehicle> GetVehicleByBatteryId(string batteryId)
+        {
+            return await _context.Vehicles
+                .Include(a => a.Battery)
+                .Include(b => b.Package)
+                .FirstOrDefaultAsync(v => v.BatteryId == batteryId);
         }
     }
 }

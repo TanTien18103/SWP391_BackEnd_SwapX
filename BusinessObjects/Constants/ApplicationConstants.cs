@@ -97,6 +97,8 @@ namespace BusinessObjects.Constants
         public const string LOGOUT_SUCCESS = "Đăng xuất thành công.";
         public const string EMAIL_IN_USE = "Email đã được sử dụng bởi người dùng khác.";
         public const string DUPLICATED_EMAIL = "Email này đang được sử dụng bởi nhiều tài khoản Active.";
+
+        public const string ACCOUNT_INACTIVE ="Tài khoản của bạn hiện không hoạt động.";
     }
 
     //Auth-Account Controllers
@@ -323,6 +325,8 @@ namespace BusinessObjects.Constants
         public const string GET_PACKAGE_BY_VEHICLE_ID_FAILED = "Lấy gói theo xe thất bại";
 
         public const string VEHICLE_NOT_OWNED = "Xe không thuộc sở hữu của khách hàng";
+
+        public const string NO_VEHICLE_FOR_USER = "Người dùng không có xe được liên kết";
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule
@@ -344,6 +348,9 @@ namespace BusinessObjects.Constants
         public const string GET_STATION_SCHEDULE_SUCCESS = "Lấy lịch trạm thành công";
         public const string DELETE_STATION_SCHEDULE_FAILED = "Xóa lịch trạm thất bại";
         public const string INVALID_TIME_RANGE = "Khoảng thời gian không hợp lệ";
+
+        public static string GET_STATION_SCHEDULE_BY_STATION_ID_SUCCESS = "Lấy lịch trạm theo ID trạm thành công";
+        public static string GET_STATION_SCHEDULE_BY_STATION_ID_FAILED = "Lấy lịch trạm theo ID trạm thất bại";
     }
     //for Rating (0-0-1)
     public static class ResponseMessageConstantsRating

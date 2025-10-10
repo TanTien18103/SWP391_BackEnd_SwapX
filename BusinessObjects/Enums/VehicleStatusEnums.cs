@@ -9,6 +9,8 @@ namespace BusinessObjects.Enums
     public enum VehicleStatusEnums
     {
         Active,
-        Inactive
+        Inactive,
+        linked,
+        Unlinked,
     }
 }

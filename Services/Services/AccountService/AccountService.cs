@@ -52,6 +52,12 @@ namespace Services.Services.AccountService
             }
 
             var user = users.First();
+            if (user.Status != AccountStatusEnums.Active.ToString())
+            {
+                throw new AppException(ResponseCodeConstants.BAD_REQUEST,
+                    ResponseMessageIdentity.ACCOUNT_INACTIVE,
+                    StatusCodes.Status400BadRequest);
+            }
 
             if (!_accountHelper.VerifyPassword(password, user.Password))
             {

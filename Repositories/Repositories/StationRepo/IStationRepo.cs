@@ -14,6 +14,6 @@ namespace Repositories.Repositories.StationRepo
         Task<List<Station>> GetAllStations();
         Task AddStation(Station station);
         Task<Station> UpdateStation(Station station);
-        Task UpdateAllStationsAverageRating();   
+        Task UpdateAllStationsAverageRating();
     }
 }

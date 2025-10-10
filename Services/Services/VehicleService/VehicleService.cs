@@ -400,7 +400,7 @@ namespace Services.Services.VehicleService
                 var vehicle = new Vehicle
                 {
                     Vin = linkVehicleRequest.VIN,
-                    Status = VehicleStatusEnums.Active.ToString(),
+                    Status = VehicleStatusEnums.linked.ToString(),
                     VehicleName = linkVehicleRequest.VehicleName.ToString(),
                     CustomerId = evDriver.CustomerId,
                     StartDate = TimeHepler.SystemTimeNow,
@@ -746,7 +746,7 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = "Evdriver not found.",
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,  
                         Data = null
                     };
                 }
@@ -759,12 +759,13 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status403Forbidden,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FORBIDDEN,
-                        Message = "You do not own this vehicle.",
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_OWNED,
                         Data = null
                     };
                 }
                 vehicle.PackageId = addVehicleInPackageRequest.PackageId;
                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+                vehicle.PackageExpiredate= TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
                 await _vehicleRepo.UpdateVehicle(vehicle);
                 return new ResultModel
                 {
@@ -935,7 +936,7 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = "Evdriver not found.",
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
                         Data = null
                     };
                 }
@@ -948,13 +949,13 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status403Forbidden,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FORBIDDEN,
-                        Message = "You do not own this vehicle.",
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_OWNED,
                         Data = null
                     };
                 }
 
                 // Unlink logic here (for example, set CustomerId to null)
-                vehicle.CustomerId = null;
+                vehicle.Status = VehicleStatusEnums.Unlinked.ToString();
                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
                 await _vehicleRepo.UpdateVehicle(vehicle);
 
@@ -1017,18 +1018,30 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = "Evdriver not found.",
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
                         Data = null
                     };
                 }
                 var vehicles = await _vehicleRepo.GetAllVehicleByCustomerId(evDriver.CustomerId);
+                var activeVehicles = vehicles.Where(v => v.Status == VehicleStatusEnums.linked.ToString()).ToList();
+                if (activeVehicles == null || activeVehicles.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.NO_VEHICLE_FOR_USER,
+                        Data = null
+                    };
+                }
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsVehicle.GET_ALL_VEHICLE_SUCCESS,
-                    Data = vehicles
+                    Data = activeVehicles
                 };
 
             }
@@ -1186,7 +1199,7 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = "Evdriver not found.",
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
                         Data = null
                     };
                 }
@@ -1210,7 +1223,7 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status403Forbidden,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FORBIDDEN,
-                        Message = "You do not own this vehicle.",
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_OWNED,
                         Data = null
                     };
                 }

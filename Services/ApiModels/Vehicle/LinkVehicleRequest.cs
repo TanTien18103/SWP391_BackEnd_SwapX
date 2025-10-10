@@ -11,6 +11,7 @@ namespace Services.ApiModels.Vehicle
     public class LinkVehicleRequest
     {
         [Required]
+        [StringLength(17, MinimumLength = 17, ErrorMessage = "VIN must be exactly 17 characters.")]
         public string VIN { get; set; }
         [Required]
         public VehicleNameEnums VehicleName { get; set; }

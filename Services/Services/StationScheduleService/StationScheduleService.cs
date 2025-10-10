@@ -208,6 +208,7 @@ namespace Services.Services.StationScheduleService
             }
         }
 
+
         public async Task<ResultModel> UpdateStationSchedule(UpdateStationScheduleRequest updateStationScheduleRequest)
         {
             try
@@ -303,6 +304,34 @@ namespace Services.Services.StationScheduleService
                     Message = ResponseMessageConstantsStationSchedule.UPDATE_STATION_SCHEDULE_FAILED,
                     Data = ex.Message
                 };
+            }
+        }
+
+        public Task<ResultModel> GetStationScheduleByStationId(string stationId)
+        {
+            try
+            {
+                var stationSchedules = _stationScheduleRepo.GetStationScheduleById(stationId);
+                return Task.FromResult(new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStationSchedule.GET_STATION_SCHEDULE_BY_STATION_ID_SUCCESS,
+                    Data = stationSchedules
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStationSchedule.GET_STATION_SCHEDULE_BY_STATION_ID_FAILED,
+                    Data = ex.Message
+                });
             }
         }
     }

@@ -19,7 +19,7 @@ namespace Repositories.Repositories.VehicleRepo
         Task<List<Vehicle>> GetAllVehicleByCustomerId(string customerId);
         Task<Package> GetPackageByVehicleId(string vehicleId);
         Task<List<Vehicle>> GetVehiclesByPackageId(string packageid);
-
+        Task<Vehicle> GetVehicleByBatteryId(string batteryId);
 
     }
 }
