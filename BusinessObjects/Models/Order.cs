@@ -25,6 +25,8 @@ public partial class Order
 
     public DateTime? UpdateDate { get; set; }
 
+    public string ServiceType { get; set; }
+
     public virtual Account Account { get; set; }
 
     public virtual Battery Battery { get; set; }
