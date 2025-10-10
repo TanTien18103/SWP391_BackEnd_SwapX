@@ -386,6 +386,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.ServiceId)
                 .HasMaxLength(100)
                 .HasColumnName("ServiceID");
+            entity.Property(e => e.ServiceType)
+                .HasMaxLength(100)
+                .HasColumnName("service_type");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
