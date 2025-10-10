@@ -417,9 +417,7 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
-            entity.Property(e => e.ExpiredDate)
-                .HasColumnType("datetime")
-                .HasColumnName("expiredDate");
+            entity.Property(e => e.ExpiredDate).HasColumnName("expiredDate");
             entity.Property(e => e.PackageName).HasMaxLength(100);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
@@ -611,6 +609,7 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.CustomerId)
                 .HasMaxLength(100)
                 .HasColumnName("CustomerID");
+            entity.Property(e => e.PackageExpiredate).HasColumnType("datetime");
             entity.Property(e => e.PackageId)
                 .HasMaxLength(100)
                 .HasColumnName("PackageID");

@@ -23,7 +23,7 @@ public partial class Package
 
     public string BatteryType { get; set; }
 
-    public DateTime? ExpiredDate { get; set; }
+    public int? ExpiredDate { get; set; }
 
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 }

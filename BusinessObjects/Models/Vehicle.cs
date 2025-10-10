@@ -25,6 +25,8 @@ public partial class Vehicle
 
     public string CustomerId { get; set; }
 
+    public DateTime? PackageExpiredate { get; set; }
+
     public virtual Battery Battery { get; set; }
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
