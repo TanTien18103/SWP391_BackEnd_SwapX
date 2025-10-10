@@ -100,7 +100,7 @@ public partial class SwapXContext : DbContext
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("batteryQuality");
             entity.Property(e => e.BatteryType)
-                .HasMaxLength(25)
+                .HasMaxLength(100)
                 .HasColumnName("Battery_type");
             entity.Property(e => e.Capacity).HasColumnName("capacity");
             entity.Property(e => e.Specification)
@@ -417,6 +417,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
+            entity.Property(e => e.ExpiredDate)
+                .HasColumnType("datetime")
+                .HasColumnName("expiredDate");
             entity.Property(e => e.PackageName).HasMaxLength(100);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.StartDate).HasColumnType("datetime");
