@@ -445,4 +445,26 @@ namespace BusinessObjects.Constants
         public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
         public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
     }
+    public static class PayOSMessages
+    {
+        public const string InvalidOrderId = "OrderId không hợp lệ.";
+        public const string OrderNotFound = "Không tìm thấy đơn hàng.";
+        public const string PaymentLinkCreated = "Tạo link thanh toán thành công.";
+    }
+    public static class ExchangeBatteryMessages
+    {
+        public const string CreateSuccess = "Tạo giao dịch đổi pin thành công.";
+        public const string CreateFailed = "Không thể tạo giao dịch đổi pin.";
+        public const string NotFound = "Không tìm thấy thông tin giao dịch đổi pin.";
+        public const string ListEmpty = "Không có bản ghi giao dịch đổi pin nào.";
+        public const string InvalidStation = "Mã trạm không hợp lệ.";
+        public const string InvalidOrder = "Mã đơn hàng không hợp lệ.";
+        public const string InvalidBattery = "Thông tin pin không hợp lệ.";
+        public const string UpdateSuccess = "Cập nhật giao dịch đổi pin thành công.";
+        public const string UpdateFailed = "Cập nhật giao dịch đổi pin thất bại.";
+        public const string DeleteSuccess = "Xóa giao dịch đổi pin thành công.";
+        public const string DeleteFailed = "Xóa giao dịch đổi pin thất bại.";
+        public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
+        public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
+    }
 }

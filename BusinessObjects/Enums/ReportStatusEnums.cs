@@ -10,6 +10,7 @@ namespace BusinessObjects.Enums
     {
         Active,
         Pending,
-        Inactive
+        Inactive,
+        Cancelled
     }
 }

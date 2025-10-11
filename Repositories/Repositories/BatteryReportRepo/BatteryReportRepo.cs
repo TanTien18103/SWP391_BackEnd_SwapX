@@ -46,5 +46,22 @@ namespace Repositories.Repositories.BatteryReportRepo
                 .OrderByDescending(r => r.UpdateDate)
                 .ToListAsync();
         }
+        public async Task<BatteryReport?> GetByBatteryId(string batteryId)
+        {
+            return await _context.BatteryReports
+                .OrderByDescending(r => r.UpdateDate)
+                .FirstOrDefaultAsync(r => r.BatteryId == batteryId);
+        }
+        public async Task<BatteryReport?> GetByExchangeBatteryId(string exchangeBatteryId)
+        {
+            return await _context.BatteryReports
+                .OrderByDescending(r => r.UpdateDate)
+                .FirstOrDefaultAsync(r => r.ExchangeBatteryId == exchangeBatteryId);
+        }
+
+        public async Task<BatteryReport> Update(BatteryReport batteryReport)
+        {
+            return await UpdateBatteryReport(batteryReport);
+        }
     }
 }

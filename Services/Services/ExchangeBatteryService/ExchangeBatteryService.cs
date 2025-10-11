@@ -113,6 +113,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
                 BatteryReportId = Guid.NewGuid().ToString(),
                 BatteryId = req.NewBatteryId, 
                 StationId = req.StationId,
+                ExchangeBatteryId = exchange.ExchangeBatteryId,
                 Status = BatteryReportStatusEnums.Pending.ToString(),
                 Description = $"Battery {req.NewBatteryId} exchanged at station {req.StationId}",
                 AccountId = req.AccountId,

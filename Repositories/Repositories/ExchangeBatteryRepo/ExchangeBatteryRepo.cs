@@ -87,5 +87,19 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Where(e => e.Vin == driverId)
                 .ToListAsync();
         }
+
+        public async Task<ExchangeBattery?> GetByOrderId(string orderId)
+        {
+            return await _context.ExchangeBatteries
+                .AsNoTracking()
+                .Include(e => e.Station)
+                .Include(e => e.Order)
+                .Include(e => e.NewBattery)
+                .Include(e => e.OldBattery)
+                .Include(e => e.StaffAccount)
+                .Include(e => e.Schedule)
+                .Include(e => e.VinNavigation)
+                .FirstOrDefaultAsync(e => e.OrderId == orderId);
+        }
     }
 }

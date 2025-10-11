@@ -13,6 +13,7 @@ namespace BusinessObjects.Enums
         Inactive, // Report is no longer valid
         Completed, // Exchange and payment are done
         Approved, // Staff has approved the report/form
-        Rejected // Staff has rejected the report/form
+        Rejected, // Staff has rejected the report/form,
+        Cancelled
     }
 }
