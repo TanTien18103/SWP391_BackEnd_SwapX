@@ -224,6 +224,9 @@ namespace BusinessObjects.Constants
         public const string UPDATE_BATTERY_STATUS_SUCCESS = "Cập nhật trạng thái pin thành công";
         public const string UPDATE_BATTERY_STATUS_FAIL = "Cập nhật trạng thái pin thất bại";
 
+        public static string BATTERY_ALREADY_BOOKED= "Pin đã được đặt";
+
+        public static string INCOMPATIBLE_BATTERY_VEHICLE =" Pin không tương thích với xe";
     }
     public static class EmailConstants
     {
@@ -265,6 +268,8 @@ namespace BusinessObjects.Constants
         public const string INVALID_FORM_STATUS_UPDATE = "Không thể cập nhật trạng thái biểu mẫu";
         public const string UPDATE_FORM_STATUS_SUCCESS = " Cập nhật trạng thái biểu mẫu thành công";
         public const string UPDATE_FORM_STATUS_FAILED = " Cập nhật trạng thái biểu mẫu thất bại";
+
+        public static string BATTERY_ALREADY_BOOKED = "Pin đã được đặt";
     }
     // For Package (0-0-1)
     public static class ResponseMessageConstantsPackage

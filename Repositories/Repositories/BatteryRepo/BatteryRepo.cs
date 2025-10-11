@@ -28,10 +28,16 @@ namespace Repositories.Repositories.BatteryRepo
 
         }
 
-        public async Task<Battery> GetBatteriesByStationId(string stationId)
+        public async Task<List<Battery>> GetBatteriesByStationId(string stationId)
         {
-            return await _context.Batteries.FirstOrDefaultAsync(b => b.StationId == stationId);
+            return await _context.Batteries
+                .Include(v => v.Vehicles)
+                .Include(b => b.Station)
+                .Where(b => b.StationId == stationId)
+                .ToListAsync();
         }
+
+
 
         public async Task<Battery> GetBatteryById(string batteryId)
         {
@@ -44,5 +50,13 @@ namespace Repositories.Repositories.BatteryRepo
             await _context.SaveChangesAsync();
             return battery;
         }
+        public async Task<List<Battery>> GetBatteriesByStationIdAndSpecification(string stationId, string specification, string batteryType)
+        {
+            return await _context.Batteries.Include(v => v.Vehicles)
+                .Include(b => b.Station)
+                .Where(b => b.StationId == stationId && b.Specification == specification&& b.BatteryType== batteryType)
+                .ToListAsync();
+        }
+
     }
 }

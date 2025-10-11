@@ -18,6 +18,8 @@ using Services.Services.StationService;
 using BusinessObjects.Models;
 using Repositories.Repositories.VehicleRepo;
 using Repositories.Repositories.BatteryHistoryRepo;
+using Repositories.Repositories.EvDriverRepo;
+using Repositories.Repositories.AccountRepo;
 namespace Services.Services.BatteryService
 {
     public class BatteryService : IBatteryService
@@ -29,8 +31,11 @@ namespace Services.Services.BatteryService
         private readonly IStationRepo _stationRepo;
         private readonly IVehicleRepo _vehicleRepo;
         private readonly IBatteryHistoryRepo _batteryHistoryRepo;
+        private readonly IEvDriverRepo _evDriverRepo;
+        private readonly IAccountRepo _accountRepo;
+
         //--------------------------------------------------------------
-        public BatteryService(IBatteryRepo batteryRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo, IVehicleRepo vehicleRepo, IBatteryHistoryRepo batteryHistoryRepo)
+        public BatteryService(IBatteryRepo batteryRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo, IVehicleRepo vehicleRepo, IBatteryHistoryRepo batteryHistoryRepo, IEvDriverRepo evDriverRepo, IAccountRepo accountRepo)
         {
             _batteryRepo = batteryRepo;
             _configuration = configuration;
@@ -38,8 +43,9 @@ namespace Services.Services.BatteryService
             _accountHelper = accountHelper;
             _stationRepo = stationRepo;
             _vehicleRepo = vehicleRepo;
-            _batteryHistoryRepo= batteryHistoryRepo;
-
+            _batteryHistoryRepo = batteryHistoryRepo;
+            _evDriverRepo = evDriverRepo;
+            _accountRepo = accountRepo;
         }
         //--------------------------------------------------------------
         public async Task<ResultModel> AddBattery(AddBatteryRequest addBatteryRequest)
@@ -236,10 +242,10 @@ namespace Services.Services.BatteryService
                     {
                         Vin = vehicle.Vin,
                         VehicleName = vehicle.VehicleName,
-                        CustomerId= vehicle.CustomerId,
+                        CustomerId = vehicle.CustomerId,
                     }
                 };
-            
+
 
                 return new ResultModel
                 {
@@ -530,6 +536,148 @@ namespace Services.Services.BatteryService
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsBattery.UPDATE_BATTERY_STATUS_IN_STATION_FAILED,
                     Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> GetAllBatterySuitVehicle(GetAllBatterySuitVehicle getAllBatterySuitVehicle)
+        {
+            try
+            {
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+             || string.IsNullOrEmpty(authHeader)
+             || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepo.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(accountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var vehicle = await _vehicleRepo.GetVehicleById(getAllBatterySuitVehicle.Vin);
+                if (vehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                // kiểm tra xem vehicle có thuộc về customer không
+                if (vehicle.CustomerId != evDriver.CustomerId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FORBIDDEN,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_OWNED,
+                        Data = null
+                    };
+                }
+                var battery = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
+                if (battery == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var batteries = await _batteryRepo.GetBatteriesByStationIdAndSpecification(getAllBatterySuitVehicle.StationId,battery.Specification,battery.BatteryType);
+                if(batteries==null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null
+                    };
+
+                }
+                var response = new List<object>();
+
+                foreach (var b in batteries)
+                {
+                    response.Add(new
+                    {
+                        BatteryId = b.BatteryId,
+                        BatteryName = b.BatteryName,
+                        Status = b.Status,
+                        Capacity = b.Capacity,
+                        BatteryType = b.BatteryType,
+                        Specification = b.Specification,
+                        BatteryQuality = b.BatteryQuality,
+                        StartDate = b.StartDate,
+                        UpdateDate = b.UpdateDate,
+                        Station = b.Station == null ? null : new
+                        {
+                            StationId = b.Station.StationId,
+                            StationName = b.Station.StationName,
+                            Location = b.Station.Location,
+                            Status = b.Station.Status,
+                            Rating = b.Station.Rating,
+                            BatteryNumber = b.Station.BatteryNumber,
+                            StartDate = b.Station.StartDate,
+                            UpdateDate = b.Station.UpdateDate
+                        },
+
+                    });
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBattery.GET_BATTERY_LIST_SUCCESS,
+                    Data = response,
+                    StatusCode = StatusCodes.Status200OK
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.INTERNAL_SERVER_ERROR,
+                    Message = ResponseMessageConstantsBattery.GET_BATTERY_FAIL,
+                    Data = null,
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
             }

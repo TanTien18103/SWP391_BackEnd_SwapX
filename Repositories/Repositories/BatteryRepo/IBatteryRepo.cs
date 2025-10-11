@@ -13,6 +13,7 @@ namespace Repositories.Repositories.BatteryRepo
         Task<Battery> AddBattery(Battery battery);
         Task<Battery> UpdateBattery(Battery battery);
         Task<List<Battery>> GetAllBatteries();
-        Task<Battery> GetBatteriesByStationId(string stationId);
+        Task<List<Battery>> GetBatteriesByStationId(string stationId);
+        Task<List<Battery>> GetBatteriesByStationIdAndSpecification(string stationId, string specification, string batteryType);
     }
 }

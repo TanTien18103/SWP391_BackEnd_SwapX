@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessObjects.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -25,5 +26,10 @@ namespace Services.ApiModels.Form
         
         [Required]
         public string StationId { get; set; }
+        [Required]
+        public string Vin { get; set; }
+        [Required]
+        public string BatteryId { get; set; }
+
     }
 }

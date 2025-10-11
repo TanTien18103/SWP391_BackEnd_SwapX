@@ -12,6 +12,7 @@ namespace BusinessObjects.Enums
         Available,
         InUse,
         Charging,
+        Booked,
         Maintenance,
         Decommissioned
     }
