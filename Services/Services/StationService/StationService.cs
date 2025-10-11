@@ -655,5 +655,74 @@ namespace Services.Services.StationService
                 };
             }
         }
+
+        public async Task<ResultModel> GetAllStationOfCustomer()
+        {
+            try
+            {
+
+                var stations = await _stationRepository.GetAllStationsOfCustomer();
+                if (stations == null || stations.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_LIST_EMPTY,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+
+                // Map sang object mới, ẩn trường station trong từng battery
+                var response = stations.Select(station => new
+                {
+                    StationId = station.StationId,
+                    StationName = station.StationName,
+                    Location = station.Location,
+                    Status = station.Status,
+                    Rating = station.Rating,
+                    BatteryNumber = station.BatteryNumber,
+                    BssStaffs = station.BssStaffs.Select(s => new
+                    {
+                        StaffId = s.StaffId,
+                    }).ToList(),
+                    Batteries = station.Batteries.Select(b => new
+                    {
+                        BatteryId = b.BatteryId,
+                        BatteryName = b.BatteryName,
+                        Status = b.Status,
+                        Capacity = b.Capacity,
+                        BatteryType = b.BatteryType,
+                        Specification = b.Specification,
+                        BatteryQuality = b.BatteryQuality,
+                        // KHÔNG có trường station ở đây!
+                    }).ToList()
+                }).ToList();
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.GET_ALL_STATION_SUCCESS,
+                    Data = response,
+                    StatusCode = StatusCodes.Status200OK
+                };
+
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.GET_ALL_STATION_FAIL,
+                    Data = ex.Message
+                };
+            }
+        }
     }
 }

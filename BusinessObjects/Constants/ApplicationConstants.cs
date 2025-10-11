@@ -229,7 +229,12 @@ namespace BusinessObjects.Constants
         public const string NewPasswordSubject = "Mật khẩu mới của bạn";
         public const string NewPasswordBodyTemplate = "Mật khẩu mới của bạn là: <b>{0}</b>. Hãy đăng nhập và đổi mật khẩu ngay.";
     }
-
+    public static class HistoryActionConstants { 
+    
+    
+    
+    
+    }
     public static class ResponseMessageConstantsForm
     {
         public const string FORM_NOT_FOUND = "Không tìm thấy biểu mẫu";

@@ -95,4 +95,11 @@ public class StationController : ControllerBase
         var res = await _stationService.UpdateStationStatus(updateStationStatusRequest);
         return StatusCode(res.StatusCode, res);
     }
+    [HttpGet("get_all_station_of_customer")]
+    [Authorize(Roles = "EvDriver")]
+    public async Task<IActionResult> GetAllStationOfCustomer()
+    {
+        var res = await _stationService.GetAllStationOfCustomer();
+        return StatusCode(res.StatusCode, res);
+    }
 }

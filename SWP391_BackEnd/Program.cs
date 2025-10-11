@@ -37,6 +37,7 @@ using Services.Services.ReportService;
 using Repositories.Repositories.BatteryReportRepo;
 using Services.Services.BatteryReportService;
 using Repositories.Repositories.BssStaffRepo;
+using Repositories.Repositories.BatteryHistoryRepo;
 
 //*************** I KNEW YOU WERE HERE ***************//
 
@@ -133,6 +134,7 @@ builder.Services.AddScoped<IRatingRepo, RatingRepo>();
 builder.Services.AddScoped<IReportRepo, ReportRepo>();
 builder.Services.AddScoped<IBatteryReportRepo, BatteryReportRepo>();
 builder.Services.AddScoped<IBssStaffRepo, BssStaffRepo>();
+builder.Services.AddScoped<IBatteryHistoryRepo, BatteryHistoryRepo>();
 //*************** I KNEW YOU WERE HERE ***************//
 
 // Register Services

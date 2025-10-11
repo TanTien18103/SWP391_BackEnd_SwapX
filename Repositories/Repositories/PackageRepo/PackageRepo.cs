@@ -42,7 +42,7 @@ namespace Repositories.Repositories.PackageRepo
         public async Task<List<Package>> GetAllPackageByBatteryType(string batteryType)
         {
             _context.Packages.Where(p => p.BatteryType == batteryType);
-            return await _context.Packages.Where(p => p.BatteryType == batteryType).ToListAsync();
+            return await _context.Packages.Where(p=>p.Status==PackageStatusEnums.Active.ToString()).Where(p => p.BatteryType == batteryType).ToListAsync();
         }
     }
 }

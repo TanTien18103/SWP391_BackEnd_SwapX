@@ -66,5 +66,15 @@ namespace Repositories.Repositories.StationRepo
             }
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Station>> GetAllStationsOfCustomer()
+        {
+            await UpdateAllStationsAverageRating();
+            return await _context.Stations
+                .Where(s => s.Status == StationStatusEnum.Active.ToString())
+                .Include(b => b.Batteries)
+                .Include(s => s.BssStaffs)
+                .ToListAsync();
+        }
     }
 }

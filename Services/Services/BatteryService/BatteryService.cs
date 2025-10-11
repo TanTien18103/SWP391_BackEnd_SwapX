@@ -17,6 +17,7 @@ using Repositories.Repositories.StationRepo;
 using Services.Services.StationService;
 using BusinessObjects.Models;
 using Repositories.Repositories.VehicleRepo;
+using Repositories.Repositories.BatteryHistoryRepo;
 namespace Services.Services.BatteryService
 {
     public class BatteryService : IBatteryService
@@ -27,8 +28,9 @@ namespace Services.Services.BatteryService
         private readonly AccountHelper _accountHelper;
         private readonly IStationRepo _stationRepo;
         private readonly IVehicleRepo _vehicleRepo;
+        private readonly IBatteryHistoryRepo _batteryHistoryRepo;
         //--------------------------------------------------------------
-        public BatteryService(IBatteryRepo batteryRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo, IVehicleRepo vehicleRepo)
+        public BatteryService(IBatteryRepo batteryRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo, IVehicleRepo vehicleRepo, IBatteryHistoryRepo batteryHistoryRepo)
         {
             _batteryRepo = batteryRepo;
             _configuration = configuration;
@@ -36,6 +38,8 @@ namespace Services.Services.BatteryService
             _accountHelper = accountHelper;
             _stationRepo = stationRepo;
             _vehicleRepo = vehicleRepo;
+            _batteryHistoryRepo= batteryHistoryRepo;
+
         }
         //--------------------------------------------------------------
         public async Task<ResultModel> AddBattery(AddBatteryRequest addBatteryRequest)

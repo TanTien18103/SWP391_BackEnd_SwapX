@@ -65,6 +65,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("add_vehicle_in_package")]
+        [Authorize(Roles ="EvDriver")]
         public async Task<IActionResult> AddVehicleInPackage([FromForm] Services.ApiModels.Vehicle.AddVehicleInPackageRequest addVehicleInPackageRequest)
         {
             var res = await _vehicleService.AddVehicleInPackage(addVehicleInPackageRequest);
