@@ -158,6 +158,57 @@ namespace Services.Services.BatteryReportService
             }
         }
 
+        public async Task<ResultModel> GetBatteryReportsByStation(string stationId)
+        {
+            try
+            {
+                var station = await _stationRepo.GetStationById(stationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null
+                    };
+                }
+
+                var reports = await _batteryReportRepository.GetBatteryReportsByStation(stationId);
+                if (reports == null || !reports.Any())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBatteryReport.BATTERY_REPORT_LIST_EMPTY,
+                        Data = null
+                    };
+                }
+
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBatteryReport.GET_ALL_BATTERY_REPORT_SUCCESS,
+                    Data = reports
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsBatteryReport.GET_ALL_BATTERY_REPORT_FAIL,
+                    Data = ex.Message
+                };
+            }
+        }
         public async Task<ResultModel> GetAllBatteryReports()
         {
             try

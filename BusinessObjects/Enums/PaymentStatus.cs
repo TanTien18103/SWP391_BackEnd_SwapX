@@ -17,3 +17,10 @@ public enum PaymentStatus
     /// </summary>
     Pending
 }
+public enum PaymentType
+{
+    Package,
+    PrePaid,
+    UsePackage,
+    PaidAtStation
+}

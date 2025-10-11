@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.ApiModels.BatteryReport;
 using Services.Services.BatteryReportService;
+
 namespace SWP391_BackEnd.Controllers
 {
     [Route("api/[controller]")]
@@ -13,7 +15,7 @@ namespace SWP391_BackEnd.Controllers
             _batteryReportService = batteryReportService;
         }
         [HttpPost("add_battery_report")]
-        public async Task<IActionResult> AddBatteryReport([FromForm] Services.ApiModels.BatteryReport.AddBatteryReportRequest addBatteryReportRequest)
+        public async Task<IActionResult> AddBatteryReport([FromForm] AddBatteryReportRequest addBatteryReportRequest)
         {
             var res = await _batteryReportService.AddBatteryReport(addBatteryReportRequest);
             return StatusCode(res.StatusCode, res);
@@ -37,9 +39,16 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("update_battery_report")]
-        public async Task<IActionResult> UpdateBatteryReport([FromForm] Services.ApiModels.BatteryReport.UpdateBatteryReportRequest updateBatteryReportRequest)
+        public async Task<IActionResult> UpdateBatteryReport([FromForm] UpdateBatteryReportRequest updateBatteryReportRequest)
         {
             var res = await _batteryReportService.UpdateBatteryReport(updateBatteryReportRequest);
+            return StatusCode(res.StatusCode, res);
+        }
+        [Authorize(Roles = "Staff")]
+        [HttpGet("get_battery_reports_by_station")]
+        public async Task<IActionResult> GetBatteryReportsByStation([FromQuery] string stationId)
+        {
+            var res = await _batteryReportService.GetBatteryReportsByStation(stationId);
             return StatusCode(res.StatusCode, res);
         }
     }
