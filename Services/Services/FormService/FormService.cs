@@ -169,9 +169,6 @@ namespace Services.Services.FormService
                         Data = null
                     };
                 }
-                battery.Status = BatteryStatusEnums.Booked.ToString();
-                battery.UpdateDate = TimeHepler.SystemTimeNow;
-                await _batteryRepo.UpdateBattery(battery);
                 if (evDriver == null)
                 {
                     return new ResultModel
@@ -183,6 +180,9 @@ namespace Services.Services.FormService
                         Data = null
                     };
                 }
+                battery.Status = BatteryStatusEnums.Booked.ToString();
+                battery.UpdateDate = TimeHepler.SystemTimeNow;
+                await _batteryRepo.UpdateBattery(battery);
                 var form = new Form
                 {
                     FormId = _accountHelper.GenerateShortGuid(),
