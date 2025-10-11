@@ -3,6 +3,7 @@ using BusinessObjects.Enums;
 using Microsoft.Extensions.Configuration;
 using Net.payOS;
 using Net.payOS.Types;
+using Repositories.Repositories.OrderRepo;
 using Services.ApiModels;
 using Services.Services;
 using Services.Helpers;
@@ -14,14 +15,14 @@ public class PayOSService : IPayOSService
     private readonly PayOS _payOS;
     private readonly PayOSHelper _helper;
     private readonly IConfiguration _config;
-    private readonly IOrderService _orderService;
-
-    public PayOSService(PayOS payOS, PayOSHelper helper, IConfiguration config, IOrderService orderService)
+    private readonly IOrderRepository _orderRepository;
+    
+    public PayOSService(PayOS payOs, PayOSHelper helper, IConfiguration config, IOrderRepository orderRepository)
     {
-        _payOS = payOS;
+        _payOS = payOs;
         _helper = helper;
         _config = config;
-        _orderService = orderService;
+        _orderRepository = orderRepository;
     }
 
     public async Task<ResultModel<PayOSWebhookResponseDto>> HandleWebhookAsync(PayOSWebhookRequestDto webhook)
@@ -43,7 +44,7 @@ public class PayOSService : IPayOSService
 
         var orderId = ExtractOrderIdFromOrderCode(webhook.Data.OrderCode);
 
-        var orderDetail = await _orderService.GetOrderByIdAsync(orderId.ToString());
+        var orderDetail = await _orderRepository.GetOrderByIdAsync(orderId.ToString());
         if (orderDetail == null)
         {
             return new ResultModel<PayOSWebhookResponseDto>
@@ -55,7 +56,7 @@ public class PayOSService : IPayOSService
             };
         }
 
-        await _orderService.UpdateOrderStatusAsync(orderDetail.OrderId, status.ToString());
+        await _orderRepository.UpdateOrderStatusAsync(orderDetail.OrderId, status.ToString());
 
         var response = new PayOSWebhookResponseDto
         {
@@ -87,7 +88,7 @@ public class PayOSService : IPayOSService
             };
         }
 
-        var orderDetail = await _orderService.GetOrderByIdAsync(orderId.ToString());
+        var orderDetail = await _orderRepository.GetOrderByIdAsync(orderId.ToString());
         if (orderDetail == null)
         {
             return new ResultModel<PayOSPaymentResponseDto>

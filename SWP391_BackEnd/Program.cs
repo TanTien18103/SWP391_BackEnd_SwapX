@@ -38,6 +38,10 @@ using Repositories.Repositories.BatteryReportRepo;
 using Services.Services.BatteryReportService;
 using Repositories.Repositories.BssStaffRepo;
 using Repositories.Repositories.BatteryHistoryRepo;
+using Repositories.Repositories.Dashboard;
+using Repositories.Repositories.ExchangeBatteryRepo;
+using Services.Services.Dashboard;
+using Services.Services.ExchangeBatteryService;
 
 //*************** I KNEW YOU WERE HERE ***************//
 
@@ -135,6 +139,9 @@ builder.Services.AddScoped<IReportRepo, ReportRepo>();
 builder.Services.AddScoped<IBatteryReportRepo, BatteryReportRepo>();
 builder.Services.AddScoped<IBssStaffRepo, BssStaffRepo>();
 builder.Services.AddScoped<IBatteryHistoryRepo, BatteryHistoryRepo>();
+builder.Services.AddScoped<IExchangeBatteryRepo, ExchangeBatteryRepo>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+
 //*************** I KNEW YOU WERE HERE ***************//
 
 // Register Services
@@ -152,6 +159,8 @@ builder.Services.AddScoped<IStationScheduleService, StationScheduleService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IBatteryReportService, BatteryReportService>();
+builder.Services.AddScoped<IExchangeBatteryService, ExchangeBatteryService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 //*************** I KNEW YOU WERE HERE ***************//
 
 //Register Helper

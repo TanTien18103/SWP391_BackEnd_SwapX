@@ -15,5 +15,6 @@ namespace Services.Services.BatteryReportService
         Task<ResultModel> AddBatteryReport(AddBatteryReportRequest addBatteryReportRequest);
         Task<ResultModel> UpdateBatteryReport(UpdateBatteryReportRequest updateBatteryReportRequest);
         Task<ResultModel> DeleteBatteryReport(string batteryReportId);
+        Task<ResultModel> GetBatteryReportsByStation(string stationId);
     }
 }

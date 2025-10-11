@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessObjects.Enums;
 
 namespace Repositories.Repositories.BatteryReportRepo
 {
@@ -34,6 +35,16 @@ namespace Repositories.Repositories.BatteryReportRepo
             _context.BatteryReports.Update(batteryReport);
             await _context.SaveChangesAsync();
             return batteryReport;
+        }
+
+        public async Task<List<BatteryReport>> GetBatteryReportsByStation(string stationId)
+        {
+            return await _context.BatteryReports
+                .Include(r => r.Battery)
+                .Include(r => r.Account)
+                .Where(r => r.StationId == stationId && r.Status != BatteryReportStatusEnums.Inactive.ToString())
+                .OrderByDescending(r => r.UpdateDate)
+                .ToListAsync();
         }
     }
 }

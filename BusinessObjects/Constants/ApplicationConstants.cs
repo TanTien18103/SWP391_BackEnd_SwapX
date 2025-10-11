@@ -203,21 +203,27 @@ namespace BusinessObjects.Constants
         public const string BATTERY_INACTIVE = "Pin đã bị ngừng hoạt động";
         public const string GET_BATTERY_LIST_SUCCESS = "Lấy danh sách pin thành công";
         public const string GET_BATTERY_DETAIL_SUCCESS = "Lấy chi tiết pin thành công";
-        public const string ADD_BATTERY_FAIL = "Thêm pin thất bại";
-        public const string GET_ALL_BATTERY_FAIL = "Lấy danh sách pin thất bại";
-        public const string BATTERY_LIST_EMPTY = "Lấy danh sách pin thất bại";
-        public const string GET_ALL_BATTERY_SUCCESS = "Lấy danh sách pin thành công";
-        public const string UPDATE_BATTERY_FAILED = "Cập nhật pin thất bại";
-        public const string GET_BATTERY_FAIL = "Lấy pin thất bại";
-        public const string GET_BATTERY_SUCCESS = "Lấy pin thành công";
-        public const string DELETE_BATTERY_FAILED = "Xóa pin thất bại";
-        public const string ADD_BATTERY_IN_STATION_FAILED = "Thêm pin vào trạm thất bại";
-        public const string ADD_BATTERY_IN_STATION_SUCCESS = "Thêm pin vào trạm thành công";
         public const string DefaultBatterySuffix = "'s Battery";
         public const string BATTERY_STATUS_ALREADY_EXISTS = "Trạng thái pin không thay đổi";
         public const string UPDATE_BATTERY_STATUS_IN_STATION_SUCCESS = "Cập nhật trạng thái pin trong trạm thành công";
         public const string UPDATE_BATTERY_STATUS_IN_STATION_FAILED = "Cập nhật trạng thái pin trong trạm thất bại";
         public const string BATTERY_DECOMMISSIONED_CANNOT_UPDATE_STATUS = "Pin đã ngừng hoạt động, không thể cập nhật trạng thái";
+        public static string ADD_BATTERY_FAIL = "Thêm pin thất bại";
+        public static string GET_ALL_BATTERY_FAIL = "Lấy danh sách pin thất bại";
+        public static string BATTERY_LIST_EMPTY = "Lấy danh sách pin thất bại";
+        public static string GET_ALL_BATTERY_SUCCESS = "Lấy danh sách pin thành công";
+        public static string UPDATE_BATTERY_FAILED = "Cập nhật pin thất bại";
+        public static string GET_BATTERY_FAIL = "Lấy pin thất bại";
+        public static string GET_BATTERY_SUCCESS = "Lấy pin thành công";
+        public static string DELETE_BATTERY_FAILED = "Xóa pin thất bại";
+        public static string ADD_BATTERY_IN_STATION_FAILED = "Thêm pin vào trạm thất bại";
+        public static string ADD_BATTERY_IN_STATION_SUCCESS = "Thêm pin vào trạm thành công";
+        public const string GET_BATTERY_HISTORY_SUCCESS = "Lấy lịch sử pin thành công";
+        public const string GET_BATTERY_HISTORY_FAIL = "Lấy lịch sử pin thất bại";
+        public const string BATTERY_HISTORY_EMPTY = "Không có lịch sử cho pin này";
+        public const string UPDATE_BATTERY_STATUS_SUCCESS = "Cập nhật trạng thái pin thành công";
+        public const string UPDATE_BATTERY_STATUS_FAIL = "Cập nhật trạng thái pin thất bại";
+
     }
     public static class EmailConstants
     {
@@ -416,5 +422,27 @@ namespace BusinessObjects.Constants
         public const string GET_BATTERY_REPORT_FAIL = "Lấy báo cáo pin thất bại";
         public const string GET_BATTERY_REPORT_SUCCESS = "Lấy báo cáo pin thành công";
         public const string DELETE_BATTERY_REPORT_FAILED = "Xóa báo cáo pin thất bại";
+    }
+    
+    public static class ExchangeMessages
+    {
+        public const string CreateSuccess = "Tạo giao dịch đổi pin thành công.";
+        public const string CreateFailed = "Không thể tạo giao dịch đổi pin.";
+
+        public const string NotFound = "Không tìm thấy thông tin giao dịch đổi pin.";
+        public const string ListEmpty = "Không có bản ghi giao dịch đổi pin nào.";
+
+        public const string InvalidStation = "Mã trạm không hợp lệ.";
+        public const string InvalidOrder = "Mã đơn hàng không hợp lệ.";
+        public const string InvalidBattery = "Thông tin pin không hợp lệ.";
+
+        public const string UpdateSuccess = "Cập nhật giao dịch đổi pin thành công.";
+        public const string UpdateFailed = "Cập nhật giao dịch đổi pin thất bại.";
+
+        public const string DeleteSuccess = "Xóa giao dịch đổi pin thành công.";
+        public const string DeleteFailed = "Xóa giao dịch đổi pin thất bại.";
+
+        public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
+        public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
     }
 }

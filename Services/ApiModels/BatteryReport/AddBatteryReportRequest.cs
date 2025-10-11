@@ -21,5 +21,8 @@ namespace Services.ApiModels.BatteryReport
         public string StationId { get; set; }
         [Required]
         public string BatteryId { get; set; }
+        [Required]
+        public string ReportType { get; set; } 
     }
+
 }
