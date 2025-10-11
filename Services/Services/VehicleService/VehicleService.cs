@@ -52,7 +52,7 @@ namespace Services.Services.VehicleService
                 var vehicle = new Vehicle
                 {
                     Vin = _accountHelper.GenerateShortGuid(),
-                    Status = VehicleStatusEnums.Active.ToString(),
+                    Status = VehicleStatusEnums.linked.ToString(),
                     VehicleType = addVehicleRequest.VehicleType.ToString(),
                     VehicleName = addVehicleRequest.VehicleName.ToString(),
                     PackageId = addVehicleRequest.PackageId,
@@ -235,7 +235,7 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
-                existingVehicle.Status = VehicleStatusEnums.Inactive.ToString();
+                existingVehicle.Status = VehicleStatusEnums.Unlinked.ToString();
                 existingVehicle.UpdateDate = TimeHepler.SystemTimeNow;
                 await _vehicleRepo.UpdateVehicle(existingVehicle);
                 return new ResultModel
