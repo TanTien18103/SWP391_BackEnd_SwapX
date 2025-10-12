@@ -1,25 +1,26 @@
 ﻿using BusinessObjects.Constants;
 using BusinessObjects.Enums;
+using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Repositories.Repositories.AccountRepo;
+using Repositories.Repositories.BatteryHistoryRepo;
 using Repositories.Repositories.BatteryRepo;
+using Repositories.Repositories.EvDriverRepo;
+using Repositories.Repositories.StationRepo;
+using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
 using Services.ApiModels.Battery;
 using Services.ApiModels.Station;
+using Services.Services.StationService;
 using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Repositories.Repositories.StationRepo;
-using Services.Services.StationService;
-using BusinessObjects.Models;
-using Repositories.Repositories.VehicleRepo;
-using Repositories.Repositories.BatteryHistoryRepo;
-using Repositories.Repositories.EvDriverRepo;
-using Repositories.Repositories.AccountRepo;
 namespace Services.Services.BatteryService
 {
     public class BatteryService : IBatteryService
@@ -66,13 +67,66 @@ namespace Services.Services.BatteryService
                 };
 
                 await _batteryRepo.AddBattery(battery);
+                //record lại lịch sử pin
+                var batteryHistory = new BatteryHistory
+                {
+                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
+                    BatteryId = battery.BatteryId,
+                    Notes = HistoryActionConstants.BATTERY_CREATED_BY_ADMIN.ToString(),
+                    ActionType = BatteryHistoryActionTypeEnums.Created.ToString(),
+                    EnergyLevel = battery.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    ActionDate = TimeHepler.SystemTimeNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
 
+                };
+                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
+                var response = new
+                {
+                    BatteryId = battery.BatteryId,
+                    BatteryName = battery.BatteryName,
+                    Status = battery.Status,
+                    Capacity = battery.Capacity,
+                    BatteryType = battery.BatteryType,
+                    Specification = battery.Specification,
+                    BatteryQuality = battery.BatteryQuality,
+                    StartDate = battery.StartDate,
+                    UpdateDate = battery.UpdateDate,
+                    Station = battery.Station == null ? null : new
+                    {
+                        StationId = battery.Station.StationId,
+                        StationName = battery.Station.StationName,
+                        Location = battery.Station.Location,
+                        Status = battery.Station.Status,
+                        Rating = battery.Station.Rating,
+                        BatteryNumber = battery.Station.BatteryNumber,
+                        StartDate = battery.Station.StartDate,
+                        UpdateDate = battery.Station.UpdateDate
+                        // KHÔNG có trường Batteries ở đây!
+                    },
+                    BatteryHistory = batteryHistory == null ? null : new
+                    {
+                        BatteryHistoryId = batteryHistory.BatteryHistoryId,
+                        BatteryId = batteryHistory.BatteryId,
+                        ExchangeBatteryId = batteryHistory.ExchangeBatteryId,
+                        Vin = batteryHistory.Vin,
+                        StationId = batteryHistory.StationId,
+                        ActionType = batteryHistory.ActionType,
+                        EnergyLevel = batteryHistory.EnergyLevel,
+                        ActionDate = batteryHistory.ActionDate,
+                        Notes = batteryHistory.Notes,
+                        Status = batteryHistory.Status,
+                        StartDate = batteryHistory.StartDate,
+                        UpdateDate = batteryHistory.UpdateDate
+                    }
+                };
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsBattery.ADD_BATTERY_SUCCESS,
-                    Data = battery,
+                    Data = response,
                     StatusCode = StatusCodes.Status201Created
                 };
             }
@@ -290,28 +344,70 @@ namespace Services.Services.BatteryService
                 // Only update if a new value is provided
                 if (updateBatteryRequest.Capacity.HasValue)
                     existingBattery.Capacity = updateBatteryRequest.Capacity.Value;
-
-                if (updateBatteryRequest.Specification.HasValue)
-                    existingBattery.Specification = updateBatteryRequest.Specification.Value.ToString();
-
-                if (updateBatteryRequest.BatteryType.HasValue)
-                    existingBattery.BatteryType = updateBatteryRequest.BatteryType.Value.ToString();
-
                 if (updateBatteryRequest.BatteryQuality.HasValue)
                     existingBattery.BatteryQuality = updateBatteryRequest.BatteryQuality.Value;
-
                 if (!string.IsNullOrEmpty(updateBatteryRequest.BatteryName))
                     existingBattery.BatteryName = updateBatteryRequest.BatteryName;
-
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+                //record lại lịch sử pin
+                var batteryHistory = new BatteryHistory
+                {
+                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
+                    BatteryId = updatedBattery.BatteryId,
+                    Notes = HistoryActionConstants.BATTERY_UPDATED.ToString(),
+                    ActionType = BatteryHistoryActionTypeEnums.Updated.ToString(),
+                    EnergyLevel = updatedBattery.Capacity.ToString(),
+                    UpdateDate = TimeHepler.SystemTimeNow
+
+                };
+                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
+                var response = new
+                {
+                    BatteryId = updatedBattery.BatteryId,
+                    BatteryName =   updatedBattery.BatteryName,
+                    Status = updatedBattery.Status,
+                    Capacity = updatedBattery.Capacity,
+                    BatteryType = updatedBattery.BatteryType,
+                    Specification = updatedBattery.Specification,
+                    BatteryQuality = updatedBattery.BatteryQuality,
+                    StartDate = updatedBattery.StartDate,
+                    UpdateDate = updatedBattery.UpdateDate,
+                    Station = updatedBattery.Station == null ? null : new
+                    {
+                        StationId = updatedBattery.Station.StationId,
+                        StationName = updatedBattery.Station.StationName,
+                        Location = updatedBattery.Station.Location,
+                        Status = updatedBattery.Station.Status,
+                        Rating = updatedBattery.Station.Rating,
+                        BatteryNumber = updatedBattery.Station.BatteryNumber,
+                        StartDate = updatedBattery.Station.StartDate,
+                        UpdateDate = updatedBattery.Station.UpdateDate
+                        // KHÔNG có trường Batteries ở đây!
+                    },
+                    BatteryHistory = batteryHistory == null ? null : new
+                    {
+                        BatteryHistoryId = batteryHistory.BatteryHistoryId,
+                        BatteryId = batteryHistory.BatteryId,
+                        ExchangeBatteryId = batteryHistory.ExchangeBatteryId,
+                        Vin = batteryHistory.Vin,
+                        StationId = batteryHistory.StationId,
+                        ActionType = batteryHistory.ActionType,
+                        EnergyLevel = batteryHistory.EnergyLevel,
+                        ActionDate = batteryHistory.ActionDate,
+                        Notes = batteryHistory.Notes,
+                        Status = batteryHistory.Status,
+                        StartDate = batteryHistory.StartDate,
+                        UpdateDate = batteryHistory.UpdateDate
+                    }
+                };
 
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsBattery.UPDATE_BATTERY_SUCCESS,
-                    Data = updatedBattery,
+                    Data = response,
                     StatusCode = StatusCodes.Status200OK
                 };
 
@@ -348,6 +444,60 @@ namespace Services.Services.BatteryService
                 existingBattery.Status = BatteryStatusEnums.Decommissioned.ToString();
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var deletedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+                //record lại lịch sử pin
+                var batteryHistory = new BatteryHistory
+                {
+                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
+                    BatteryId = deletedBattery.BatteryId,
+                    Notes = HistoryActionConstants.BATTERY_DELETED.ToString(),
+                    ActionType = BatteryHistoryActionTypeEnums.Deleted.ToString(),
+                    EnergyLevel = deletedBattery.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    ActionDate = TimeHepler.SystemTimeNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
+
+                };
+                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
+                var response = new
+                {
+                    BatteryId = deletedBattery.BatteryId,
+                    BatteryName = deletedBattery.BatteryName,
+                    Status = deletedBattery.Status,
+                    Capacity = deletedBattery.Capacity,
+                    BatteryType = deletedBattery.BatteryType,
+                    Specification = deletedBattery.Specification,
+                    BatteryQuality = deletedBattery.BatteryQuality,
+                    StartDate = deletedBattery.StartDate,
+                    UpdateDate = deletedBattery.UpdateDate,
+                    Station = deletedBattery.Station == null ? null : new
+                    {
+                        StationId = deletedBattery.Station.StationId,
+                        StationName = deletedBattery.Station.StationName,
+                        Location = deletedBattery.Station.Location,
+                        Status = deletedBattery.Station.Status,
+                        Rating = deletedBattery.Station.Rating,
+                        BatteryNumber = deletedBattery.Station.BatteryNumber,
+                        StartDate = deletedBattery.Station.StartDate,
+                        UpdateDate = deletedBattery.Station.UpdateDate
+                        // KHÔNG có trường Batteries ở đây!
+                    },
+                    BatteryHistory = batteryHistory == null ? null : new
+                    {
+                        BatteryHistoryId = batteryHistory.BatteryHistoryId,
+                        BatteryId = batteryHistory.BatteryId,
+                        ExchangeBatteryId = batteryHistory.ExchangeBatteryId,
+                        Vin = batteryHistory.Vin,
+                        StationId = batteryHistory.StationId,
+                        ActionType = batteryHistory.ActionType,
+                        EnergyLevel = batteryHistory.EnergyLevel,
+                        ActionDate = batteryHistory.ActionDate,
+                        Notes = batteryHistory.Notes,
+                        Status = batteryHistory.Status,
+                        StartDate = batteryHistory.StartDate,
+                        UpdateDate = batteryHistory.UpdateDate
+                    }
+                };
                 return new ResultModel
                 {
                     IsSuccess = true,
@@ -402,8 +552,21 @@ namespace Services.Services.BatteryService
 
                 // Lấy lại battery đã cập nhật, include station
                 var batteryDetail = await _batteryRepo.GetBatteryById(updatedBattery.BatteryId);
+                //record lại lịch sử pin
+                var batteryHistory = new BatteryHistory
+                {
+                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
+                    BatteryId = batteryDetail.BatteryId,
+                    Notes = HistoryActionConstants.BATTERY_ADDED_TO_STATION.ToString(),
+                    ActionType = BatteryHistoryActionTypeEnums.Moved.ToString(),
+                    EnergyLevel = batteryDetail.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    ActionDate = TimeHepler.SystemTimeNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
 
-                // Map sang object giống GetBatteryById
+                };
+                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
                 var response = new
                 {
                     BatteryId = batteryDetail.BatteryId,
@@ -425,7 +588,22 @@ namespace Services.Services.BatteryService
                         BatteryNumber = batteryDetail.Station.BatteryNumber,
                         StartDate = batteryDetail.Station.StartDate,
                         UpdateDate = batteryDetail.Station.UpdateDate
-                        // KHÔNG có trường Batteries!
+                        // KHÔNG có trường Batteries ở đây!
+                    },
+                    BatteryHistory = batteryHistory == null ? null : new
+                    {
+                        BatteryHistoryId = batteryHistory.BatteryHistoryId,
+                        BatteryId = batteryHistory.BatteryId,
+                        ExchangeBatteryId = batteryHistory.ExchangeBatteryId,
+                        Vin = batteryHistory.Vin,
+                        StationId = batteryHistory.StationId,
+                        ActionType = batteryHistory.ActionType,
+                        EnergyLevel = batteryHistory.EnergyLevel,
+                        ActionDate = batteryHistory.ActionDate,
+                        Notes = batteryHistory.Notes,
+                        Status = batteryHistory.Status,
+                        StartDate = batteryHistory.StartDate,
+                        UpdateDate = batteryHistory.UpdateDate
                     }
                 };
 
@@ -618,8 +796,8 @@ namespace Services.Services.BatteryService
                         Data = null
                     };
                 }
-                var batteries = await _batteryRepo.GetBatteriesByStationIdAndSpecification(getAllBatterySuitVehicle.StationId,battery.Specification,battery.BatteryType);
-                if(batteries==null)
+                var batteries = await _batteryRepo.GetBatteriesByStationIdAndSpecification(getAllBatterySuitVehicle.StationId, battery.Specification, battery.BatteryType);
+                if (batteries == null)
                 {
                     return new ResultModel
                     {
@@ -678,6 +856,303 @@ namespace Services.Services.BatteryService
                     ResponseCode = ResponseCodeConstants.INTERNAL_SERVER_ERROR,
                     Message = ResponseMessageConstantsBattery.GET_BATTERY_FAIL,
                     Data = null,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> CreateBatteryByVehicleName(CreateBatteryByVehicleNameRequest createBatteryByVehicleNameRequest)
+        {
+            try
+            {
+                var battery = new Battery();
+                // Kiểm tra battery
+                if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_I6_Lithium_Battery.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Lithium.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_I6_Accumulator.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Accumulator.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+
+                }
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_I8_VINTAGE.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_I8.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_IFUN.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_IGO.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Lithium.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V48_Ah12.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_VITO.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Lithium.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V36_Ah10_4.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_FLIT.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Lithium.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V36_Ah7_8.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_VELAX.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_VELAX_SOOBIN.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.LFP.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V72_Ah30.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_VOLTGUARD_U.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.LFP.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V72_Ah50.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_VOLTGUARD_P.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V72_Ah38.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_ORLA_P.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_OCEAN.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_ODORA_S.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_ODORA_S2.ToString()
+                    || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_M6I.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_VIGOR.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_X_MEN_NEO.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V60_Ah22.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_ORIS.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_ORIS_SOOBIN.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_OSSY.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V72_Ah22.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+
+                else if (createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_ICUTE.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_X_ZONE.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_VEKOO.ToString()
+                     || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_VEKOO_SOOBIN.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_X_SKY.ToString() || createBatteryByVehicleNameRequest.VehicleName.ToString() == VehicleNameEnums.YADEA_X_BULL.ToString())
+                {
+                    battery = new Battery
+                    {
+                        BatteryId = _accountHelper.GenerateShortGuid(),
+                        Status = BatteryStatusEnums.Available.ToString(),
+                        Capacity = 100,
+                        BatteryQuality = 100.00m,
+                        BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
+                        BatteryName = createBatteryByVehicleNameRequest.BatteryName,
+                        Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+                    await _batteryRepo.AddBattery(battery);
+
+                }
+
+                //record lại lịch sử pin
+                var batteryHistory = new BatteryHistory
+                {
+                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
+                    BatteryId = battery.BatteryId,
+                    Notes = HistoryActionConstants.BATTERY_CREATED_BY_ADMIN.ToString(),
+                    ActionType = BatteryHistoryActionTypeEnums.Created.ToString(),
+                    EnergyLevel = battery.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    ActionDate = TimeHepler.SystemTimeNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
+
+                };
+                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
+                var response = new
+                {
+                    BatteryId = battery.BatteryId,
+                    BatteryName = battery.BatteryName,
+                    Status = battery.Status,
+                    Capacity = battery.Capacity,
+                    BatteryType = battery.BatteryType,
+                    Specification = battery.Specification,
+                    BatteryQuality = battery.BatteryQuality,
+                    StartDate = battery.StartDate,
+                    UpdateDate = battery.UpdateDate,
+                    Station = battery.Station == null ? null : new
+                    {
+                        StationId = battery.Station.StationId,
+                        StationName = battery.Station.StationName,
+                        Location = battery.Station.Location,
+                        Status = battery.Station.Status,
+                        Rating = battery.Station.Rating,
+                        BatteryNumber = battery.Station.BatteryNumber,
+                        StartDate = battery.Station.StartDate,
+                        UpdateDate = battery.Station.UpdateDate
+                        // KHÔNG có trường Batteries ở đây!
+                    },
+                    BatteryHistory = batteryHistory == null ? null : new
+                    {
+                        BatteryHistoryId = batteryHistory.BatteryHistoryId,
+                        BatteryId = batteryHistory.BatteryId,
+                        ExchangeBatteryId = batteryHistory.ExchangeBatteryId,
+                        Vin = batteryHistory.Vin,
+                        StationId = batteryHistory.StationId,
+                        ActionType = batteryHistory.ActionType,
+                        EnergyLevel = batteryHistory.EnergyLevel,
+                        ActionDate = batteryHistory.ActionDate,
+                        Notes = batteryHistory.Notes,
+                        Status = batteryHistory.Status,
+                        StartDate = batteryHistory.StartDate,
+                        UpdateDate = batteryHistory.UpdateDate
+                    }
+                };
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBattery.ADD_BATTERY_SUCCESS,
+                    Data = response,
+                    StatusCode = StatusCodes.Status201Created
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsBattery.ADD_BATTERY_FAIL,
+                    Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
             }

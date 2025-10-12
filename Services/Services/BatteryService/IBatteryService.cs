@@ -19,5 +19,6 @@ namespace Services.Services.BatteryService
         Task<ResultModel> AddBatteryInStation(AddBatteryInStationRequest addBatteryInStationRequest);
         Task<ResultModel> UpdateBatteryStatusInStation(UpdateBatteryStatusRequest updateBatteryStatusRequest);
         Task<ResultModel> GetAllBatterySuitVehicle(GetAllBatterySuitVehicle getAllBatterySuitVehicle);
+        Task<ResultModel> CreateBatteryByVehicleName(CreateBatteryByVehicleNameRequest createBatteryByVehicleNameRequest);
     }
 }
