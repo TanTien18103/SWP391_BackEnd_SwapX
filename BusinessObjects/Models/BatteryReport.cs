@@ -34,5 +34,7 @@ public partial class BatteryReport
 
     public virtual Battery Battery { get; set; }
 
+    public virtual ExchangeBattery ExchangeBattery { get; set; }
+
     public virtual Station Station { get; set; }
 }

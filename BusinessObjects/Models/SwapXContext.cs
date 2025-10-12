@@ -185,6 +185,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
+            entity.Property(e => e.ExchangeBatteryId)
+                .HasMaxLength(100)
+                .HasColumnName("ExchangeBatteryID");
             entity.Property(e => e.Image)
                 .HasMaxLength(255)
                 .HasColumnName("image");
@@ -210,6 +213,10 @@ public partial class SwapXContext : DbContext
             entity.HasOne(d => d.Battery).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.BatteryId)
                 .HasConstraintName("FK__BatteryRe__Batte__59FA5E80");
+
+            entity.HasOne(d => d.ExchangeBattery).WithMany(p => p.BatteryReports)
+                .HasForeignKey(d => d.ExchangeBatteryId)
+                .HasConstraintName("FK_BatteryReport_ExchangeBattery");
 
             entity.HasOne(d => d.Station).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.StationId)
