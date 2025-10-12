@@ -78,6 +78,18 @@ public class OrderRepository : IOrderRepository
             .FirstOrDefaultAsync(o => o.OrderCode == orderCode);
     }
 
+    public Task<Order> UpdateOrderByOrderCodeAsync(string orderId, long orderCode)
+    {
+        var order = _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+        order.Result.OrderCode = orderCode;
+        order.Result.UpdateDate = DateTime.UtcNow;
+
+        _context.SaveChangesAsync();
+
+        return order;
+    }
+
     public async Task<(List<Order> Orders, int Total)> FilterOrdersAsync(
         string orderId, string status, string accountId, string serviceType, int page, int pageSize)
     {

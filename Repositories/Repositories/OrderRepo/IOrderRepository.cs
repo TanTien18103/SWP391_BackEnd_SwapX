@@ -11,6 +11,7 @@ public interface IOrderRepository
     Task<List<Order>> FilterOrdersByStatusAsync(string status);
     Task<bool> DeleteOrderAsync(string orderId);
     Task<Order> GetOrderByOrderCodeAsync(long orderCode);
+    Task<Order> UpdateOrderByOrderCodeAsync(string orderId, long orderCode);
 
     public Task<(List<Order> Orders, int Total)> FilterOrdersAsync(string orderId, string status, string accountId,
         string serviceType, int page, int pageSize);

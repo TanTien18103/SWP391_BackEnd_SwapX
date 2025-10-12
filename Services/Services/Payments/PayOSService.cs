@@ -125,7 +125,9 @@ public class PayOSService : IPayOSService
         }
 
         var orderCode = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-
+        orderDetail.OrderCode = long.Parse(orderCode);
+        await _orderRepository.UpdateOrderByOrderCodeAsync(orderDetail.OrderId, long.Parse(orderCode));
+        
         var description = $"Order {request.OrderId}"; 
 
         var paymentRequest = new PaymentData(
