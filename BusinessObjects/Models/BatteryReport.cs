@@ -27,12 +27,13 @@ public partial class BatteryReport
 
     public DateTime? UpdateDate { get; set; }
 
-    public string ExchangeBatteryId { get; set; } 
-    public virtual ExchangeBattery ExchangeBattery { get; set; }
+    public string ExchangeBatteryId { get; set; }
 
     public virtual Account Account { get; set; }
 
     public virtual Battery Battery { get; set; }
+
+    public virtual ExchangeBattery ExchangeBattery { get; set; }
 
     public virtual Station Station { get; set; }
 }
