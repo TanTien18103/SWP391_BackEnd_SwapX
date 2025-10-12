@@ -34,8 +34,7 @@ public class PayOSService : IPayOSService
     {
         if (!_helper.VerifyWebhook(webhook))
         {
-            var orderId = ExtractOrderIdFromOrderCode(webhook.Data.OrderCode);
-            var orderDetail = await _orderRepository.GetOrderByIdAsync(orderId.ToString());
+            var orderDetail = await _orderRepository.GetOrderByOrderCodeAsync(webhook.Data.OrderCode);
             if (orderDetail != null)
             {
                 var exchangeBattery = await _exchangeBatteryRepo.GetByOrderId(orderDetail.OrderId);
@@ -66,8 +65,7 @@ public class PayOSService : IPayOSService
             ? PaymentStatus.Paid
             : PaymentStatus.Failed;
 
-        var orderId2 = ExtractOrderIdFromOrderCode(webhook.Data.OrderCode);
-        var orderDetail2 = await _orderRepository.GetOrderByIdAsync(orderId2.ToString());
+        var orderDetail2 = await _orderRepository.GetOrderByOrderCodeAsync(webhook.Data.OrderCode);
         if (orderDetail2 == null)
         {
             return new ResultModel<PayOSWebhookResponseDto>
@@ -115,17 +113,7 @@ public class PayOSService : IPayOSService
         var returnUrl = _config["PayOS:ReturnUrl"];
         var cancelUrl = _config["PayOS:CancelUrl"];
 
-        if (!long.TryParse(request.OrderId, out var orderId))
-        {
-            return new ResultModel<PayOSPaymentResponseDto>
-            {
-                IsSuccess = false,
-                StatusCode = 400,
-                Message = PayOSMessages.InvalidOrderId
-            };
-        }
-
-        var orderDetail = await _orderRepository.GetOrderByIdAsync(orderId.ToString());
+        var orderDetail = await _orderRepository.GetOrderByIdAsync(request.OrderId);
         if (orderDetail == null)
         {
             return new ResultModel<PayOSPaymentResponseDto>
@@ -136,11 +124,12 @@ public class PayOSService : IPayOSService
             };
         }
 
-        var orderCode = GenerateOrderCode(orderId);
-        var description = $"Order {orderId}"; // PayOS limit 25 chars
+        var orderCode = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+
+        var description = $"Order {request.OrderId}"; 
 
         var paymentRequest = new PaymentData(
-            orderCode: orderCode,
+            orderCode: long.Parse(orderCode),
             amount: (int)request.Amount,
             description: description,
             items: new List<ItemData>
@@ -168,19 +157,4 @@ public class PayOSService : IPayOSService
             Data = paymentResponse
         };
     }
-
-    #region Helpers
-    private long GenerateOrderCode(long orderId)
-    {
-        var prefix = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-        return long.Parse(prefix + orderId.ToString());
-    }
-
-    private long ExtractOrderIdFromOrderCode(long orderCode)
-    {
-        var codeStr = orderCode.ToString();
-        if (codeStr.Length <= 14) return 0;
-        return long.Parse(codeStr.Substring(14));
-    }
-    #endregion
 }
