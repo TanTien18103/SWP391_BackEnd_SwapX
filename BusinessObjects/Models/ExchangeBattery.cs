@@ -33,6 +33,8 @@ public partial class ExchangeBattery
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
 
+    public virtual ICollection<BatteryReport> BatteryReports { get; set; } = new List<BatteryReport>();
+
     public virtual Battery NewBattery { get; set; }
 
     public virtual Battery OldBattery { get; set; }
