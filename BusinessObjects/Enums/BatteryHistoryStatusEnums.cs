@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace BusinessObjects.Enums
 {
-    public enum BatteryHistoryActionTypeEnums
+    public enum BatteryHistoryStatusEnums
     {
-        Created,
-        Updated,
-        Deleted,
-        Moved
+        Active,
+        Inactive
     }
 }

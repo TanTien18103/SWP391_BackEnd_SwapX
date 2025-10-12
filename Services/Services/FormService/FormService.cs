@@ -4,9 +4,13 @@ using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using Repositories.Repositories.FormRepo;
 using Repositories.Repositories.StationRepo;
 using Repositories.Repositories.StationScheduleRepo;
+using Repositories.Repositories.VehicleRepo;
+using Repositories.Repositories.EvDriverRepo;
+using Repositories.Repositories.BatteryRepo;
 using Services.ApiModels;
 using Services.ApiModels.Form;
 using Services.ServicesHelpers;
@@ -26,8 +30,12 @@ namespace Services.Services.FormService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IStationRepo _stationRepo;
         private readonly IStationScheduleRepo _stationScheduleRepo;
+        private readonly IVehicleRepo _vehicleRepo;
+        private readonly IEvDriverRepo _evDriverRepo;
+        private readonly IBatteryRepo _batteryRepo;
 
-        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IStationRepo stationRepo, IStationScheduleRepo stationScheduleRepo)
+
+        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IStationRepo stationRepo, IStationScheduleRepo stationScheduleRepo, IVehicleRepo vehicleRepo, IEvDriverRepo evDriverRepo, IBatteryRepo batteryRepo)
         {
             _formRepo = formRepo;
             _accountHelper = accountHelper;
@@ -35,6 +43,9 @@ namespace Services.Services.FormService
             _httpContextAccessor = httpContextAccessor;
             _stationRepo = stationRepo;
             _stationScheduleRepo = stationScheduleRepo;
+            _vehicleRepo = vehicleRepo;
+            _evDriverRepo = evDriverRepo;
+            _batteryRepo = batteryRepo;
         }
         public async Task<ResultModel> AddForm(AddFormRequest addFormRequest)
         {
@@ -96,7 +107,82 @@ namespace Services.Services.FormService
                 string formStatus = prepaidCount >= 3
                     ? FormStatusEnums.Approved.ToString()
                     : FormStatusEnums.Submitted.ToString();
-
+                //Kiểm tra xe của tài khoản có phải của accountId không
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(addFormRequest.AccountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var vehicle = await _vehicleRepo.GetVehicleById(addFormRequest.Vin);
+                if (vehicle == null || vehicle.CustomerId != evDriver.CustomerId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var battery = await _batteryRepo.GetBatteryById(addFormRequest.BatteryId);
+                var batteryOfVehicle = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
+                if (battery==null||battery.StationId!=station.StationId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                //Kiểm tra xem pin có tương thích với xe không
+                if( battery.Specification != batteryOfVehicle.Specification || battery.BatteryType != batteryOfVehicle.BatteryType)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                        Data = null
+                    };
+                }
+                //Kiểm tra xem pin được booked chưa
+                if(battery.Status == BatteryStatusEnums.Booked.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsForm.BATTERY_ALREADY_BOOKED,
+                        Data = null
+                    };
+                }
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                battery.Status = BatteryStatusEnums.Booked.ToString();
+                battery.UpdateDate = TimeHepler.SystemTimeNow;
+                await _batteryRepo.UpdateBattery(battery);
                 var form = new Form
                 {
                     FormId = _accountHelper.GenerateShortGuid(),

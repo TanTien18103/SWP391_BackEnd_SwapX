@@ -61,5 +61,19 @@ namespace SWP391_BackEnd.Controllers
             var res = await _batteryService.UpdateBatteryStatusInStation(updateBatteryStatusRequest);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpGet("get_batteries_suit_vehicle")]
+        [Authorize(Roles ="EvDriver")]
+        public async Task<IActionResult> GetAllBatterySuitVehicle([FromQuery] GetAllBatterySuitVehicle getAllBatterySuitVehicle)
+        {
+            var res = await _batteryService.GetAllBatterySuitVehicle(getAllBatterySuitVehicle);
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpPost("create_battery_by_vehicle_name")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateBatteryByVehicleName([FromForm] CreateBatteryByVehicleNameRequest createBatteryByVehicleName)
+        {
+            var res = await _batteryService.CreateBatteryByVehicleName(createBatteryByVehicleName);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

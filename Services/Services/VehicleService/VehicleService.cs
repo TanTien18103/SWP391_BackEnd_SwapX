@@ -18,6 +18,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Repositories.Repositories.BatteryHistoryRepo;
 
 
 
@@ -33,8 +34,9 @@ namespace Services.Services.VehicleService
         private readonly IPackageRepo _packageRepo;
         private readonly IEvDriverRepo _evDriverRepo;
         private readonly IAccountRepo _accountRepo;
+        private readonly IBatteryHistoryRepo _batteryHistoryRepo;
 
-        public VehicleService(IVehicleRepo vehicleRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBatteryRepo batteryRepo, IPackageRepo packageRepo, IEvDriverRepo evDriverRepo, IAccountRepo accountRepo)
+        public VehicleService(IVehicleRepo vehicleRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBatteryRepo batteryRepo, IPackageRepo packageRepo, IEvDriverRepo evDriverRepo, IAccountRepo accountRepo, IBatteryHistoryRepo batteryHistoryRepo)
         {
             _vehicleRepo = vehicleRepo;
             _configuration = configuration;
@@ -44,6 +46,7 @@ namespace Services.Services.VehicleService
             _packageRepo = packageRepo;
             _evDriverRepo = evDriverRepo;
             _accountRepo = accountRepo;
+            _batteryHistoryRepo = batteryHistoryRepo;
         }
         public async Task<ResultModel> AddVehicle(AddVehicleRequest addVehicleRequest)
         {
@@ -417,10 +420,11 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
+                var battery = new Battery();
                 // Kiểm tra battery
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_I6_Lithium_Battery.ToString())
                 {
-                    var battery = new Battery
+                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -438,7 +442,7 @@ namespace Services.Services.VehicleService
                 }
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_I6_Accumulator.ToString())
                 {
-                    var battery = new Battery
+                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -456,7 +460,7 @@ namespace Services.Services.VehicleService
                 }
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_I8_VINTAGE.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_I8.ToString())
                 {
-                    var battery = new Battery
+                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -474,7 +478,7 @@ namespace Services.Services.VehicleService
                 }
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_IFUN.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_IGO.ToString())
                 {
-                    var battery = new Battery
+                    battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -492,7 +496,7 @@ namespace Services.Services.VehicleService
                 }
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_VITO.ToString())
                 {
-                    var battery = new Battery
+                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -510,7 +514,7 @@ namespace Services.Services.VehicleService
                 }
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_FLIT.ToString())
                 {
-                    var battery = new Battery
+                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -529,7 +533,7 @@ namespace Services.Services.VehicleService
 
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_VELAX.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_VELAX_SOOBIN.ToString())
                 {
-                    var battery = new Battery
+                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -548,7 +552,7 @@ namespace Services.Services.VehicleService
 
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_VOLTGUARD_U.ToString())
                 {
-                    var battery = new Battery
+                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -567,7 +571,7 @@ namespace Services.Services.VehicleService
 
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_VOLTGUARD_P.ToString())
                 {
-                    var battery = new Battery
+                    battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -587,7 +591,7 @@ namespace Services.Services.VehicleService
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_ORLA_P.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_OCEAN.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_ODORA_S.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_ODORA_S2.ToString()
                     || vehicle.VehicleName == VehicleNameEnums.YADEA_M6I.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_VIGOR.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_X_MEN_NEO.ToString())
                 {
-                    var battery = new Battery
+                    battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -606,7 +610,7 @@ namespace Services.Services.VehicleService
 
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_ORIS.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_ORIS_SOOBIN.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_OSSY.ToString())
                 {
-                    var battery = new Battery
+                    battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -626,7 +630,7 @@ namespace Services.Services.VehicleService
                 if (vehicle.VehicleName == VehicleNameEnums.YADEA_ICUTE.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_X_ZONE.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_VEKOO.ToString()
                     || vehicle.VehicleName == VehicleNameEnums.YADEA_VEKOO_SOOBIN.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_X_SKY.ToString() || vehicle.VehicleName == VehicleNameEnums.YADEA_X_BULL.ToString())
                 {
-                    var battery = new Battery
+                    battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
                         Status = BatteryStatusEnums.Available.ToString(),
@@ -642,13 +646,23 @@ namespace Services.Services.VehicleService
                     vehicle.BatteryId = battery.BatteryId;
                     vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                 }
-
-
                 await _vehicleRepo.AddVehicle(vehicle);
+                //record lại lịch sử pin
+                var batteryHistory = new BatteryHistory
+                {
+                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
+                    BatteryId = battery.BatteryId,
+                    Notes = HistoryActionConstants.BATTERY_CREATED_BY_USER.ToString(),
+                    ActionType = BatteryHistoryActionTypeEnums.Created.ToString(),
+                    EnergyLevel = battery.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    Vin = vehicle.Vin,
+                    ActionDate = TimeHepler.SystemTimeNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
 
-
-
-
+                };
+                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -746,7 +760,7 @@ namespace Services.Services.VehicleService
                         StatusCode = StatusCodes.Status404NotFound,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,  
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
                         Data = null
                     };
                 }
@@ -765,7 +779,7 @@ namespace Services.Services.VehicleService
                 }
                 vehicle.PackageId = addVehicleInPackageRequest.PackageId;
                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
-                vehicle.PackageExpiredate= TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
+                vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
                 await _vehicleRepo.UpdateVehicle(vehicle);
                 return new ResultModel
                 {
