@@ -27,6 +27,8 @@ public partial class Order
 
     public string ServiceType { get; set; }
 
+    public long? OrderCode { get; set; }
+
     public virtual Account Account { get; set; }
 
     public virtual Battery Battery { get; set; }
