@@ -42,6 +42,7 @@ using Repositories.Repositories.Dashboard;
 using Repositories.Repositories.ExchangeBatteryRepo;
 using Services.Services.Dashboard;
 using Services.Services.ExchangeBatteryService;
+using Services.Payments;
 
 //*************** I KNEW YOU WERE HERE ***************//
 
