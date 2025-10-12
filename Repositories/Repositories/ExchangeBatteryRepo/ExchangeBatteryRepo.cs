@@ -20,8 +20,23 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
 
         public async Task Update(ExchangeBattery exchange)
         {
-            _context.ExchangeBatteries.Update(exchange);
-            await _context.SaveChangesAsync();
+            var trackedExchange = await _context.ExchangeBatteries
+                .FirstOrDefaultAsync(e => e.ExchangeBatteryId == exchange.ExchangeBatteryId);
+
+            if (trackedExchange != null)
+            {
+                trackedExchange.Status = exchange.Status;
+                trackedExchange.UpdateDate = exchange.UpdateDate;
+                trackedExchange.Notes = exchange.Notes;
+                trackedExchange.OrderId = exchange.OrderId;
+                trackedExchange.NewBatteryId = exchange.NewBatteryId;
+                trackedExchange.OldBatteryId = exchange.OldBatteryId;
+                trackedExchange.ScheduleId = exchange.ScheduleId;
+                trackedExchange.StaffAccountId = exchange.StaffAccountId;
+                trackedExchange.StationId = exchange.StationId;
+                trackedExchange.Vin = exchange.Vin;
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task Delete(ExchangeBattery exchange)

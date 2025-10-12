@@ -78,15 +78,16 @@ public class OrderRepository : IOrderRepository
             .FirstOrDefaultAsync(o => o.OrderCode == orderCode);
     }
 
-    public Task<Order> UpdateOrderByOrderCodeAsync(string orderId, long orderCode)
+    public async Task<Order> UpdateOrderByOrderCodeAsync(string orderId, long orderCode)
     {
-        var order = _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
-
-        order.Result.OrderCode = orderCode;
-        order.Result.UpdateDate = DateTime.UtcNow;
-
-        _context.SaveChangesAsync();
-
+        var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+        if (order == null)
+        {
+            throw new KeyNotFoundException($"Order with ID {orderId} not found");
+        }
+        order.OrderCode = orderCode;
+        order.UpdateDate = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
         return order;
     }
 

@@ -123,7 +123,6 @@ public class PayOSService : IPayOSService
                 Message = PayOSMessages.OrderNotFound
             };
         }
-
         var orderCode = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
         orderDetail.OrderCode = long.Parse(orderCode);
         await _orderRepository.UpdateOrderByOrderCodeAsync(orderDetail.OrderId, long.Parse(orderCode));

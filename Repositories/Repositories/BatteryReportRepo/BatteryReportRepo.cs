@@ -32,10 +32,25 @@ namespace Repositories.Repositories.BatteryReportRepo
         }
         public async Task<BatteryReport> UpdateBatteryReport(BatteryReport batteryReport)
         {
-            _context.BatteryReports.Update(batteryReport);
+            var trackedReport = _context.ChangeTracker.Entries<BatteryReport>()
+                .FirstOrDefault(e => e.Entity.BatteryReportId == batteryReport.BatteryReportId);
+            if (trackedReport != null)
+                trackedReport.State = EntityState.Detached;
+
+            // Detach tracked Battery entity if exists
+            if (batteryReport.Battery != null)
+            {
+                var trackedBattery = _context.ChangeTracker.Entries<Battery>()
+                    .FirstOrDefault(e => e.Entity.BatteryId == batteryReport.Battery.BatteryId);
+                if (trackedBattery != null)
+                    trackedBattery.State = EntityState.Detached;
+            }
+
+            _context.Entry(batteryReport).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return batteryReport;
         }
+
 
         public async Task<List<BatteryReport>> GetBatteryReportsByStation(string stationId)
         {
