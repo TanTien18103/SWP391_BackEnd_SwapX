@@ -69,6 +69,15 @@ public class OrderRepository : IOrderRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public Task<Order> GetOrderByOrderCodeAsync(long orderCode)
+    {
+        return _context.Orders
+            .Include(o => o.Account)
+            .Include(o => o.Battery)
+            .FirstOrDefaultAsync(o => o.OrderCode == orderCode);
+    }
+
     public async Task<(List<Order> Orders, int Total)> FilterOrdersAsync(
         string orderId, string status, string accountId, string serviceType, int page, int pageSize)
     {
