@@ -202,9 +202,6 @@ public partial class SwapXContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("status");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
-            entity.Property(e => e.ExchangeBatteryId)
-                .HasMaxLength(100)
-                .HasColumnName("ExchangeBatteryID");
 
             entity.HasOne(d => d.Account).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.AccountId)
@@ -221,12 +218,6 @@ public partial class SwapXContext : DbContext
             entity.HasOne(d => d.Station).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.StationId)
                 .HasConstraintName("FK__BatteryRe__Stati__5AEE82B9");
-
-            entity.HasOne(d => d.ExchangeBattery)
-                .WithMany()
-                .HasForeignKey(d => d.ExchangeBatteryId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__BatteryReport__ExchangeBatteryID");
         });
 
         modelBuilder.Entity<BssStaff>(entity =>
@@ -658,14 +649,6 @@ public partial class SwapXContext : DbContext
         });
 
         OnModelCreatingPartial(modelBuilder);
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer("Data Source=localhost,1433;Initial Catalog=SWAPX_SWP391;Persist Security Info=True;User ID=sa;Password=123456789a@;Encrypt=True;Trust Server Certificate=True");
-        }
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
