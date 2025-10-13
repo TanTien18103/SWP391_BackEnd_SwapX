@@ -25,6 +25,10 @@ public partial class Form
 
     public DateTime? UpdateDate { get; set; }
 
+    public string Vin { get; set; }
+
+    public string BatteryId { get; set; }
+
     public virtual Account Account { get; set; }
 
     public virtual Station Station { get; set; }

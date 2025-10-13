@@ -12,8 +12,6 @@ namespace Services.ApiModels.Station
         [Required]
         public string Name { get; set; }
 
-        [Range(0, 30, ErrorMessage = "BatteryNumber must be between 0 and 30.")]
-        public int? BatteryNumber { get; set; }
         [Required]
         public string Location { get; set; }
     }

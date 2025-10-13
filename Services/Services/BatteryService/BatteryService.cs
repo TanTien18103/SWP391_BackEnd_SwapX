@@ -269,6 +269,20 @@ namespace Services.Services.BatteryService
                 var vehicle = await _vehicleRepo.GetVehicleByBatteryId(b.BatteryId);
 
                 // Map sang object mới, station chỉ chứa thông tin cơ bản, không có batteries
+                // Before creating the response object
+                var stationObj = b.Station == null ? null : new
+                {
+                    StationId = b.Station.StationId,
+                    StationName = b.Station.StationName,
+                    Location = b.Station.Location,
+                    Status = b.Station.Status,
+                    Rating = b.Station.Rating,
+                    BatteryNumber = b.Station.BatteryNumber,
+                    StartDate = b.Station.StartDate,
+                    UpdateDate = b.Station.UpdateDate
+                    // No Batteries field here!
+                };
+
                 var response = new
                 {
                     BatteryId = b.BatteryId,
@@ -280,23 +294,12 @@ namespace Services.Services.BatteryService
                     BatteryQuality = b.BatteryQuality,
                     StartDate = b.StartDate,
                     UpdateDate = b.UpdateDate,
-                    Station = b.Station == null ? null : new
-                    {
-                        StationId = b.Station.StationId,
-                        StationName = b.Station.StationName,
-                        Location = b.Station.Location,
-                        Status = b.Station.Status,
-                        Rating = b.Station.Rating,
-                        BatteryNumber = b.Station.BatteryNumber,
-                        StartDate = b.Station.StartDate,
-                        UpdateDate = b.Station.UpdateDate
-                        // KHÔNG có trường Batteries ở đây!
-                    },
+                    Station = stationObj,
                     Vehicle = b.Vehicles == null ? null : new
                     {
-                        Vin = vehicle.Vin,
-                        VehicleName = vehicle.VehicleName,
-                        CustomerId = vehicle.CustomerId,
+                        Vin = vehicle?.Vin,
+                        VehicleName = vehicle?.VehicleName,
+                        CustomerId = vehicle?.CustomerId,
                     }
                 };
 
@@ -365,7 +368,7 @@ namespace Services.Services.BatteryService
                 var response = new
                 {
                     BatteryId = updatedBattery.BatteryId,
-                    BatteryName =   updatedBattery.BatteryName,
+                    BatteryName = updatedBattery.BatteryName,
                     Status = updatedBattery.Status,
                     Capacity = updatedBattery.Capacity,
                     BatteryType = updatedBattery.BatteryType,
@@ -546,9 +549,33 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+                if (existingBattery.Status == BatteryStatusEnums.Decommissioned.ToString() || existingBattery.Status == BatteryStatusEnums.InUse.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_DECOMMISSIONED_INUSE_CANNOT_ADD_TO_STATION,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
                 existingBattery.StationId = addBatteryInStationRequest.StationId;
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+
+                var batteryInStation = await _batteryRepo.GetBatteriesByStationId(addBatteryInStationRequest.StationId);
+                if (batteryInStation.Count > 30)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStation.STATION_BATTERY_LIMIT,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+                stationResult.BatteryNumber = batteryInStation.Count;
+                await _stationRepo.UpdateStation(stationResult);
 
                 // Lấy lại battery đã cập nhật, include station
                 var batteryDetail = await _batteryRepo.GetBatteryById(updatedBattery.BatteryId);

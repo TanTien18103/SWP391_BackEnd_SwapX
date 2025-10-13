@@ -191,6 +191,7 @@ namespace BusinessObjects.Constants
         public static string INVALID_STATION_STATUS { get; set; }
         public static string UPDATE_STATION_STATUS_SUCCESS { get; set; }
         public static string UPDATE_STATION_STATUS_FAILED { get; set; }
+        public static string STATION_BATTERY_LIMIT { get; set; }
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -224,9 +225,11 @@ namespace BusinessObjects.Constants
         public const string UPDATE_BATTERY_STATUS_SUCCESS = "Cập nhật trạng thái pin thành công";
         public const string UPDATE_BATTERY_STATUS_FAIL = "Cập nhật trạng thái pin thất bại";
 
-        public static string BATTERY_ALREADY_BOOKED= "Pin đã được đặt";
+        public const string BATTERY_ALREADY_BOOKED= "Pin đã được đặt";
 
-        public static string INCOMPATIBLE_BATTERY_VEHICLE =" Pin không tương thích với xe";
+        public const string INCOMPATIBLE_BATTERY_VEHICLE =" Pin không tương thích với xe";
+
+        public const string BATTERY_DECOMMISSIONED_INUSE_CANNOT_ADD_TO_STATION = "Pin ngừng hoạt động hoặc đang sử dụng không thêm vào trạm được";
     }
     public static class EmailConstants
     {
@@ -390,6 +393,7 @@ namespace BusinessObjects.Constants
         public const string GET_RATING_FAIL = "Lấy đánh giá thất bại";
         public const string GET_RATING_SUCCESS = "Lấy đánh giá thành công";
         public const string DELETE_RATING_FAILED = "Xóa đánh giá thất bại";
+        public static string ADD_RATING_ONE_TIME = "Bạn chỉ có thể đánh giá một lần cho mỗi trạm nếu bạn muốn đánh giá lần nữa bạn có thể chỉnh sửa";
     }
     //for Report (0-0-1)
     public static class ResponseMessageConstantsReport

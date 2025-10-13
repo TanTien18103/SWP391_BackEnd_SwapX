@@ -51,7 +51,7 @@ namespace Services.Services.RatingService
                     Description = addRatingRequest.Description,
                     StationId = addRatingRequest.StationId,
                     Status = AccountStatusEnums.Active.ToString(),
-                    StartDate = TimeHepler.SystemTimeNow,    
+                    StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
                 if (await _stationRepo.GetStationById(addRatingRequest.StationId) == null)
@@ -62,6 +62,18 @@ namespace Services.Services.RatingService
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var exitstRating = await _ratingRepo.GetRatingByAccountIdAndStationId(addRatingRequest.AccountId, addRatingRequest.StationId);
+                if (exitstRating != null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsRating.ADD_RATING_ONE_TIME,
                         Data = null
                     };
                 }
@@ -227,7 +239,7 @@ namespace Services.Services.RatingService
                         Data = null
                     };
                 }
-                if(updateRatingRequest.Rating1 != null)
+                if (updateRatingRequest.Rating1 != null)
                 {
                     existingRating.Rating1 = updateRatingRequest.Rating1;
                 }

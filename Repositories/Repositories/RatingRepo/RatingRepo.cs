@@ -30,6 +30,8 @@ namespace Repositories.Repositories.RatingRepo
             return await _context.Ratings.Include(a => a.Station).Include(b => b.Account).ToListAsync();
         }
 
+   
+
         public async Task<Rating> GetRatingById(string ratingId)
         {
             return await _context.Ratings.Include(a=>a.Station).Include(b=>b.Account).FirstOrDefaultAsync(r => r.RatingId == ratingId);
@@ -62,5 +64,11 @@ namespace Repositories.Repositories.RatingRepo
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<Rating> GetRatingByAccountIdAndStationId(string accountId, string stationId)
+        {
+            return await _context.Ratings
+                .FirstOrDefaultAsync(r => r.AccountId == accountId && r.StationId == stationId);
+        }
+
     }
 }

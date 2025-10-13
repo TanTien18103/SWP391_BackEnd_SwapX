@@ -53,7 +53,7 @@ namespace Services.Services.StationService
                     Location = addStationRequest.Location,
                     Status = StationStatusEnum.Active.ToString(),
                     Rating = 0m,
-                    BatteryNumber = addStationRequest.BatteryNumber ?? 0, // Set to 0 if null
+                    BatteryNumber = 0, 
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
                 };
@@ -235,15 +235,6 @@ namespace Services.Services.StationService
                         Data = null,
                         StatusCode = StatusCodes.Status404NotFound
                     };
-                }
-
-                if (updateStationRequest.BatteryNumber.HasValue)
-                {
-                    existingStation.BatteryNumber = updateStationRequest.BatteryNumber.Value;
-                }
-                else
-                {
-                    existingStation.BatteryNumber = 0;
                 }
                 if (!string.IsNullOrEmpty(updateStationRequest.Location))
                 {

@@ -49,7 +49,7 @@ public partial class SwapXContext : DbContext
     {
         modelBuilder.Entity<Account>(entity =>
         {
-            entity.HasKey(e => e.AccountId).HasName("PK__Account__F267253E9C6E442D");
+            entity.HasKey(e => e.AccountId).HasName("PK__Account__F267253E3545EB79");
 
             entity.ToTable("Account");
 
@@ -86,7 +86,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Battery>(entity =>
         {
-            entity.HasKey(e => e.BatteryId).HasName("PK__Battery__5710803E287D4B4A");
+            entity.HasKey(e => e.BatteryId).HasName("PK__Battery__5710803EFBC41643");
 
             entity.ToTable("Battery");
 
@@ -117,12 +117,12 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Station).WithMany(p => p.Batteries)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Battery__station__5441852A");
+                .HasConstraintName("FK__Battery__station__5FF32EF8");
         });
 
         modelBuilder.Entity<BatteryHistory>(entity =>
         {
-            entity.HasKey(e => e.BatteryHistoryId).HasName("PK__BatteryH__4E7644D24A446D7E");
+            entity.HasKey(e => e.BatteryHistoryId).HasName("PK__BatteryH__4E7644D2A1D48F84");
 
             entity.ToTable("BatteryHistory");
 
@@ -152,24 +152,24 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Battery).WithMany(p => p.BatteryHistories)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__BatteryHi__Batte__5535A963");
+                .HasConstraintName("FK__BatteryHi__Batte__1466F737");
 
             entity.HasOne(d => d.ExchangeBattery).WithMany(p => p.BatteryHistories)
                 .HasForeignKey(d => d.ExchangeBatteryId)
-                .HasConstraintName("FK__BatteryHi__Excha__5629CD9C");
+                .HasConstraintName("FK__BatteryHi__Excha__155B1B70");
 
             entity.HasOne(d => d.Station).WithMany(p => p.BatteryHistories)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__BatteryHi__stati__571DF1D5");
+                .HasConstraintName("FK__BatteryHi__stati__174363E2");
 
             entity.HasOne(d => d.VinNavigation).WithMany(p => p.BatteryHistories)
                 .HasForeignKey(d => d.Vin)
-                .HasConstraintName("FK__BatteryHist__VIN__5812160E");
+                .HasConstraintName("FK__BatteryHist__VIN__164F3FA9");
         });
 
         modelBuilder.Entity<BatteryReport>(entity =>
         {
-            entity.HasKey(e => e.BatteryReportId).HasName("PK__BatteryR__0A361DA7C09CCE11");
+            entity.HasKey(e => e.BatteryReportId).HasName("PK__BatteryR__0A361DA7FBC1C1A4");
 
             entity.ToTable("BatteryReport");
 
@@ -205,11 +205,11 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__BatteryRe__Accou__59063A47");
+                .HasConstraintName("FK__BatteryRe__Accou__7F6BDA51");
 
             entity.HasOne(d => d.Battery).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__BatteryRe__Batte__59FA5E80");
+                .HasConstraintName("FK__BatteryRe__Batte__015422C3");
 
             entity.HasOne(d => d.ExchangeBattery).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.ExchangeBatteryId)
@@ -217,12 +217,12 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Station).WithMany(p => p.BatteryReports)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__BatteryRe__Stati__5AEE82B9");
+                .HasConstraintName("FK__BatteryRe__Stati__005FFE8A");
         });
 
         modelBuilder.Entity<BssStaff>(entity =>
         {
-            entity.HasKey(e => e.StaffId).HasName("PK__BSS_Staf__96D4AAF7F2826E50");
+            entity.HasKey(e => e.StaffId).HasName("PK__BSS_Staf__96D4AAF75695419E");
 
             entity.ToTable("BSS_Staff");
 
@@ -243,16 +243,16 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.BssStaffs)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__BSS_Staff__Accou__5BE2A6F2");
+                .HasConstraintName("FK__BSS_Staff__Accou__6C5905DD");
 
             entity.HasOne(d => d.Station).WithMany(p => p.BssStaffs)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__BSS_Staff__Stati__5CD6CB2B");
+                .HasConstraintName("FK__BSS_Staff__Stati__6D4D2A16");
         });
 
         modelBuilder.Entity<Evdriver>(entity =>
         {
-            entity.HasKey(e => e.CustomerId).HasName("PK__EVDriver__A4AE64B868918DE6");
+            entity.HasKey(e => e.CustomerId).HasName("PK__EVDriver__A4AE64B890FB4533");
 
             entity.ToTable("EVDriver");
 
@@ -270,12 +270,12 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Evdrivers)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__EVDriver__accoun__5DCAEF64");
+                .HasConstraintName("FK__EVDriver__accoun__697C9932");
         });
 
         modelBuilder.Entity<ExchangeBattery>(entity =>
         {
-            entity.HasKey(e => e.ExchangeBatteryId).HasName("PK__Exchange__B321FE92B7665EFC");
+            entity.HasKey(e => e.ExchangeBatteryId).HasName("PK__Exchange__B321FE9244402C2D");
 
             entity.ToTable("ExchangeBattery");
 
@@ -312,36 +312,36 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.NewBattery).WithMany(p => p.ExchangeBatteryNewBatteries)
                 .HasForeignKey(d => d.NewBatteryId)
-                .HasConstraintName("FK__ExchangeB__NewBa__5FB337D6");
+                .HasConstraintName("FK__ExchangeB__NewBa__0DB9F9A8");
 
             entity.HasOne(d => d.OldBattery).WithMany(p => p.ExchangeBatteryOldBatteries)
                 .HasForeignKey(d => d.OldBatteryId)
-                .HasConstraintName("FK__ExchangeB__OldBa__60A75C0F");
+                .HasConstraintName("FK__ExchangeB__OldBa__0CC5D56F");
 
             entity.HasOne(d => d.Order).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__ExchangeB__Order__619B8048");
+                .HasConstraintName("FK__ExchangeB__Order__10966653");
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.ScheduleId)
-                .HasConstraintName("FK__ExchangeB__Sched__628FA481");
+                .HasConstraintName("FK__ExchangeB__Sched__0FA2421A");
 
             entity.HasOne(d => d.StaffAccount).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.StaffAccountId)
-                .HasConstraintName("FK__ExchangeB__Staff__6383C8BA");
+                .HasConstraintName("FK__ExchangeB__Staff__0EAE1DE1");
 
             entity.HasOne(d => d.Station).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__ExchangeB__stati__6477ECF3");
+                .HasConstraintName("FK__ExchangeB__stati__118A8A8C");
 
             entity.HasOne(d => d.VinNavigation).WithMany(p => p.ExchangeBatteries)
                 .HasForeignKey(d => d.Vin)
-                .HasConstraintName("FK__ExchangeBat__VIN__656C112C");
+                .HasConstraintName("FK__ExchangeBat__VIN__0BD1B136");
         });
 
         modelBuilder.Entity<Form>(entity =>
         {
-            entity.HasKey(e => e.FormId).HasName("PK__Form__FB05B7BD4218BBBD");
+            entity.HasKey(e => e.FormId).HasName("PK__Form__FB05B7BD37CE4E1C");
 
             entity.ToTable("Form");
 
@@ -351,6 +351,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.AccountId)
                 .HasMaxLength(100)
                 .HasColumnName("AccountID");
+            entity.Property(e => e.BatteryId)
+                .HasMaxLength(100)
+                .HasColumnName("BatteryID");
             entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
@@ -366,19 +369,22 @@ public partial class SwapXContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("title");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.Vin)
+                .HasMaxLength(100)
+                .HasColumnName("VIN");
 
             entity.HasOne(d => d.Account).WithMany(p => p.Forms)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Form__AccountID__66603565");
+                .HasConstraintName("FK__Form__AccountID__702996C1");
 
             entity.HasOne(d => d.Station).WithMany(p => p.Forms)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Form__StationID__6754599E");
+                .HasConstraintName("FK__Form__StationID__711DBAFA");
         });
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAF8CE09CA2");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BAFF4964C89");
 
             entity.Property(e => e.OrderId)
                 .HasMaxLength(100)
@@ -405,16 +411,16 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Orders__AccountI__68487DD7");
+                .HasConstraintName("FK__Orders__AccountI__7B9B496D");
 
             entity.HasOne(d => d.Battery).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__Orders__BatteryI__693CA210");
+                .HasConstraintName("FK__Orders__BatteryI__7C8F6DA6");
         });
 
         modelBuilder.Entity<Package>(entity =>
         {
-            entity.HasKey(e => e.PackageId).HasName("PK__Package__322035EC6A45A890");
+            entity.HasKey(e => e.PackageId).HasName("PK__Package__322035ECCFD86AD3");
 
             entity.ToTable("Package");
 
@@ -439,7 +445,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<Rating>(entity =>
         {
-            entity.HasKey(e => e.RatingId).HasName("PK__Rating__FCCDF85CD48F902B");
+            entity.HasKey(e => e.RatingId).HasName("PK__Rating__FCCDF85CEEFCB1C0");
 
             entity.ToTable("Rating");
 
@@ -466,16 +472,16 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Ratings)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Rating__AccountI__6B24EA82");
+                .HasConstraintName("FK__Rating__AccountI__74EE4BDE");
 
             entity.HasOne(d => d.Station).WithMany(p => p.Ratings)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Rating__StationI__6C190EBB");
+                .HasConstraintName("FK__Rating__StationI__73FA27A5");
         });
 
         modelBuilder.Entity<Report>(entity =>
         {
-            entity.HasKey(e => e.ReportId).HasName("PK__Report__D5BD48E504DC6B1F");
+            entity.HasKey(e => e.ReportId).HasName("PK__Report__D5BD48E580BC9884");
 
             entity.ToTable("Report");
 
@@ -489,7 +495,7 @@ public partial class SwapXContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("description");
             entity.Property(e => e.Image)
-                .HasMaxLength(50)
+                .HasMaxLength(200)
                 .HasColumnName("image");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
@@ -505,16 +511,16 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Reports)
                 .HasForeignKey(d => d.AccountId)
-                .HasConstraintName("FK__Report__AccountI__6D0D32F4");
+                .HasConstraintName("FK__Report__AccountI__08012052");
 
             entity.HasOne(d => d.Station).WithMany(p => p.Reports)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Report__StationI__6E01572D");
+                .HasConstraintName("FK__Report__StationI__08F5448B");
         });
 
         modelBuilder.Entity<Slot>(entity =>
         {
-            entity.HasKey(e => e.SlotId).HasName("PK__Slot__0A124A4F88119764");
+            entity.HasKey(e => e.SlotId).HasName("PK__Slot__0A124A4F193A647E");
 
             entity.ToTable("Slot");
 
@@ -537,16 +543,16 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Battery).WithMany(p => p.Slots)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__Slot__BatteryID__6EF57B66");
+                .HasConstraintName("FK__Slot__BatteryID__0524B3A7");
 
             entity.HasOne(d => d.Station).WithMany(p => p.Slots)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__Slot__StationID__6FE99F9F");
+                .HasConstraintName("FK__Slot__StationID__04308F6E");
         });
 
         modelBuilder.Entity<Station>(entity =>
         {
-            entity.HasKey(e => e.StationId).HasName("PK__Station__F0A7F3E0EE3A1E80");
+            entity.HasKey(e => e.StationId).HasName("PK__Station__F0A7F3E0D8121AC1");
 
             entity.ToTable("Station");
 
@@ -572,7 +578,7 @@ public partial class SwapXContext : DbContext
 
         modelBuilder.Entity<StationSchedule>(entity =>
         {
-            entity.HasKey(e => e.StationScheduleId).HasName("PK__StationS__12BF61BEC9CF80C5");
+            entity.HasKey(e => e.StationScheduleId).HasName("PK__StationS__12BF61BE1CB50D57");
 
             entity.ToTable("StationSchedule");
 
@@ -597,16 +603,16 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Form).WithMany(p => p.StationSchedules)
                 .HasForeignKey(d => d.FormId)
-                .HasConstraintName("FK__StationSc__FormI__70DDC3D8");
+                .HasConstraintName("FK__StationSc__FormI__78BEDCC2");
 
             entity.HasOne(d => d.Station).WithMany(p => p.StationSchedules)
                 .HasForeignKey(d => d.StationId)
-                .HasConstraintName("FK__StationSc__Stati__71D1E811");
+                .HasConstraintName("FK__StationSc__Stati__77CAB889");
         });
 
         modelBuilder.Entity<Vehicle>(entity =>
         {
-            entity.HasKey(e => e.Vin).HasName("PK__Vehicle__C5DF234D17ECC187");
+            entity.HasKey(e => e.Vin).HasName("PK__Vehicle__C5DF234D224034D2");
 
             entity.ToTable("Vehicle");
 
@@ -637,15 +643,15 @@ public partial class SwapXContext : DbContext
 
             entity.HasOne(d => d.Battery).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.BatteryId)
-                .HasConstraintName("FK__Vehicle__Battery__72C60C4A");
+                .HasConstraintName("FK__Vehicle__Battery__64B7E415");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__Vehicle__Custome__01142BA1");
+                .HasConstraintName("FK__Vehicle__Custome__1A1FD08D");
 
             entity.HasOne(d => d.Package).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.PackageId)
-                .HasConstraintName("FK__Vehicle__Package__73BA3083");
+                .HasConstraintName("FK__Vehicle__Package__65AC084E");
         });
 
         OnModelCreatingPartial(modelBuilder);

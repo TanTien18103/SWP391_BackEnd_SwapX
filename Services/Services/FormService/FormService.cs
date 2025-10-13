@@ -192,6 +192,8 @@ namespace Services.Services.FormService
                     Description = addFormRequest.Description,
                     Date = addFormRequest.Date,
                     Status = formStatus,
+                    Vin = addFormRequest.Vin,
+                    BatteryId = addFormRequest.BatteryId,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };

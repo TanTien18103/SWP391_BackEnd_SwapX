@@ -427,7 +427,7 @@ namespace Services.Services.VehicleService
                      battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
@@ -445,7 +445,7 @@ namespace Services.Services.VehicleService
                      battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Accumulator.ToString(),
@@ -463,7 +463,7 @@ namespace Services.Services.VehicleService
                      battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
@@ -481,7 +481,7 @@ namespace Services.Services.VehicleService
                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
@@ -499,7 +499,7 @@ namespace Services.Services.VehicleService
                      battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
@@ -517,7 +517,7 @@ namespace Services.Services.VehicleService
                      battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
@@ -536,7 +536,7 @@ namespace Services.Services.VehicleService
                      battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.LFP.ToString(),
@@ -555,7 +555,7 @@ namespace Services.Services.VehicleService
                      battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.LFP.ToString(),
@@ -574,7 +574,7 @@ namespace Services.Services.VehicleService
                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
@@ -594,7 +594,7 @@ namespace Services.Services.VehicleService
                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
@@ -613,7 +613,7 @@ namespace Services.Services.VehicleService
                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
@@ -633,7 +633,7 @@ namespace Services.Services.VehicleService
                     battery = new Battery
                     {
                         BatteryId = _accountHelper.GenerateShortGuid(),
-                        Status = BatteryStatusEnums.Available.ToString(),
+                        Status = BatteryStatusEnums.InUse.ToString(),
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
