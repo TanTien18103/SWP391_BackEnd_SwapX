@@ -811,8 +811,21 @@ namespace Services.Services.BatteryService
                         Data = null
                     };
                 }
+                var station = await _stationRepo.GetStationById(getAllBatterySuitVehicle.StationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null
+                    };
+                }
                 var battery = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
-                if (battery == null)
+                var batteries = await _batteryRepo.GetBatteriesByStationIdAndSpecification(getAllBatterySuitVehicle.StationId, battery.Specification, battery.BatteryType);
+                if (batteries == null || batteries.Count==0)
                 {
                     return new ResultModel
                     {
@@ -823,8 +836,9 @@ namespace Services.Services.BatteryService
                         Data = null
                     };
                 }
-                var batteries = await _batteryRepo.GetBatteriesByStationIdAndSpecification(getAllBatterySuitVehicle.StationId, battery.Specification, battery.BatteryType);
-                if (batteries == null)
+
+
+                if (battery == null)
                 {
                     return new ResultModel
                     {
@@ -834,7 +848,6 @@ namespace Services.Services.BatteryService
                         Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
                         Data = null
                     };
-
                 }
                 var response = new List<object>();
 
