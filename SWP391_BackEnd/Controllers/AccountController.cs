@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BusinessObjects.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.Repositories.AccountRepo;
@@ -64,7 +65,7 @@ namespace Services.Controllers
         [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
-             var res = await _accountService.GetCurrentUser();
+            var res = await _accountService.GetCurrentUser();
             return StatusCode(res.StatusCode, res);
         }
 

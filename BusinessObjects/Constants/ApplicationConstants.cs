@@ -11,6 +11,7 @@ namespace BusinessObjects.Constants
         public const string KEYID_EXISTED = "KeyId {0} đã tồn tại.";
         public const string KeyId = "KeyId";
         public const string DUPLICATE = "Symtem_id is duplicated";
+        public const string NOT_ALLOWED = "You are not allowed to access this resource.";
     }
 
     //Service (1-0-0)

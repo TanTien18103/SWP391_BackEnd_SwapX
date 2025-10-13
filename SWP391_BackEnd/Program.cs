@@ -216,6 +216,22 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+            var result = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                isSuccess = false,
+                responseCode = "UNAUTHORIZED",
+                message = "Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn."
+            });
+            return context.Response.WriteAsync(result);
+        }
+    };
 })
 .AddCookie("Cookies")
 .AddGoogle(googleOptions =>
@@ -227,6 +243,24 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 //*************** I KNEW YOU WERE HERE ***************//
+
+// Middleware bắt lỗi 403
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == StatusCodes.Status403Forbidden)
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            isSuccess = false,
+            responseCode = "FORBIDDEN",
+            message = "Bạn không có quyền truy cập tài nguyên này."
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
 
 // Middleware
 if (app.Environment.IsDevelopment())
@@ -248,6 +282,8 @@ app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+
 //*************** I KNEW YOU WERE HERE ***************//
 
 app.MapControllers();
