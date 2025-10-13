@@ -22,5 +22,6 @@ namespace Services.Services.StationService
         Task<ResultModel> GetStationByStaffId(string staffId);
         Task<ResultModel> UpdateStationStatus(UpdateStationStatusRequest updateStationStatusRequest);
         Task<ResultModel> GetAllStationOfCustomer();
+        Task<ResultModel> GetAllStationOfCustomerSuitVehicle(string vehicleId);
     }
 }

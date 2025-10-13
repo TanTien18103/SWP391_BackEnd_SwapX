@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.BssStaffRepo;
+using Repositories.Repositories.EvDriverRepo;
 using Repositories.Repositories.StationRepo;
 using Repositories.Repositories.StationScheduleRepo;
+using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
+using Services.ApiModels.Battery;
 using Services.ApiModels.Station;
 using Services.ServicesHelpers;
 using System;
@@ -30,8 +33,10 @@ namespace Services.Services.StationService
         private readonly IAccountRepo _accountRepository;
         private readonly IStationScheduleRepo _stationScheduleRepository;
         private readonly AccountHelper _accountHelper;
+        private readonly IEvDriverRepo _evDriverRepo;
+        private readonly IVehicleRepo _vehicleRepo;
 
-        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBssStaffRepo bssStaffRepository, IAccountRepo accountRepository, AccountHelper accountHelper,IStationScheduleRepo stationScheduleRepo)
+        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBssStaffRepo bssStaffRepository, IAccountRepo accountRepository, AccountHelper accountHelper,IStationScheduleRepo stationScheduleRepo, IEvDriverRepo evDriverRepo, IVehicleRepo vehicleRepo)
         {
             _stationRepository = stationRepository;
             _configuration = configuration;
@@ -40,6 +45,8 @@ namespace Services.Services.StationService
             _accountRepository = accountRepository;
             _accountHelper = accountHelper;
             _stationScheduleRepository = stationScheduleRepo;
+            _evDriverRepo = evDriverRepo;
+            _vehicleRepo = vehicleRepo;
         }
 
         public async Task<ResultModel> AddStation(AddStationRequest addStationRequest)
@@ -701,6 +708,120 @@ namespace Services.Services.StationService
                     StatusCode = StatusCodes.Status200OK
                 };
 
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStation.GET_ALL_STATION_FAIL,
+                    Data = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResultModel> GetAllStationOfCustomerSuitVehicle(string vehicleId)
+        {
+            try
+            {
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+            || string.IsNullOrEmpty(authHeader)
+            || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepository.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(accountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var vehicle = await _vehicleRepo.GetVehicleById(vehicleId);
+                // kiểm tra xem vehicle có thuộc về customer không
+                if (vehicle.CustomerId != evDriver.CustomerId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FORBIDDEN,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_OWNED,
+                        Data = null
+                    };
+                }
+                var stations = await _stationRepository.GetAllStationsOfCustomerSuitVehicle(vehicleId);
+                if(stations==null|| stations.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_LIST_EMPTY,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                var response = stations.Select(station => new
+                {
+                    StationId = station.StationId,
+                    StationName = station.StationName,
+                    Location = station.Location,
+                    Status = station.Status,
+                    Rating = station.Rating,
+                    BatteryNumber = station.BatteryNumber,
+                    BssStaffs = station.BssStaffs.Select(s => new
+                    {
+                        StaffId = s.StaffId,
+                    }).ToList(),
+                    Batteries = station.Batteries.Select(b => new
+                    {
+                        BatteryId = b.BatteryId,
+                        BatteryName = b.BatteryName,
+                        Status = b.Status,
+                        Capacity = b.Capacity,
+                        BatteryType = b.BatteryType,
+                        Specification = b.Specification,
+                        BatteryQuality = b.BatteryQuality,
+                        // KHÔNG có trường station ở đây!
+                    }).ToList()
+                }).ToList();
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStation.GET_ALL_STATION_SUCCESS,
+                    Data = response,
+                    StatusCode = StatusCodes.Status200OK
+                };
 
             }
             catch (Exception ex)

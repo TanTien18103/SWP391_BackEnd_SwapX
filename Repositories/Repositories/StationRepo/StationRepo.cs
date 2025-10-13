@@ -43,6 +43,7 @@ namespace Repositories.Repositories.StationRepo
         public async Task<Station> UpdateStation(Station station)
         {
             _context.Stations.Update(station);
+            await UpdateAllStationsAverageRating();
             await _context.SaveChangesAsync();
             return station;
         }
@@ -74,6 +75,20 @@ namespace Repositories.Repositories.StationRepo
                 .Where(s => s.Status == StationStatusEnum.Active.ToString())
                 .Include(b => b.Batteries)
                 .Include(s => s.BssStaffs)
+                .ToListAsync();
+        }
+
+        public async Task<List<Station>> GetAllStationsOfCustomerSuitVehicle(string vehicleId)
+        {
+            await UpdateAllStationsAverageRating();
+            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Vin == vehicleId);
+            if(vehicle == null) return await GetAllStationsOfCustomer();
+            var batteryOfVehicle = await _context.Batteries.FirstOrDefaultAsync(b => b.BatteryId == vehicle.BatteryId);
+            return await _context.Stations
+                .Where(s => s.Status == StationStatusEnum.Active.ToString())
+                .Include(b => b.Batteries)
+                .Include(s => s.BssStaffs)
+                .Where(s => s.Batteries.Any(b => b.BatteryType == batteryOfVehicle.BatteryType && b.Status == BatteryStatusEnums.Available.ToString()&& b.Specification == batteryOfVehicle.Specification))
                 .ToListAsync();
         }
     }

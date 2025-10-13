@@ -216,6 +216,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
+    // Custom response for unauthorized requests
     options.Events = new JwtBearerEvents
     {
         OnChallenge = context =>
