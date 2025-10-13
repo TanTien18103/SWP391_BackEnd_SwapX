@@ -188,9 +188,6 @@ namespace Services.Services.PackageService
                 };
             }
         }
-
-
-
         public async Task<ResultModel> UpdatePackage(UpdatePackageRequest updatePackageRequest)
         {
             try
@@ -204,6 +201,17 @@ namespace Services.Services.PackageService
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FAILED,
                         Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if(package.Status == PackageStatusEnums.Inactive.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_INACTIVE_CANNOT_UPDATE,
                         Data = null
                     };
                 }

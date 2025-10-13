@@ -157,15 +157,31 @@ namespace Services.Services.RatingService
         {
             try
             {
-
                 var ratings = await _ratingRepo.GetAllRatings();
+                var response = new List<object>();
+                foreach (var rating in ratings)
+                {
+                    response.Add(new
+                    {
+                        RatingId = rating.RatingId,
+                        AccountId = rating.AccountId,
+                        Rating1 = rating.Rating1,
+                        Description = rating.Description,
+                        StationId = rating.StationId,
+                        Status = rating.Status,
+                        StartDate = rating.StartDate,
+                        UpdateDate = rating.UpdateDate,
+                        AccountName = (await _accountRepo.GetAccountById(rating.AccountId))?.Name,
+                        StationName = (await _stationRepo.GetStationById(rating.StationId))?.StationName
+                    });
+                }
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsRating.GET_ALL_RATING_SUCCESS,
-                    Data = ratings
+                    Data = response
                 };
 
             }
@@ -186,7 +202,6 @@ namespace Services.Services.RatingService
         {
             try
             {
-
                 var rating = await _ratingRepo.GetRatingById(ratingId);
                 if (rating == null)
                 {

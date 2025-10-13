@@ -304,6 +304,8 @@ namespace BusinessObjects.Constants
         public const string UPDATE_PACKAGE_STATUS_SUCCESS = "Cập nhật trạng thái gói thành công";
         public const string PACKAGE_IN_USE_CANNOT_INACTIVE = "Gói đang được sử dụng, không thể ngừng hoạt động";
         public const string UPDATE_PACKAGE_STATUS_FAILED = "Cập nhật trạng thái gói thất bại";
+
+        public static string PACKAGE_INACTIVE_CANNOT_UPDATE = "Gói đã ngừng hoạt động, không thể cập nhật";
     }
     //for Vehicle (0-0-1)
     public static class ResponseMessageConstantsVehicle
