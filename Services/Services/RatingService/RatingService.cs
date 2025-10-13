@@ -89,13 +89,26 @@ namespace Services.Services.RatingService
                     };
                 }
                 var createdRating = await _ratingRepo.AddRating(newRating);
+                var response = new
+                {
+                    RatingId = createdRating.RatingId,
+                    AccountId = createdRating.AccountId,
+                    Rating1 = createdRating.Rating1,
+                    Description = createdRating.Description,
+                    StationId = createdRating.StationId,
+                    Status = createdRating.Status,
+                    StartDate = createdRating.StartDate,
+                    UpdateDate = createdRating.UpdateDate,
+                    AccountName = (await _accountRepo.GetAccountById(createdRating.AccountId))?.Name,
+                    StationName = (await _stationRepo.GetStationById(createdRating.StationId))?.StationName
+                };
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status201Created,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsRating.ADD_RATING_SUCCESS,
-                    Data = createdRating
+                    Data = response
                 };
             }
             catch (Exception ex)
