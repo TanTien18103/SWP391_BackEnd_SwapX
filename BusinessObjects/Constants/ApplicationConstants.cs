@@ -186,13 +186,17 @@ namespace BusinessObjects.Constants
         public const string STAFF_NOT_ASSIGNED_TO_ANY_STATION = "Nhân viên chưa được phân công cho trạm nào.";
         public const string GET_STATION_BY_STAFF_FAILED = "Lấy trạm theo nhân viên thất bại";
         public const string STAFF_ALREADY_ASSIGNED_TO_THIS_STATION = "Nhân viên đã được phân công cho trạm này.";
+        public const string STATION_BATTERY_LIMIT = "Trạm đã đạt giới hạn pin tối đa.";
 
-        public static string CANNOT_CHANGE_STATUS_DUE_TO_TODAY_SCHEDULE { get; set; }
-        public static string STATION_ALREADY_IN_THIS_STATUS { get; set; }
-        public static string INVALID_STATION_STATUS { get; set; }
-        public static string UPDATE_STATION_STATUS_SUCCESS { get; set; }
-        public static string UPDATE_STATION_STATUS_FAILED { get; set; }
-        public static string STATION_BATTERY_LIMIT { get; set; }
+        public const string STATION_ALREADY_IN_THIS_STATUS ="Trạng thái trạm không thay đổi";
+
+        public const string CANNOT_CHANGE_STATUS_DUE_TO_TODAY_SCHEDULE = "Trạng thái trạm không thay đổi";
+
+        public const string INVALID_STATION_STATUS = "Trạng thái trạm không thay đổi";
+
+        public const string UPDATE_STATION_STATUS_SUCCESS = "Trạng thái trạm không thay đổi";
+
+        public const string UPDATE_STATION_STATUS_FAILED = "Trạng thái trạm không thay đổi";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -210,16 +214,16 @@ namespace BusinessObjects.Constants
         public const string UPDATE_BATTERY_STATUS_IN_STATION_SUCCESS = "Cập nhật trạng thái pin trong trạm thành công";
         public const string UPDATE_BATTERY_STATUS_IN_STATION_FAILED = "Cập nhật trạng thái pin trong trạm thất bại";
         public const string BATTERY_DECOMMISSIONED_CANNOT_UPDATE_STATUS = "Pin đã ngừng hoạt động, không thể cập nhật trạng thái";
-        public static string ADD_BATTERY_FAIL = "Thêm pin thất bại";
-        public static string GET_ALL_BATTERY_FAIL = "Lấy danh sách pin thất bại";
-        public static string BATTERY_LIST_EMPTY = "Lấy danh sách pin thất bại";
-        public static string GET_ALL_BATTERY_SUCCESS = "Lấy danh sách pin thành công";
-        public static string UPDATE_BATTERY_FAILED = "Cập nhật pin thất bại";
-        public static string GET_BATTERY_FAIL = "Lấy pin thất bại";
-        public static string GET_BATTERY_SUCCESS = "Lấy pin thành công";
-        public static string DELETE_BATTERY_FAILED = "Xóa pin thất bại";
-        public static string ADD_BATTERY_IN_STATION_FAILED = "Thêm pin vào trạm thất bại";
-        public static string ADD_BATTERY_IN_STATION_SUCCESS = "Thêm pin vào trạm thành công";
+        public const string ADD_BATTERY_FAIL = "Thêm pin thất bại";
+        public const string GET_ALL_BATTERY_FAIL = "Lấy danh sách pin thất bại";
+        public const string BATTERY_LIST_EMPTY = "Lấy danh sách pin thất bại";
+        public const string GET_ALL_BATTERY_SUCCESS = "Lấy danh sách pin thành công";
+        public const string UPDATE_BATTERY_FAILED = "Cập nhật pin thất bại";
+        public const string GET_BATTERY_FAIL = "Lấy pin thất bại";
+        public const string GET_BATTERY_SUCCESS = "Lấy pin thành công";
+        public const string DELETE_BATTERY_FAILED = "Xóa pin thất bại";
+        public const string ADD_BATTERY_IN_STATION_FAILED = "Thêm pin vào trạm thất bại";
+        public const string ADD_BATTERY_IN_STATION_SUCCESS = "Thêm pin vào trạm thành công";
         public const string GET_BATTERY_HISTORY_SUCCESS = "Lấy lịch sử pin thành công";
         public const string GET_BATTERY_HISTORY_FAIL = "Lấy lịch sử pin thất bại";
         public const string BATTERY_HISTORY_EMPTY = "Không có lịch sử cho pin này";
@@ -484,4 +488,12 @@ namespace BusinessObjects.Constants
         public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
         public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
     }
+    public static class ResponseMessageBatteryHistory
+    {
+        public const string BATTERY_HISTORY_NOT_FOUND = "Không tìm thấy lịch sử pin";
+        public const string BATTERY_HISTORY_LIST_EMPTY = "Lịch sử pin trống";
+        public const string GET_BATTERY_HISTORY_SUCCESS = "Lấy lịch sử pin thành công";
+        public const string GET_BATTERY_HISTORY_FAIL = "Lấy lịch sử pin thất bại";
+    }
+    
 }

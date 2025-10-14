@@ -43,6 +43,7 @@ using Repositories.Repositories.ExchangeBatteryRepo;
 using Services.Services.Dashboard;
 using Services.Services.ExchangeBatteryService;
 using Services.Payments;
+using Services.Services.BatteryHistoryService;
 
 //*************** I KNEW YOU WERE HERE ***************//
 
@@ -162,6 +163,7 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IBatteryReportService, BatteryReportService>();
 builder.Services.AddScoped<IExchangeBatteryService, ExchangeBatteryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IBatteryHistoryService, BatteryHistoryService>();
 //*************** I KNEW YOU WERE HERE ***************//
 
 //Register Helper
