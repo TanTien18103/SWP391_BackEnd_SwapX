@@ -157,8 +157,19 @@ namespace Services.Services.FormService
                         Data = null
                     };
                 }
+                if(battery.Status == BatteryStatusEnums.Charging.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_CHARGING,
+                        Data = null
+                    };
+                }
                 //Kiểm tra xem pin được booked chưa
-                if(battery.Status == BatteryStatusEnums.Booked.ToString())
+                if (battery.Status == BatteryStatusEnums.Booked.ToString())
                 {
                     return new ResultModel
                     {

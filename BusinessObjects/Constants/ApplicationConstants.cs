@@ -231,6 +231,8 @@ namespace BusinessObjects.Constants
         public const string INCOMPATIBLE_BATTERY_VEHICLE =" Pin không tương thích với xe";
 
         public const string BATTERY_DECOMMISSIONED_INUSE_CANNOT_ADD_TO_STATION = "Pin ngừng hoạt động hoặc đang sử dụng không thêm vào trạm được";
+
+        public static string BATTERY_CHARGING = "Pin đang được sạc";
     }
     public static class EmailConstants
     {
