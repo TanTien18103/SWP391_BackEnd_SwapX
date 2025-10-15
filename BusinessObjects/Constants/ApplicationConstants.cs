@@ -402,7 +402,9 @@ namespace BusinessObjects.Constants
         public const string GET_RATING_FAIL = "Lấy đánh giá thất bại";
         public const string GET_RATING_SUCCESS = "Lấy đánh giá thành công";
         public const string DELETE_RATING_FAILED = "Xóa đánh giá thất bại";
-        public static string ADD_RATING_ONE_TIME = "Bạn chỉ có thể đánh giá một lần cho mỗi trạm nếu bạn muốn đánh giá lần nữa bạn có thể chỉnh sửa";
+        public const string ADD_RATING_ONE_TIME = "Bạn chỉ có thể đánh giá một lần cho mỗi trạm nếu bạn muốn đánh giá lần nữa bạn có thể chỉnh sửa";
+        public const string DELETE_RATING_FORBIDDEN = "Bạn không có quyền xóa đánh giá này";
+        public const string UPDATE_RATING_FORBIDDEN = "Bạn không có quyền cập nhật đánh giá này";
     }
     //for Report (0-0-1)
     public static class ResponseMessageConstantsReport
