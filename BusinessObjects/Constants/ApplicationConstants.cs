@@ -314,6 +314,8 @@ namespace BusinessObjects.Constants
         public const string PACKAGE_INACTIVE_CANNOT_UPDATE = "Gói đã ngừng hoạt động, không thể cập nhật";
 
         public const string PACKAGE_ACTIVE_CANNOT_UPDATE ="Gói đang hoạt động, không thể cập nhật";
+
+        public const string PACKAGE_ALREADY_INACTIVE = "Gói đang hoạt động, không thể cập nhật";
     }
     //for Vehicle (0-0-1)
     public static class ResponseMessageConstantsVehicle
