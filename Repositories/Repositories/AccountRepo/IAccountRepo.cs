@@ -20,5 +20,6 @@ namespace Repositories.Repositories.AccountRepo
         Task<Account> GetAccountByStaffId(string staffId);
         Task<string> GetAccountIdFromToken(string token);
         Task<List<Account>> GetAllCustomerHasPackage();
+        Task<List<object>> GetCustomersStatus();
     }
 }

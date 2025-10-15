@@ -9,8 +9,6 @@ public partial class Station
 {
     public string StationId { get; set; }
 
-    public string StationName { get; set; }
-
     public int? BatteryNumber { get; set; }
 
     public string Location { get; set; }
@@ -22,6 +20,8 @@ public partial class Station
     public DateTime? StartDate { get; set; }
 
     public DateTime? UpdateDate { get; set; }
+
+    public string StationName { get; set; }
 
     public virtual ICollection<Battery> Batteries { get; set; } = new List<Battery>();
 
