@@ -30,5 +30,6 @@ namespace Services.Services.AccountService
         Task<ResultModel> UpdateCustomer(UpdateCustomerRequest updateCustomerRequest);
         Task<ResultModel> UpdateStatus(UpdateStatusRequest updateStatusRequest);
         Task<ResultModel> GetAllCustomerHasPackage();
+        Task<ResultModel> GetCustomersStatus();
     }
 }
