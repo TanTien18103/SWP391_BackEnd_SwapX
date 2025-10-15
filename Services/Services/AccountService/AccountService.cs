@@ -1179,6 +1179,41 @@ namespace Services.Services.AccountService
                 };
             }
         }
+        public async Task<ResultModel> GetAccountByCustomerId(string customerId)
+        {
+            try
+            {
+                var account = await _accountRepository.GetAccountByCustomerId(customerId);
+                if (account == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
+                    Data = account,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
     }
 }
 

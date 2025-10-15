@@ -118,5 +118,18 @@ namespace Repositories.Repositories.AccountRepo
 
             return result.Cast<object>().ToList();
         }
+
+        public async Task<Account> GetAccountByCustomerId(string customerId)
+        {
+            var evdriver =  _context.Evdrivers.FirstOrDefaultAsync(d => d.CustomerId == customerId);
+            if (evdriver != null)
+            {
+                return await _context.Accounts
+                    .Include(a => a.BssStaffs).Include(a => a.Evdrivers)
+                    .FirstOrDefaultAsync(a => a.AccountId == evdriver.Result.AccountId);
+            }
+            return null;
+
+        }
     }
 }

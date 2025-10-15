@@ -25,7 +25,7 @@ public class StationController : ControllerBase
     }
 
     [HttpGet("get_all_stations")]
-    
+    [Authorize(Roles= "Admin, Bsstaff")]
     public async Task<IActionResult> GetAllStations()
     {
         var res = await _stationService.GetAllStations();
@@ -81,7 +81,7 @@ public class StationController : ControllerBase
     }
 
     [HttpGet("get_station_by_staff_id_for_staff")]
-    [Authorize(Roles = "Staff")]
+    [Authorize(Roles = "Bsstaff")]
     public async Task<IActionResult> GetStationByStaffIdForStaff([FromQuery] string? staffId)
     {
         var res = await _stationService.GetStationByStaffId(staffId);

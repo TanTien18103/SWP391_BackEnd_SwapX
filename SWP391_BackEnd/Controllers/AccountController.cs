@@ -177,7 +177,7 @@ namespace Services.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_customer_has_package")]
-        [Authorize(Roles = "Admin, Staff")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> GetCustomerHasPackage()
         {
             var res = await _accountService.GetAllCustomerHasPackage();
@@ -189,6 +189,13 @@ namespace Services.Controllers
         public async Task<IActionResult> GetCustomersStatus()
         {
             var res = await _accountService.GetCustomersStatus();
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpGet("get_account_by_customer_id_for_staff")]
+        [Authorize(Roles = "Admin, Staff")]
+        public async Task<IActionResult> GetAccountByCustomerId([FromQuery] string? customerId)
+        {
+            var res = await _accountService.GetAccountByCustomerId(customerId);
             return StatusCode(res.StatusCode, res);
         }
     }

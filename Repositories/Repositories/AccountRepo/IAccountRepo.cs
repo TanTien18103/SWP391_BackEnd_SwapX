@@ -21,5 +21,7 @@ namespace Repositories.Repositories.AccountRepo
         Task<string> GetAccountIdFromToken(string token);
         Task<List<Account>> GetAllCustomerHasPackage();
         Task<List<object>> GetCustomersStatus();
+        Task<Account>GetAccountByCustomerId(string customerId);
+
     }
 }
