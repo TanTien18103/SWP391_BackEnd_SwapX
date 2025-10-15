@@ -294,7 +294,7 @@ namespace Services.Services.RatingService
                         Data = null
                     };
                 }
-                if(existingRating.AccountId != accountId)
+                if (existingRating.AccountId != accountId)
                 {
                     return new ResultModel
                     {
@@ -302,6 +302,18 @@ namespace Services.Services.RatingService
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FAILED,
                         Message = ResponseMessageConstantsRating.UPDATE_RATING_FORBIDDEN,
+                        Data = null
+                    };
+                }
+                if (existingRating.Status == RatingStatusEnums.Inactive.ToString())
+                {
+
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsRating.RATING_INACTIVE,
                         Data = null
                     };
                 }
