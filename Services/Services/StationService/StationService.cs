@@ -593,20 +593,20 @@ namespace Services.Services.StationService
 
                     var schedules = await _stationScheduleRepository.GetStationSchedulesByStationId(existingStation.StationId);
 
-                    // Chỉ chặn nếu có lịch hôm nay mà chưa bị hủy
-                    bool hasTodaySchedule = schedules.Any(s =>
+                    // Chỉ chặn nếu đã có lịch trong tương lai (bao gồm cả hôm nay)
+                    bool hasFutureSchedule = schedules.Any(s =>
                         s.Date.HasValue &&
-                        s.Date.Value.Date == today &&
+                        s.Date.Value.Date >= today &&
                         !string.Equals(s.Status, ScheduleStatusEnums.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase)
                     );
 
-                    if (hasTodaySchedule)
+                    if (hasFutureSchedule)
                     {
                         return new ResultModel
                         {
                             IsSuccess = false,
                             ResponseCode = ResponseCodeConstants.CONFLICT,
-                            Message = ResponseMessageConstantsStation.CANNOT_CHANGE_STATUS_DUE_TO_TODAY_SCHEDULE,
+                            Message = ResponseMessageConstantsStation.STATION_HAS_FUTURE_SCHEDULES,
                             Data = null,
                             StatusCode = StatusCodes.Status409Conflict
                         };

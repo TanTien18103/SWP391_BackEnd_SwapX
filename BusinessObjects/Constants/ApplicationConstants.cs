@@ -190,13 +190,17 @@ namespace BusinessObjects.Constants
 
         public const string STATION_ALREADY_IN_THIS_STATUS = "Trạng thái trạm không thay đổi";
 
-        public const string CANNOT_CHANGE_STATUS_DUE_TO_TODAY_SCHEDULE = "Trạng thái trạm không thay đổi";
+        public const string CANNOT_CHANGE_STATUS_DUE_TO_SCHEDULE = "Không thể thay đổi trạng thái do đã có lịch trình";
 
         public const string INVALID_STATION_STATUS = "Trạng thái trạm không thay đổi";
 
         public const string UPDATE_STATION_STATUS_SUCCESS = "Trạng thái trạm không thay đổi";
 
         public const string UPDATE_STATION_STATUS_FAILED = "Trạng thái trạm không thay đổi";
+
+        public const string STATION_HAS_FUTURE_SCHEDULES = "Trạm có lịch trình trong tương lai, không thể ngừng hoạt động";
+
+        public const string STATION_INACTIVE_OR_MAINTENANCE = "Trạm đang ngừng hoạt động hoặc bảo trì";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -313,7 +317,7 @@ namespace BusinessObjects.Constants
 
         public const string PACKAGE_INACTIVE_CANNOT_UPDATE = "Gói đã ngừng hoạt động, không thể cập nhật";
 
-        public const string PACKAGE_ACTIVE_CANNOT_UPDATE ="Gói đang hoạt động, không thể cập nhật";
+        public const string PACKAGE_ACTIVE_CANNOT_UPDATE = "Gói đang hoạt động, không thể cập nhật";
 
         public const string PACKAGE_ALREADY_INACTIVE = "Gói đang hoạt động, không thể cập nhật";
     }

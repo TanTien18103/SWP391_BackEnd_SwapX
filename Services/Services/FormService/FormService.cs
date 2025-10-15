@@ -606,7 +606,29 @@ namespace Services.Services.FormService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
-
+                var station = await _stationRepo.GetStationById(existingForm.StationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                if (station.Status == StationStatusEnum.Inactive.ToString() || station.Status == StationStatusEnum.Maintenance.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStation.STATION_INACTIVE_OR_MAINTENANCE,
+                        Data = null,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
                 // Only allow status update from Submitted to Approved or Rejected
                 if (existingForm.Status != FormStatusEnums.Submitted.ToString())
                 {
