@@ -91,7 +91,7 @@ namespace SWP391_BackEnd.Controllers
 
         [HttpPut("update-form-status-staff")]
         [Authorize(Roles = "Bsstaff")]
-        public async Task<IActionResult> UpdateFormStatusStaff([FromBody] UpdateFormStatusStaffRequest updateFormStatusStaffRequest)
+        public async Task<IActionResult> UpdateFormStatusStaff([FromForm] UpdateFormStatusStaffRequest updateFormStatusStaffRequest)
         {
             var res = await _formService.UpdateFormStatusStaff(updateFormStatusStaffRequest);
             return StatusCode(res.StatusCode, res);
