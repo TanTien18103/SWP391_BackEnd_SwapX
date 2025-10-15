@@ -310,8 +310,10 @@ namespace BusinessObjects.Constants
         public const string UPDATE_PACKAGE_STATUS_SUCCESS = "Cập nhật trạng thái gói thành công";
         public const string PACKAGE_IN_USE_CANNOT_INACTIVE = "Gói đang được sử dụng, không thể ngừng hoạt động";
         public const string UPDATE_PACKAGE_STATUS_FAILED = "Cập nhật trạng thái gói thất bại";
+
         public const string PACKAGE_INACTIVE_CANNOT_UPDATE = "Gói đã ngừng hoạt động, không thể cập nhật";
-        public const string PACKAGE_ALREADY_INACTIVE = "Gói đã ngừng hoạt động";
+
+        public const string PACKAGE_ACTIVE_CANNOT_UPDATE ="Gói đang hoạt động, không thể cập nhật";
     }
     //for Vehicle (0-0-1)
     public static class ResponseMessageConstantsVehicle
@@ -401,7 +403,9 @@ namespace BusinessObjects.Constants
         public const string GET_RATING_FAIL = "Lấy đánh giá thất bại";
         public const string GET_RATING_SUCCESS = "Lấy đánh giá thành công";
         public const string DELETE_RATING_FAILED = "Xóa đánh giá thất bại";
-        public static string ADD_RATING_ONE_TIME = "Bạn chỉ có thể đánh giá một lần cho mỗi trạm nếu bạn muốn đánh giá lần nữa bạn có thể chỉnh sửa";
+        public const string ADD_RATING_ONE_TIME = "Bạn chỉ có thể đánh giá một lần cho mỗi trạm nếu bạn muốn đánh giá lần nữa bạn có thể chỉnh sửa";
+        public const string DELETE_RATING_FORBIDDEN = "Bạn không có quyền xóa đánh giá này";
+        public const string UPDATE_RATING_FORBIDDEN = "Bạn không có quyền cập nhật đánh giá này";
     }
     //for Report (0-0-1)
     public static class ResponseMessageConstantsReport

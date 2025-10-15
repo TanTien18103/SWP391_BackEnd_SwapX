@@ -16,5 +16,6 @@ namespace Services.Services.RatingService
         Task<ResultModel> AddRating(AddRatingRequest addRatingRequest);
         Task<ResultModel> UpdateRating(UpdateRatingRequest updateRatingRequest);
         Task<ResultModel> DeleteRating(string ratingId);
+        Task<ResultModel>DeleteRatingForCustomerByRatingId(DeleteRatingForCustomerByRatingId deleteRatingForCustomerByRatingId);
     }
 }

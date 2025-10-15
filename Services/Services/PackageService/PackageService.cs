@@ -230,14 +230,14 @@ namespace Services.Services.PackageService
                         Data = null
                     };
                 }
-                if (package.Status == PackageStatusEnums.Inactive.ToString())
+                if(package.Status == PackageStatusEnums.Active.ToString())
                 {
                     return new ResultModel
                     {
                         StatusCode = StatusCodes.Status400BadRequest,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsPackage.PACKAGE_INACTIVE_CANNOT_UPDATE,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_ACTIVE_CANNOT_UPDATE,
                         Data = null
                     };
                 }

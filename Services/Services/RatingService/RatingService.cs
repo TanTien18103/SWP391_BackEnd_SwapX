@@ -1,9 +1,12 @@
 ﻿using BusinessObjects.Constants;
 using BusinessObjects.Enums;
+using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.RatingRepo;
+using Repositories.Repositories.StationRepo;
 using Services.ApiModels;
 using Services.ApiModels.Rating;
 using Services.ServicesHelpers;
@@ -12,8 +15,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Repositories.Repositories.StationRepo;
-using Repositories.Repositories.AccountRepo;
 
 
 
@@ -27,6 +28,7 @@ namespace Services.Services.RatingService
         private readonly AccountHelper _accountHelper;
         private readonly IStationRepo _stationRepo;
         private readonly IAccountRepo _accountRepo;
+
         public RatingService(IRatingRepo ratingRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo, IAccountRepo accountRepo)
         {
             _ratingRepo = ratingRepo;
@@ -254,6 +256,31 @@ namespace Services.Services.RatingService
         {
             try
             {
+                if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
+                || string.IsNullOrEmpty(authHeader)
+                || !authHeader.ToString().StartsWith("Bearer "))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_NOT_SEND,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
+
+                var token = authHeader.ToString().Substring("Bearer ".Length);
+                var accountId = await _accountRepo.GetAccountIdFromToken(token);
+                if (string.IsNullOrEmpty(accountId))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.UNAUTHORIZED,
+                        Message = ResponseMessageIdentity.TOKEN_INVALID_OR_EXPIRED,
+                        StatusCode = StatusCodes.Status401Unauthorized
+                    };
+                }
 
                 var existingRating = await _ratingRepo.GetRatingById(updateRatingRequest.RatingId);
                 if (existingRating == null)
@@ -264,6 +291,29 @@ namespace Services.Services.RatingService
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsRating.RATING_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if (existingRating.AccountId != accountId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsRating.UPDATE_RATING_FORBIDDEN,
+                        Data = null
+                    };
+                }
+                if (existingRating.Status == RatingStatusEnums.Inactive.ToString())
+                {
+
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsRating.RATING_INACTIVE,
                         Data = null
                     };
                 }
@@ -299,5 +349,57 @@ namespace Services.Services.RatingService
                 };
             }
         }
+        public async Task<ResultModel> DeleteRatingForCustomerByRatingId(DeleteRatingForCustomerByRatingId deleteRatingForCustomerByRatingId)
+        {
+            try
+            {
+                var existingRating = await _ratingRepo.GetRatingById(deleteRatingForCustomerByRatingId.RatingId);
+                if (existingRating == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsRating.RATING_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if (existingRating.AccountId != deleteRatingForCustomerByRatingId.AccountId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsRating.DELETE_RATING_FORBIDDEN,
+                        Data = null
+                    };
+                }
+                existingRating.Status = AccountStatusEnums.Inactive.ToString();
+                existingRating.UpdateDate = TimeHepler.SystemTimeNow;
+                var deletedRating = await _ratingRepo.UpdateRating(existingRating);
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsRating.DELETE_RATING_SUCCESS,
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsRating.DELETE_RATING_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
+
     }
 }
