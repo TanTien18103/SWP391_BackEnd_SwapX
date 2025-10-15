@@ -62,5 +62,11 @@ namespace Repositories.Repositories.FormRepo
                 .ToListAsync();
         }
 
+        public async Task<List<Form>> GetFormsByVin(string Vin)
+        {
+            return await _context.Forms
+                .Where(f => f.Vin == Vin)
+                .ToListAsync();
+        }
     }
 }

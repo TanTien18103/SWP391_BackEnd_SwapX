@@ -1,5 +1,6 @@
 ﻿using BusinessObjects.Constants;
 using BusinessObjects.Enums;
+using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -93,7 +94,32 @@ namespace Services.Services.PackageService
 
                     };
                 }
-                package.Status = BatteryStatusEnums.Decommissioned.ToString();
+                if (package.Status == PackageStatusEnums.Inactive.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_ALREADY_INACTIVE,
+                        Data = null
+                    };
+                }
+
+                var vehicles = await _vehicleRepo.GetVehiclesByPackageId(package.PackageId);
+                if (vehicles != null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsPackage.PACKAGE_IN_USE_CANNOT_INACTIVE,
+                        Data = null
+                    };
+                }
+
+                package.Status = PackageStatusEnums.Inactive.ToString();
                 package.UpdateDate = TimeHepler.SystemTimeNow;
                 var deletedPackage = await _packageRepo.UpdatePackage(package);
                 return new ResultModel
@@ -272,7 +298,7 @@ namespace Services.Services.PackageService
                         Data = null
                     };
                 }
-                
+
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -327,7 +353,8 @@ namespace Services.Services.PackageService
                 if (updatePackageStatusRequest.Status == PackageStatusEnums.Inactive)
                 {
                     var vehicles = await _vehicleRepo.GetVehiclesByPackageId(package.PackageId);
-                    if (vehicles != null)
+
+                    if (vehicles != null && vehicles.Any())
                     {
                         return new ResultModel
                         {
@@ -343,7 +370,7 @@ namespace Services.Services.PackageService
                 package.Status = updatePackageStatusRequest.Status.ToString();
                 package.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedPackage = await _packageRepo.UpdatePackage(package);
-                
+
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
