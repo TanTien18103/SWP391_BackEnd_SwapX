@@ -183,5 +183,13 @@ namespace Services.Controllers
             var res = await _accountService.GetAllCustomerHasPackage();
             return StatusCode(res.StatusCode, res);
         }
+
+        [HttpGet("get_customers_status")]
+        [Authorize]
+        public async Task<IActionResult> GetCustomersStatus()
+        {
+            var res = await _accountService.GetCustomersStatus();
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

@@ -9,8 +9,6 @@ public partial class Battery
 {
     public string BatteryId { get; set; }
 
-    public string BatteryName { get; set; }
-
     public string Status { get; set; }
 
     public int? Capacity { get; set; }
@@ -26,6 +24,8 @@ public partial class Battery
     public DateTime? StartDate { get; set; }
 
     public DateTime? UpdateDate { get; set; }
+
+    public string BatteryName { get; set; }
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
 

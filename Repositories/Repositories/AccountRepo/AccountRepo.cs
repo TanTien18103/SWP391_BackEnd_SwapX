@@ -102,5 +102,21 @@ namespace Repositories.Repositories.AccountRepo
                 .Where(a => a.Role == RoleEnums.EvDriver.ToString() && a.Evdrivers.Any(e => e.Vehicles.Any(v => v.PackageId != null)))
                 .ToListAsync();
         }
+
+        public async Task<List<object>> GetCustomersStatus()
+        {
+            var result = await _context.Accounts
+                .Include(a => a.Evdrivers)
+                .ThenInclude(e => e.Vehicles)
+                .Where(a => a.Role == RoleEnums.EvDriver.ToString())
+                .Select(a => new
+                {
+                    CustomerId = a.AccountId,
+                    Status = a.Status,
+                })
+                .ToListAsync();
+
+            return result.Cast<object>().ToList();
+        }
     }
 }
