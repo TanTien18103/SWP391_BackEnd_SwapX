@@ -157,7 +157,20 @@ namespace Services.Services.FormService
                         Data = null
                     };
                 }
-                if(battery.Status == BatteryStatusEnums.Charging.ToString())
+                //kiểm tra xem xe đó đã lên tạo form trước đó nhưng chưa được approve
+                var existingForms = await _formRepo.GetFormsByVin(addFormRequest.Vin);
+                if (existingForms.Any(f => f.Status == FormStatusEnums.Submitted.ToString()))
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsForm.VEHICLE_ALREADY_HAS_PENDING_FORM,
+                        Data = null
+                    };
+                }
+                if (battery.Status == BatteryStatusEnums.Charging.ToString())
                 {
                     return new ResultModel
                     {
