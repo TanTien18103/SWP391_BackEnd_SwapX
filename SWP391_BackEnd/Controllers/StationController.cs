@@ -25,7 +25,7 @@ public class StationController : ControllerBase
     }
 
     [HttpGet("get_all_stations")]
-    [Authorize(Roles= "Admin, Bsstaff")]
+    [Authorize]
     public async Task<IActionResult> GetAllStations()
     {
         var res = await _stationService.GetAllStations();
@@ -57,7 +57,7 @@ public class StationController : ControllerBase
     }
 
     [HttpPost("add_staff_to_station_for_admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Bsstaff")]
     public async Task<IActionResult> AddStaffToStationForAdmin([FromBody] AddStaffToStationRequest addStaffToStationRequest)
     {
         var res = await _stationService.AddStaffToStation(addStaffToStationRequest);
