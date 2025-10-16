@@ -26,7 +26,9 @@ namespace Repositories.Repositories.FormRepo
 
         public async Task<List<Form>> GetAll()
         {
-            return await _context.Forms.ToListAsync();
+            return await _context.Forms
+                .Include(s => s.StationSchedules)
+                .ToListAsync();
         }
 
         public async Task<List<Form>> GetByAccountId(string accountId)
@@ -39,6 +41,7 @@ namespace Repositories.Repositories.FormRepo
         public async Task<Form> GetById(string formId)
         {
             return await _context.Forms
+                .Include(s => s.StationSchedules)
                  .FirstOrDefaultAsync(f => f.FormId == formId);
         }
 

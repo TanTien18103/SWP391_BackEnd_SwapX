@@ -23,18 +23,18 @@ namespace Repositories.Repositories.StationScheduleRepo
         }
         public async Task<List<StationSchedule>> GetAllStationSchedules()
         {
-            return await _context.StationSchedules.Include(b => b.Station).Include(a => a.Form).ToListAsync();
+            return await _context.StationSchedules
+                .ToListAsync();
         }
         public async Task<StationSchedule> GetStationScheduleById(string stationScheduleId)
         {
-            return _context.StationSchedules.Include(b=>b.Station).Include(a=>a.Form).FirstOrDefault(ss => ss.StationScheduleId == stationScheduleId);
+            return _context.StationSchedules
+                .FirstOrDefault(ss => ss.StationScheduleId == stationScheduleId);
         }
 
         public async Task<List<StationSchedule>> GetStationSchedulesByStationId(string stationId)
         {
             return await _context.StationSchedules
-                .Include(b => b.Station)
-                .Include(a => a.Form)
                 .Where(ss => ss.StationId == stationId)
                 .ToListAsync();
         }
