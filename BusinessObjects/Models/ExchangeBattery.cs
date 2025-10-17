@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObjects.Models;
 
@@ -34,18 +35,18 @@ public partial class ExchangeBattery
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
 
     public virtual ICollection<BatteryReport> BatteryReports { get; set; } = new List<BatteryReport>();
-
+    [JsonIgnore]
     public virtual Battery NewBattery { get; set; }
-
+    [JsonIgnore]
     public virtual Battery OldBattery { get; set; }
-
+    [JsonIgnore]
     public virtual Order Order { get; set; }
-
+    [JsonIgnore]
     public virtual StationSchedule Schedule { get; set; }
-
+    [JsonIgnore]
     public virtual Account StaffAccount { get; set; }
-
+    [JsonIgnore]
     public virtual Station Station { get; set; }
-
+    [JsonIgnore]
     public virtual Vehicle VinNavigation { get; set; }
 }

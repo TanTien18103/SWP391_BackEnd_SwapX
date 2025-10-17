@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObjects.Models;
 
@@ -22,8 +23,8 @@ public partial class Rating
     public DateTime? StartDate { get; set; }
 
     public DateTime? UpdateDate { get; set; }
-
+    [JsonIgnore]
     public virtual Account Account { get; set; }
-
+    [JsonIgnore]
     public virtual Station Station { get; set; }
 }

@@ -669,6 +669,7 @@ namespace Services.Services.FormService
                         StationId = existingForm.StationId,
                         Date = existingForm.Date,
                         StartDate = existingForm.StartDate,
+                        Description = existingForm.Description,
                         Status = ScheduleStatusEnums.Pending.ToString(),
                         UpdateDate = TimeHepler.SystemTimeNow
                     };
