@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Repositories\Repositories.csproj" />
     <PackageReference Include="CloudinaryDotNet" Version="1.27.7" />
+    <PackageReference Include="Mscc.GenerativeAI.Google" Version="2.8.18" />
     <PackageReference Include="payOS" Version="1.0.9" />
   </ItemGroup>
 

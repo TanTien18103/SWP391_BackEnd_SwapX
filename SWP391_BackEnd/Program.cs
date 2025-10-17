@@ -44,6 +44,7 @@ using Services.Services.Dashboard;
 using Services.Services.ExchangeBatteryService;
 using Services.Payments;
 using Services.Services.BatteryHistoryService;
+using Services.Services.GeminiService;
 
 //*************** I KNEW YOU WERE HERE ***************//
 
@@ -164,6 +165,7 @@ builder.Services.AddScoped<IBatteryReportService, BatteryReportService>();
 builder.Services.AddScoped<IExchangeBatteryService, ExchangeBatteryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IBatteryHistoryService, BatteryHistoryService>();
+builder.Services.AddScoped<IGeminiService, GeminiService>();
 //*************** I KNEW YOU WERE HERE ***************//
 
 //Register Helper
@@ -264,7 +266,6 @@ app.Use(async (context, next) =>
         await context.Response.WriteAsync(result);
     }
 });
-
 // Middleware
 if (app.Environment.IsDevelopment())
 {
