@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObjects.Models;
 
@@ -30,12 +31,12 @@ public partial class BatteryHistory
     public DateTime? StartDate { get; set; }
 
     public DateTime? UpdateDate { get; set; }
-
+    [JsonIgnore]
     public virtual Battery Battery { get; set; }
-
+    [JsonIgnore]
     public virtual ExchangeBattery ExchangeBattery { get; set; }
-
+    [JsonIgnore]
     public virtual Station Station { get; set; }
-
+    [JsonIgnore]
     public virtual Vehicle VinNavigation { get; set; }
 }

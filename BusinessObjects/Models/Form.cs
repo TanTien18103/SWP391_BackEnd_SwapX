@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObjects.Models;
 
@@ -28,9 +29,9 @@ public partial class Form
     public string Vin { get; set; }
 
     public string BatteryId { get; set; }
-
+    [JsonIgnore]
     public virtual Account Account { get; set; }
-
+    [JsonIgnore]
     public virtual Station Station { get; set; }
 
     public virtual ICollection<StationSchedule> StationSchedules { get; set; } = new List<StationSchedule>();
