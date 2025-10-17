@@ -34,6 +34,7 @@ namespace Repositories.Repositories.FormRepo
         public async Task<List<Form>> GetByAccountId(string accountId)
         {
             return await _context.Forms
+                .Include(s => s.StationSchedules)
                 .Where(f => f.AccountId == accountId)
                 .ToListAsync();
         }

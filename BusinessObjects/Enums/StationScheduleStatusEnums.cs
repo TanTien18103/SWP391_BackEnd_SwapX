@@ -8,7 +8,10 @@ namespace BusinessObjects.Enums
 {
     public enum StationScheduleStatusEnums
     {
-        Active,
-        Inactive
+        Scheduled,
+        Pending,
+        Deleted,
+        Completed,
+        Cancelled
     }
 }
