@@ -31,6 +31,8 @@ namespace BusinessObjects.Constants
         public const string EXPIRED = "Expired!";
         public const string VALIDATION_FAIL = "Validation fail!";
         public const string CONFLICT = "Conflict!";
+        public const string AI_SERVICE_ERROR = "AI Service Error!";
+        public const string AI_SERVICE_SUCCESS = "Successfully retrieved Gemini AI data.";
     }
 
     //Controllers
