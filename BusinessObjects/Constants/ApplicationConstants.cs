@@ -388,9 +388,14 @@ namespace BusinessObjects.Constants
         public const string GET_STATION_SCHEDULE_SUCCESS = "Lấy lịch trạm thành công";
         public const string DELETE_STATION_SCHEDULE_FAILED = "Xóa lịch trạm thất bại";
         public const string INVALID_TIME_RANGE = "Khoảng thời gian không hợp lệ";
-
-        public static string GET_STATION_SCHEDULE_BY_STATION_ID_SUCCESS = "Lấy lịch trạm theo ID trạm thành công";
-        public static string GET_STATION_SCHEDULE_BY_STATION_ID_FAILED = "Lấy lịch trạm theo ID trạm thất bại";
+        public const string GET_STATION_SCHEDULE_BY_STATION_ID_SUCCESS = "Lấy lịch trạm theo ID trạm thành công";
+        public const string GET_STATION_SCHEDULE_BY_STATION_ID_FAILED = "Lấy lịch trạm theo ID trạm thất bại";
+        public const string UPDATE_STATUS_STATION_SCHEDULE_SUCCESS = "Cập nhật trạng thái lịch trạm thành công";
+        public const string FORM_NOT_APPROVED = "Biểu mẫu chưa được phê duyệt, không thể Cập nhật trạng thái lịch trạm";
+        public const string UPDATE_STATUS_STATION_SCHEDULE_FAILED = "Cập nhật trạng thái lịch trạm thất bại";
+        public const string CANNOT_COMPLETE_BEFORE_DATE = "Không thể hoàn thành lịch trạm trước ngày hiện tại";
+        public const string STATION_SCHEDULE_ALREADY_COMPLETED = "Lịch trạm đã được hoàn thành";
+        public const string CANNOT_UPDATE_STATUS_FROM_INACTIVE = "Không thể cập nhật trạng thái từ ngừng hoạt động";
     }
     //for Rating (0-0-1)
     public static class ResponseMessageConstantsRating

@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObjects.Models;
 
@@ -26,14 +27,14 @@ public partial class Vehicle
     public string CustomerId { get; set; }
 
     public DateTime? PackageExpiredate { get; set; }
-
+    [JsonIgnore]
     public virtual Battery Battery { get; set; }
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
-
+    [JsonIgnore]
     public virtual Evdriver Customer { get; set; }
 
     public virtual ICollection<ExchangeBattery> ExchangeBatteries { get; set; } = new List<ExchangeBattery>();
-
+    [JsonIgnore]
     public virtual Package Package { get; set; }
 }

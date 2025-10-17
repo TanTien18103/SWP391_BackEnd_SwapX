@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObjects.Models;
 
@@ -24,8 +25,8 @@ public partial class StationSchedule
     public DateTime? UpdateDate { get; set; }
 
     public virtual ICollection<ExchangeBattery> ExchangeBatteries { get; set; } = new List<ExchangeBattery>();
-
+    [JsonIgnore]
     public virtual Form Form { get; set; }
-
+    [JsonIgnore]
     public virtual Station Station { get; set; }
 }

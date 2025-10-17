@@ -71,7 +71,7 @@ namespace Services.Services.StationScheduleService
                     Date = addStationScheduleRequest.Date,
                     FormId = addStationScheduleRequest.FormId,
                     Description = addStationScheduleRequest.Description,
-                    Status = StationScheduleStatusEnums.Active.ToString(),
+                    Status = StationScheduleStatusEnums.Pending.ToString(),
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
@@ -116,7 +116,7 @@ namespace Services.Services.StationScheduleService
                         Data = null
                     };
                 }
-                stationSchedule.Status = StationScheduleStatusEnums.Inactive.ToString();
+                stationSchedule.Status = StationScheduleStatusEnums.Deleted.ToString();
                 stationSchedule.UpdateDate = TimeHepler.SystemTimeNow;
                 await _stationScheduleRepo.UpdateStationSchedule(stationSchedule);
                 return new ResultModel
@@ -225,7 +225,7 @@ namespace Services.Services.StationScheduleService
                         Data = null
                     };
                 }
-                if (stationSchedule.Status == StationScheduleStatusEnums.Inactive.ToString())
+                if (stationSchedule.Status == StationScheduleStatusEnums.Deleted.ToString())
                 {
                     return new ResultModel
                     {
@@ -332,6 +332,93 @@ namespace Services.Services.StationScheduleService
                     Message = ResponseMessageConstantsStationSchedule.GET_STATION_SCHEDULE_BY_STATION_ID_FAILED,
                     Data = ex.Message
                 });
+            }
+        }
+
+        public async Task<ResultModel> UpdateStatusStationSchedule(UpdateStatusStationScheduleRequest updateStatusStationScheduleRequest)
+        {
+            try
+            {
+                var stationSchedule = await _stationScheduleRepo.GetStationScheduleById(updateStatusStationScheduleRequest.StationScheduleId);
+                if (stationSchedule == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStationSchedule.STATION_SCHEDULE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var form = await _formRepo.GetById(stationSchedule.FormId);
+                if (form.Status != FormStatusEnums.Approved.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStationSchedule.FORM_NOT_APPROVED,
+                        Data = null
+                    };
+                }
+                if (updateStatusStationScheduleRequest.Status == StationScheduleStatusEnums.Completed || updateStatusStationScheduleRequest.Status == StationScheduleStatusEnums.Completed && stationSchedule.Date > TimeHepler.SystemTimeNow)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStationSchedule.CANNOT_COMPLETE_BEFORE_DATE,
+                        Data = null
+                    };
+                }
+                if (stationSchedule.Status == StationScheduleStatusEnums.Completed.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStationSchedule.STATION_SCHEDULE_ALREADY_COMPLETED,
+                        Data = null
+                    };
+                }
+                if (stationSchedule.Status == StationScheduleStatusEnums.Deleted.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStationSchedule.CANNOT_UPDATE_STATUS_FROM_INACTIVE,
+                        Data = null
+                    };
+                }
+                stationSchedule.Status = updateStatusStationScheduleRequest.Status.ToString();
+                stationSchedule.UpdateDate = TimeHepler.SystemTimeNow;
+                await _stationScheduleRepo.UpdateStationSchedule(stationSchedule);
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStationSchedule.UPDATE_STATUS_STATION_SCHEDULE_SUCCESS,
+                    Data = stationSchedule
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStationSchedule.UPDATE_STATUS_STATION_SCHEDULE_FAILED,
+                    Data = ex.Message
+                };
             }
         }
     }

@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObjects.Models;
 
@@ -28,12 +29,12 @@ public partial class BatteryReport
     public DateTime? UpdateDate { get; set; }
 
     public string ExchangeBatteryId { get; set; }
-
+    [JsonIgnore]
     public virtual Account Account { get; set; }
-
+    [JsonIgnore]
     public virtual Battery Battery { get; set; }
-
+    [JsonIgnore]
     public virtual ExchangeBattery ExchangeBattery { get; set; }
-
+    [JsonIgnore]
     public virtual Station Station { get; set; }
 }

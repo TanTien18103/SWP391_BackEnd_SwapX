@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace BusinessObjects.Models;
 
@@ -28,9 +29,9 @@ public partial class Order
     public string ServiceType { get; set; }
 
     public long? OrderCode { get; set; }
-
+    [JsonIgnore]
     public virtual Account Account { get; set; }
-
+    [JsonIgnore]
     public virtual Battery Battery { get; set; }
 
     public virtual ICollection<ExchangeBattery> ExchangeBatteries { get; set; } = new List<ExchangeBattery>();
