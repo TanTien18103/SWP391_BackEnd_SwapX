@@ -18,6 +18,7 @@ using Services.Services.StationService;
 using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,6 +65,7 @@ namespace Services.Services.BatteryService
                     BatteryQuality = addBatteryRequest.BatteryQuality,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
+                    Image = addBatteryRequest.Image
                 };
 
                 await _batteryRepo.AddBattery(battery);
@@ -93,6 +95,7 @@ namespace Services.Services.BatteryService
                     BatteryQuality = battery.BatteryQuality,
                     StartDate = battery.StartDate,
                     UpdateDate = battery.UpdateDate,
+                    Image = battery.Image,
                     Station = battery.Station == null ? null : new
                     {
                         StationId = battery.Station.StationId,
@@ -102,7 +105,8 @@ namespace Services.Services.BatteryService
                         Rating = battery.Station.Rating,
                         BatteryNumber = battery.Station.BatteryNumber,
                         StartDate = battery.Station.StartDate,
-                        UpdateDate = battery.Station.UpdateDate
+                        UpdateDate = battery.Station.UpdateDate,
+                        Image = battery.Station.Image,
                         // KHÔNG có trường Batteries ở đây!
                     },
                     BatteryHistory = batteryHistory == null ? null : new
@@ -166,6 +170,7 @@ namespace Services.Services.BatteryService
                         BatteryQuality = b.BatteryQuality,
                         StartDate = b.StartDate,
                         UpdateDate = b.UpdateDate,
+                        Image = b.Image,
                         Station = b.Station == null ? null : new
                         {
                             StationId = b.Station.StationId,
@@ -175,7 +180,8 @@ namespace Services.Services.BatteryService
                             Rating = b.Station.Rating,
                             BatteryNumber = b.Station.BatteryNumber,
                             StartDate = b.Station.StartDate,
-                            UpdateDate = b.Station.UpdateDate
+                            UpdateDate = b.Station.UpdateDate,
+                            Image = b.Station.Image,
                         },
                         Vehicle = vehicle == null ? null : new
                         {
@@ -279,7 +285,8 @@ namespace Services.Services.BatteryService
                     Rating = b.Station.Rating,
                     BatteryNumber = b.Station.BatteryNumber,
                     StartDate = b.Station.StartDate,
-                    UpdateDate = b.Station.UpdateDate
+                    UpdateDate = b.Station.UpdateDate,
+                    Image = b.Station.Image,
                     // No Batteries field here!
                 };
 
@@ -294,6 +301,7 @@ namespace Services.Services.BatteryService
                     BatteryQuality = b.BatteryQuality,
                     StartDate = b.StartDate,
                     UpdateDate = b.UpdateDate,
+                    Image = b.Image,
                     Station = stationObj,
                     Vehicle = b.Vehicles == null ? null : new
                     {
@@ -351,6 +359,8 @@ namespace Services.Services.BatteryService
                     existingBattery.BatteryQuality = updateBatteryRequest.BatteryQuality.Value;
                 if (!string.IsNullOrEmpty(updateBatteryRequest.BatteryName))
                     existingBattery.BatteryName = updateBatteryRequest.BatteryName;
+                if (!string.IsNullOrEmpty(updateBatteryRequest.Image))
+                    existingBattery.Image = updateBatteryRequest.Image;
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
                 //record lại lịch sử pin
@@ -376,6 +386,7 @@ namespace Services.Services.BatteryService
                     BatteryQuality = updatedBattery.BatteryQuality,
                     StartDate = updatedBattery.StartDate,
                     UpdateDate = updatedBattery.UpdateDate,
+                    Image = updatedBattery.Image,
                     Station = updatedBattery.Station == null ? null : new
                     {
                         StationId = updatedBattery.Station.StationId,
@@ -385,7 +396,8 @@ namespace Services.Services.BatteryService
                         Rating = updatedBattery.Station.Rating,
                         BatteryNumber = updatedBattery.Station.BatteryNumber,
                         StartDate = updatedBattery.Station.StartDate,
-                        UpdateDate = updatedBattery.Station.UpdateDate
+                        UpdateDate = updatedBattery.Station.UpdateDate,
+                        Image = updatedBattery.Station.Image,
                         // KHÔNG có trường Batteries ở đây!
                     },
                     BatteryHistory = batteryHistory == null ? null : new
@@ -473,6 +485,7 @@ namespace Services.Services.BatteryService
                     BatteryQuality = deletedBattery.BatteryQuality,
                     StartDate = deletedBattery.StartDate,
                     UpdateDate = deletedBattery.UpdateDate,
+                    Image = deletedBattery.Image,
                     Station = deletedBattery.Station == null ? null : new
                     {
                         StationId = deletedBattery.Station.StationId,
@@ -482,7 +495,8 @@ namespace Services.Services.BatteryService
                         Rating = deletedBattery.Station.Rating,
                         BatteryNumber = deletedBattery.Station.BatteryNumber,
                         StartDate = deletedBattery.Station.StartDate,
-                        UpdateDate = deletedBattery.Station.UpdateDate
+                        UpdateDate = deletedBattery.Station.UpdateDate,
+                        Image = deletedBattery.Station.Image
                         // KHÔNG có trường Batteries ở đây!
                     },
                     BatteryHistory = batteryHistory == null ? null : new
@@ -605,6 +619,7 @@ namespace Services.Services.BatteryService
                     BatteryQuality = batteryDetail.BatteryQuality,
                     StartDate = batteryDetail.StartDate,
                     UpdateDate = batteryDetail.UpdateDate,
+                    Image = batteryDetail.Image,
                     Station = batteryDetail.Station == null ? null : new
                     {
                         StationId = batteryDetail.Station.StationId,
@@ -614,7 +629,8 @@ namespace Services.Services.BatteryService
                         Rating = batteryDetail.Station.Rating,
                         BatteryNumber = batteryDetail.Station.BatteryNumber,
                         StartDate = batteryDetail.Station.StartDate,
-                        UpdateDate = batteryDetail.Station.UpdateDate
+                        UpdateDate = batteryDetail.Station.UpdateDate,
+                        Image = batteryDetail.Station.Image,
                         // KHÔNG có trường Batteries ở đây!
                     },
                     BatteryHistory = batteryHistory == null ? null : new
@@ -711,6 +727,7 @@ namespace Services.Services.BatteryService
                     BatteryQuality = batteryDetail.BatteryQuality,
                     StartDate = batteryDetail.StartDate,
                     UpdateDate = batteryDetail.UpdateDate,
+                    Image = batteryDetail.Image,
                     Station = batteryDetail.Station == null ? null : new
                     {
                         StationId = batteryDetail.Station.StationId,
@@ -720,7 +737,8 @@ namespace Services.Services.BatteryService
                         Rating = batteryDetail.Station.Rating,
                         BatteryNumber = batteryDetail.Station.BatteryNumber,
                         StartDate = batteryDetail.Station.StartDate,
-                        UpdateDate = batteryDetail.Station.UpdateDate
+                        UpdateDate = batteryDetail.Station.UpdateDate,
+                        Image = batteryDetail.Station.Image,
                     }
                 };
 
@@ -864,6 +882,7 @@ namespace Services.Services.BatteryService
                         BatteryQuality = b.BatteryQuality,
                         StartDate = b.StartDate,
                         UpdateDate = b.UpdateDate,
+                        Image = b.Image,
                         Station = b.Station == null ? null : new
                         {
                             StationId = b.Station.StationId,
@@ -873,7 +892,8 @@ namespace Services.Services.BatteryService
                             Rating = b.Station.Rating,
                             BatteryNumber = b.Station.BatteryNumber,
                             StartDate = b.Station.StartDate,
-                            UpdateDate = b.Station.UpdateDate
+                            UpdateDate = b.Station.UpdateDate,
+                            Image = b.Station.Image,
                         },
 
                     });
@@ -919,7 +939,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -936,7 +957,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -954,7 +976,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -971,7 +994,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V48_Ah12.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -988,7 +1012,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V36_Ah10_4.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -1005,7 +1030,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V36_Ah7_8.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -1023,7 +1049,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V72_Ah30.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -1041,7 +1068,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V72_Ah50.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -1059,7 +1087,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V72_Ah38.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -1078,7 +1107,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V60_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -1096,7 +1126,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V72_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -1115,7 +1146,8 @@ namespace Services.Services.BatteryService
                         BatteryName = createBatteryByVehicleNameRequest.BatteryName,
                         Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Image = createBatteryByVehicleNameRequest.Image,
                     };
                     await _batteryRepo.AddBattery(battery);
 
@@ -1147,6 +1179,7 @@ namespace Services.Services.BatteryService
                     BatteryQuality = battery.BatteryQuality,
                     StartDate = battery.StartDate,
                     UpdateDate = battery.UpdateDate,
+                    Image = battery.Image,
                     Station = battery.Station == null ? null : new
                     {
                         StationId = battery.Station.StationId,
@@ -1156,7 +1189,8 @@ namespace Services.Services.BatteryService
                         Rating = battery.Station.Rating,
                         BatteryNumber = battery.Station.BatteryNumber,
                         StartDate = battery.Station.StartDate,
-                        UpdateDate = battery.Station.UpdateDate
+                        UpdateDate = battery.Station.UpdateDate,
+                        Image = battery.Station.Image,
                         // KHÔNG có trường Batteries ở đây!
                     },
                     BatteryHistory = batteryHistory == null ? null : new

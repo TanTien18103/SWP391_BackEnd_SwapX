@@ -43,19 +43,7 @@ namespace Services.Services.RatingService
         {
             try
             {
-
-                var userId = _accountHelper.GenerateShortGuid();
-                var newRating = new BusinessObjects.Models.Rating
-                {
-                    RatingId = _accountHelper.GenerateShortGuid(),
-                    AccountId = addRatingRequest.AccountId,
-                    Rating1 = addRatingRequest.Rating1,
-                    Description = addRatingRequest.Description,
-                    StationId = addRatingRequest.StationId,
-                    Status = AccountStatusEnums.Active.ToString(),
-                    StartDate = TimeHepler.SystemTimeNow,
-                    UpdateDate = TimeHepler.SystemTimeNow
-                };
+                
                 if (await _stationRepo.GetStationById(addRatingRequest.StationId) == null)
                 {
                     return new ResultModel
@@ -90,6 +78,18 @@ namespace Services.Services.RatingService
                         Data = null
                     };
                 }
+                var newRating = new Rating
+                {
+                    RatingId = _accountHelper.GenerateShortGuid(),
+                    AccountId = addRatingRequest.AccountId,
+                    Rating1 = addRatingRequest.Rating1,
+                    Description = addRatingRequest.Description,
+                    StationId = addRatingRequest.StationId,
+                    Status = AccountStatusEnums.Active.ToString(),
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
+                    Image = addRatingRequest.Image
+                };
                 var createdRating = await _ratingRepo.AddRating(newRating);
                 var response = new
                 {
@@ -102,7 +102,8 @@ namespace Services.Services.RatingService
                     StartDate = createdRating.StartDate,
                     UpdateDate = createdRating.UpdateDate,
                     AccountName = (await _accountRepo.GetAccountById(createdRating.AccountId))?.Name,
-                    StationName = (await _stationRepo.GetStationById(createdRating.StationId))?.StationName
+                    StationName = (await _stationRepo.GetStationById(createdRating.StationId))?.StationName,
+                    Image = createdRating.Image
                 };
                 return new ResultModel
                 {
@@ -324,6 +325,10 @@ namespace Services.Services.RatingService
                 if (!string.IsNullOrEmpty(updateRatingRequest.Description))
                 {
                     existingRating.Description = updateRatingRequest.Description;
+                }
+                if (!string.IsNullOrEmpty(updateRatingRequest.Image))
+                {
+                    existingRating.Image = updateRatingRequest.Image;
                 }
                 existingRating.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedRating = await _ratingRepo.UpdateRating(existingRating);

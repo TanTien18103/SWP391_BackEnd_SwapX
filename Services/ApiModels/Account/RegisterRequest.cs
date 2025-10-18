@@ -31,7 +31,9 @@ namespace Services.ApiModels.Account
         
         [Required]
         public string Address { get; set; }
-        
+        [Required]
+        public string Avatar { get; set; }
+
         [Required]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Email không hợp lệ")]
         public string Email { get; set; }

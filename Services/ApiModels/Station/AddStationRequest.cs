@@ -14,5 +14,8 @@ namespace Services.ApiModels.Station
 
         [Required]
         public string Location { get; set; }
+
+        [Required]
+        public string Image { get; set; }
     }
 }
