@@ -63,6 +63,7 @@ namespace Services.Services.StationService
                     BatteryNumber = 0, 
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
+                    Image = addStationRequest.Image
                 };
 
                 await _stationRepository.AddStation(station);
@@ -250,6 +251,10 @@ namespace Services.Services.StationService
                 if (!string.IsNullOrEmpty(updateStationRequest.Name))
                 {
                     existingStation.StationName = updateStationRequest.Name;
+                }
+                if (!string.IsNullOrEmpty(updateStationRequest.Image))
+                {
+                    existingStation.Image = updateStationRequest.Image;
                 }
                 existingStation.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedStation = await _stationRepository.UpdateStation(existingStation);

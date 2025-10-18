@@ -23,6 +23,8 @@ public partial class Station
 
     public string StationName { get; set; }
 
+    public string Image { get; set; }
+
     public virtual ICollection<Battery> Batteries { get; set; } = new List<Battery>();
 
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();

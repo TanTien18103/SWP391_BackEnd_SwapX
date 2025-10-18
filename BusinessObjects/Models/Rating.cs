@@ -23,6 +23,8 @@ public partial class Rating
     public DateTime? StartDate { get; set; }
 
     public DateTime? UpdateDate { get; set; }
+
+    public string Image { get; set; }
     [JsonIgnore]
     public virtual Account Account { get; set; }
     [JsonIgnore]
