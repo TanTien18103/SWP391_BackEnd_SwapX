@@ -431,7 +431,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -449,7 +449,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Accumulator.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -467,7 +467,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -485,7 +485,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah12.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -503,7 +503,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V36_Ah10_4.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -521,7 +521,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V36_Ah7_8.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -540,7 +540,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.LFP.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V72_Ah30.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -559,7 +559,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.LFP.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V72_Ah50.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -578,7 +578,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V72_Ah38.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -598,7 +598,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V60_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -617,7 +617,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V72_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
@@ -637,7 +637,7 @@ namespace Services.Services.VehicleService
                         Capacity = 100,
                         BatteryQuality = 100.00m,
                         BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                        BatteryName = account.Username + ResponseMessageConstantsBattery.DefaultBatterySuffix,
+                        BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                         Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
                         StartDate = TimeHepler.SystemTimeNow,
                         UpdateDate = TimeHepler.SystemTimeNow
