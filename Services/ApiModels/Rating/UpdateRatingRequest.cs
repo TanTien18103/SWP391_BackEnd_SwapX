@@ -14,6 +14,7 @@ namespace Services.ApiModels.Rating
         public decimal? Rating1 { get; set; }
 
         public string? Description { get; set; }
+        public string? Image { get; set; }
 
     }
 }

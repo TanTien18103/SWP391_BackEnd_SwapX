@@ -18,5 +18,7 @@ namespace Services.ApiModels.Battery
 
         [Range(0, 100, ErrorMessage = "Độ bền pin cần nhập từ 0 đến 100")]
         public decimal? BatteryQuality { get; set; }
+
+        public string? Image { get; set; }
     }
 }

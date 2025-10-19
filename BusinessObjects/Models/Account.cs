@@ -33,6 +33,8 @@ public partial class Account
 
     public DateTime? OtpExpiredTime { get; set; }
 
+    public string Avatar { get; set; }
+
     public virtual ICollection<BatteryReport> BatteryReports { get; set; } = new List<BatteryReport>();
 
     public virtual ICollection<BssStaff> BssStaffs { get; set; } = new List<BssStaff>();

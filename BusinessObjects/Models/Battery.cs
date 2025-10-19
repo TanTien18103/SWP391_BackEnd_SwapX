@@ -28,6 +28,8 @@ public partial class Battery
 
     public string BatteryName { get; set; }
 
+    public string Image { get; set; }
+
     public virtual ICollection<BatteryHistory> BatteryHistories { get; set; } = new List<BatteryHistory>();
 
     public virtual ICollection<BatteryReport> BatteryReports { get; set; } = new List<BatteryReport>();

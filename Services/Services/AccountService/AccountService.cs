@@ -174,6 +174,7 @@ namespace Services.Services.AccountService
                     Status = AccountStatusEnums.Active.ToString(),
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
+                    Avatar = registerRequest.Avatar,
                 };
 
                 var driver = new BssStaff
@@ -245,6 +246,8 @@ namespace Services.Services.AccountService
                     existingUser.Address = updateStaffRequest.Address;
                 if (updateStaffRequest.Email != null)
                     existingUser.Email = updateStaffRequest.Email;
+                if (updateStaffRequest.Avatar != null)
+                    existingUser.Avatar = updateStaffRequest.Avatar;
 
                 existingUser.UpdateDate = TimeHepler.SystemTimeNow;
                 await _accountRepository.UpdateAccount(existingUser);
@@ -849,6 +852,9 @@ namespace Services.Services.AccountService
                     existingUser.Address = updateCustomerRequest.Address;
                 if (updateCustomerRequest.Email != null)
                     existingUser.Email = updateCustomerRequest.Email;
+                if (updateCustomerRequest.Avatar != null)
+                    existingUser.Avatar = updateCustomerRequest.Avatar;
+
                 existingUser.UpdateDate = TimeHepler.SystemTimeNow;
                 await _accountRepository.UpdateAccount(existingUser);
                 return new ResultModel
@@ -923,6 +929,8 @@ namespace Services.Services.AccountService
                     existingAccount.Address = updateProfileRequest.Address;
                 if (updateProfileRequest.Email != null)
                     existingAccount.Email = updateProfileRequest.Email;
+                if (updateProfileRequest.Avatar != null)
+                    existingAccount.Avatar = updateProfileRequest.Avatar;
 
                 existingAccount.UpdateDate = TimeHepler.SystemTimeNow;
                 await _accountRepository.UpdateAccount(existingAccount);
@@ -984,6 +992,7 @@ namespace Services.Services.AccountService
                     Email = registerRequest.Email,
                     Role = RoleEnums.Admin.ToString(),
                     Status = AccountStatusEnums.Active.ToString(),
+                    Avatar = registerRequest.Avatar,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
                 };

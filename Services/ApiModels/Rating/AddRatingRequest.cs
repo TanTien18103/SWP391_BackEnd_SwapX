@@ -17,5 +17,7 @@ namespace Services.ApiModels.Rating
         public string StationId { get; set; }
         [Required]
         public string AccountId { get; set; }
+        [Required]
+        public string Image { get; set; }
     }
 }
