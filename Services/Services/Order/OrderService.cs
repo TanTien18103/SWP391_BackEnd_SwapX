@@ -2,6 +2,7 @@ using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
 using Repositories.Repositories.OrderRepo;
+using Repositories.Repositories.ExchangeBatteryRepo;
 using Services.ApiModels;
 using Services.ApiModels.Order;
 
@@ -10,10 +11,12 @@ namespace Services.Services;
 public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
 
-    public OrderService(IOrderRepository orderRepository)
+    public OrderService(IOrderRepository orderRepository, IExchangeBatteryRepo exchangeBatteryRepo)
     {
         _orderRepository = orderRepository;
+        _exchangeBatteryRepo = exchangeBatteryRepo;
     }
 
     public async Task<ResultModel> CreateOrder(CreateOrderRequest request)
@@ -32,6 +35,19 @@ public class OrderService : IOrderService
         };
 
         var createdOrder = await _orderRepository.CreateOrderAsync(order);
+
+        // If an ExchangeBatteryId is provided, link the exchange record to this order
+        if (!string.IsNullOrEmpty(request.ExchangeBatteryId))
+        {
+            var exchange = await _exchangeBatteryRepo.GetById(request.ExchangeBatteryId);
+            if (exchange != null)
+            {
+                exchange.OrderId = createdOrder.OrderId;
+                exchange.UpdateDate = TimeHepler.SystemTimeNow;
+                await _exchangeBatteryRepo.Update(exchange);
+            }
+        }
+
         var response = new OrderResponse(createdOrder);
         return new ResultModel { StatusCode = 201, IsSuccess = true, Data = response };
     }

@@ -72,9 +72,8 @@ public class OrderRepository : IOrderRepository
 
     public Task<Order> GetOrderByOrderCodeAsync(long orderCode)
     {
+        // Avoid eager-loading navigation properties here to prevent selecting columns that may not exist in some DB schemas
         return _context.Orders
-            .Include(o => o.Account)
-            .Include(o => o.Battery)
             .FirstOrDefaultAsync(o => o.OrderCode == orderCode);
     }
 

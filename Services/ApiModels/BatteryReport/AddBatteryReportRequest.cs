@@ -22,7 +22,9 @@ namespace Services.ApiModels.BatteryReport
         [Required]
         public string BatteryId { get; set; }
         [Required]
-        public string ReportType { get; set; } 
+        public string ReportType { get; set; }
+        // Optional: link this battery report to an existing ExchangeBattery
+        public string ExchangeBatteryId { get; set; }
     }
 
 }

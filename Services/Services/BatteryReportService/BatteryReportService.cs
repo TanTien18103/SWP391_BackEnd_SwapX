@@ -15,6 +15,8 @@ using Services.ApiModels.BatteryReport;
 using BusinessObjects.Constants;
 using BusinessObjects.Enums;
 using BusinessObjects.TimeCoreHelper;
+using Repositories.Repositories.ExchangeBatteryRepo;
+
 namespace Services.Services.BatteryReportService
 {
     public class BatteryReportService : IBatteryReportService
@@ -26,7 +28,8 @@ namespace Services.Services.BatteryReportService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AccountHelper _accountHelper;
         private readonly IConfiguration _configuration;
-        public BatteryReportService(IBatteryReportRepo batteryReportRepository, IBatteryRepo batteryRepo, IAccountRepo accountRepo, IStationRepo stationRepo, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IConfiguration configuration)
+        private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
+        public BatteryReportService(IBatteryReportRepo batteryReportRepository, IBatteryRepo batteryRepo, IAccountRepo accountRepo, IStationRepo stationRepo, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IConfiguration configuration, IExchangeBatteryRepo exchangeBatteryRepo)
         {
             _batteryReportRepository = batteryReportRepository;
             _batteryRepo = batteryRepo;
@@ -35,6 +38,7 @@ namespace Services.Services.BatteryReportService
             _httpContextAccessor = httpContextAccessor;
             _accountHelper = accountHelper;
             _configuration = configuration;
+            _exchangeBatteryRepo = exchangeBatteryRepo;
         }
 
         public async Task<ResultModel> AddBatteryReport(AddBatteryReportRequest addBatteryReportRequest)
@@ -91,6 +95,20 @@ namespace Services.Services.BatteryReportService
                     UpdateDate = TimeHepler.SystemTimeNow,
                     Status = BatteryReportStatusEnums.Pending.ToString(),
                 };
+
+                // If ExchangeBatteryId provided, link it
+                if (!string.IsNullOrEmpty(addBatteryReportRequest.ExchangeBatteryId))
+                {
+                    var exchange = await _exchangeBatteryRepo.GetById(addBatteryReportRequest.ExchangeBatteryId);
+                    if (exchange != null)
+                    {
+                        batteryReport.ExchangeBatteryId = exchange.ExchangeBatteryId;
+                        // Optionally update exchange record update date
+                        exchange.UpdateDate = TimeHepler.SystemTimeNow;
+                        await _exchangeBatteryRepo.Update(exchange);
+                    }
+                }
+
                 await _batteryReportRepository.AddBatteryReport(batteryReport);
                 return new ResultModel
                 {

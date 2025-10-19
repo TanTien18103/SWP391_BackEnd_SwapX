@@ -32,30 +32,13 @@ public class PayOSService : IPayOSService
 
     public async Task<ResultModel<PayOSWebhookResponseDto>> HandleWebhookAsync(PayOSWebhookRequestDto webhook)
     {
+        // If webhook verification fails, do not modify other entities. Only return failure.
         if (!_helper.VerifyWebhook(webhook))
         {
-            var orderDetail = await _orderRepository.GetOrderByOrderCodeAsync(webhook.Data.OrderCode);
-            if (orderDetail != null)
-            {
-                var exchangeBattery = await _exchangeBatteryRepo.GetByOrderId(orderDetail.OrderId);
-                if (exchangeBattery != null)
-                {
-                    exchangeBattery.Status = ExchangeStatusEnums.Cancelled.ToString();
-                    exchangeBattery.UpdateDate = DateTime.Now;
-                    await _exchangeBatteryRepo.Update(exchangeBattery);
-                }
-                var batteryReportCancel = await _batteryRepo.GetByExchangeBatteryId(exchangeBattery.ExchangeBatteryId);
-                if (batteryReportCancel != null)
-                {
-                    batteryReportCancel.Status = BatteryReportStatusEnums.Cancelled.ToString();
-                    batteryReportCancel.UpdateDate = DateTime.Now;
-                    await _batteryRepo.UpdateBatteryReport(batteryReportCancel);
-                }
-            }
             return new ResultModel<PayOSWebhookResponseDto>
             {
                 IsSuccess = false,
-                StatusCode = 400,
+                StatusCode = 200,
                 Message = ExchangeBatteryMessages.CreateFailed,
                 Data = new PayOSWebhookResponseDto { Success = false, Message = ExchangeBatteryMessages.CreateFailed }
             };
@@ -71,28 +54,15 @@ public class PayOSService : IPayOSService
             return new ResultModel<PayOSWebhookResponseDto>
             {
                 IsSuccess = false,
-                StatusCode = 404,
+                StatusCode = 200,
                 Message = ExchangeBatteryMessages.NotFound,
                 Data = new PayOSWebhookResponseDto { Success = false, Message = ExchangeBatteryMessages.NotFound }
             };
         }
     
+        // Only update the order status. Do not touch exchange battery or battery report entities here.
         await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
-        var exchangeBattery2 = await _exchangeBatteryRepo.GetByOrderId(orderDetail2.OrderId);
-        if (exchangeBattery2 != null)
-        {
-            exchangeBattery2.Status = status == PaymentStatus.Paid ? ExchangeStatusEnums.Completed.ToString() : ExchangeStatusEnums.Cancelled.ToString();
-            exchangeBattery2.UpdateDate = DateTime.Now;
-            await _exchangeBatteryRepo.Update(exchangeBattery2);
-        }
-        
-        var batteryReportComplete = await _batteryRepo.GetByExchangeBatteryId(exchangeBattery2.ExchangeBatteryId);
-        if (batteryReportComplete != null && status == PaymentStatus.Paid)
-        {
-            batteryReportComplete.Status = BatteryReportStatusEnums.Completed.ToString();
-            batteryReportComplete.UpdateDate = DateTime.Now;
-            await _batteryRepo.UpdateBatteryReport(batteryReportComplete);
-        }
+
         var response = new PayOSWebhookResponseDto
         {
             Success = status == PaymentStatus.Paid,
@@ -102,7 +72,7 @@ public class PayOSService : IPayOSService
         return new ResultModel<PayOSWebhookResponseDto>
         {
             IsSuccess = status == PaymentStatus.Paid,
-            StatusCode = status == PaymentStatus.Paid ? 200 : 400,
+            StatusCode =200,
             Message = status == PaymentStatus.Paid ? ExchangeBatteryMessages.CreateSuccess : ExchangeBatteryMessages.CreateFailed,
             Data = response
         };

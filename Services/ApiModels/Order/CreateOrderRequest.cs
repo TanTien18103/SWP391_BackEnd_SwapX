@@ -9,4 +9,6 @@ public class CreateOrderRequest
     public string BatteryId { get; set; }
     public string ServiceId { get; set; }
     public PaymentType ServiceType { get; set; }
+    // Optional: link this order to an existing ExchangeBattery
+    public string ExchangeBatteryId { get; set; }
 }
