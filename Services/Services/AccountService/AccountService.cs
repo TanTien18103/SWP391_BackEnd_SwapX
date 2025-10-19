@@ -1179,12 +1179,12 @@ namespace Services.Services.AccountService
                 };
             }
         }
-        public async Task<ResultModel> GetAccountByCustomerId(string customerId)
+        public async Task<ResultModel> GetCustomerByAccountId(string accountId)
         {
             try
             {
-                var account = await _accountRepository.GetAccountByCustomerId(customerId);
-                if (account == null)
+                var existingUser = await _accountRepository.GetAccountById(accountId);
+                if (existingUser == null)
                 {
                     return new ResultModel
                     {
@@ -1194,12 +1194,22 @@ namespace Services.Services.AccountService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+                if (existingUser.Role != RoleEnums.EvDriver.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsUser.USER_NOT_CUSTOMER,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsUser.GET_USER_INFO_SUCCESS,
-                    Data = account,
+                    Data = existingUser,
                     StatusCode = StatusCodes.Status200OK
                 };
             }
@@ -1209,7 +1219,7 @@ namespace Services.Services.AccountService
                 {
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ex.Message,
+                    Message = ResponseCodeConstants.BAD_REQUEST,
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
             }

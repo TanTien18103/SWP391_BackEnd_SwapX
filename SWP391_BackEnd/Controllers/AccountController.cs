@@ -191,12 +191,13 @@ namespace Services.Controllers
             var res = await _accountService.GetCustomersStatus();
             return StatusCode(res.StatusCode, res);
         }
-        [HttpGet("get_account_by_customer_id_for_staff")]
-        [Authorize(Roles = "Admin, Staff")]
-        public async Task<IActionResult> GetAccountByCustomerId([FromQuery] string? customerId)
+        [HttpGet("get_customer_by_account_id")]
+        [Authorize(Roles = "Admin, Bsstaff")]
+        public async Task<IActionResult> GetCustomerByAccountId([FromQuery] string accountId)
         {
-            var res = await _accountService.GetAccountByCustomerId(customerId);
+            var res = await _accountService.GetCustomerByAccountId(accountId);
             return StatusCode(res.StatusCode, res);
         }
+
     }
 }
