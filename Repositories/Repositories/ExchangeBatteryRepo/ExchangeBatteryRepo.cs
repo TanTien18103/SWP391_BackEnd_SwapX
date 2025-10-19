@@ -12,13 +12,14 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
             _context = context;
         }
 
-        public async Task Add(ExchangeBattery exchange)
+        public async Task<ExchangeBattery> Add(ExchangeBattery exchange)
         {
             _context.ExchangeBatteries.Add(exchange);
             await _context.SaveChangesAsync();
+            return exchange;
         }
 
-        public async Task Update(ExchangeBattery exchange)
+        public async Task<ExchangeBattery> Update(ExchangeBattery exchange)
         {
             var trackedExchange = await _context.ExchangeBatteries
                 .FirstOrDefaultAsync(e => e.ExchangeBatteryId == exchange.ExchangeBatteryId);
@@ -37,6 +38,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 trackedExchange.Vin = exchange.Vin;
                 await _context.SaveChangesAsync();
             }
+            return trackedExchange!;
         }
 
         public async Task Delete(ExchangeBattery exchange)

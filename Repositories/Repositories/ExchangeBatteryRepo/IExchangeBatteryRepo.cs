@@ -4,8 +4,8 @@ using BusinessObjects.Models;
 
 public interface IExchangeBatteryRepo
 {
-    Task Add(ExchangeBattery exchange);
-    Task Update(ExchangeBattery exchange);
+    Task<ExchangeBattery> Add(ExchangeBattery exchange);
+    Task<ExchangeBattery> Update(ExchangeBattery exchange);
     Task Delete(ExchangeBattery exchange);
     Task<ExchangeBattery?> GetById(string exchangeId);
     Task<List<ExchangeBattery>> GetAll();
