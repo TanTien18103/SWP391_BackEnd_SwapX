@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Repositories.Repositories.ExchangeBatteryRepo;
 
 namespace Services.Services.FormService
 {
@@ -33,9 +34,20 @@ namespace Services.Services.FormService
         private readonly IVehicleRepo _vehicleRepo;
         private readonly IEvDriverRepo _evDriverRepo;
         private readonly IBatteryRepo _batteryRepo;
+        private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
 
-
-        public FormService(IFormRepo formRepo, AccountHelper accountHelper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IStationRepo stationRepo, IStationScheduleRepo stationScheduleRepo, IVehicleRepo vehicleRepo, IEvDriverRepo evDriverRepo, IBatteryRepo batteryRepo)
+        public FormService(
+            IFormRepo formRepo,
+            AccountHelper accountHelper,
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor,
+            IStationRepo stationRepo,
+            IStationScheduleRepo stationScheduleRepo,
+            IVehicleRepo vehicleRepo,
+            IEvDriverRepo evDriverRepo,
+            IBatteryRepo batteryRepo,
+            IExchangeBatteryRepo exchangeBatteryRepo
+            )
         {
             _formRepo = formRepo;
             _accountHelper = accountHelper;
@@ -46,6 +58,7 @@ namespace Services.Services.FormService
             _vehicleRepo = vehicleRepo;
             _evDriverRepo = evDriverRepo;
             _batteryRepo = batteryRepo;
+            _exchangeBatteryRepo = exchangeBatteryRepo;
         }
         public async Task<ResultModel> AddForm(AddFormRequest addFormRequest)
         {
@@ -134,7 +147,7 @@ namespace Services.Services.FormService
                 }
                 var battery = await _batteryRepo.GetBatteryById(addFormRequest.BatteryId);
                 var batteryOfVehicle = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
-                if (battery==null||battery.StationId!=station.StationId)
+                if (battery == null || battery.StationId != station.StationId)
                 {
                     return new ResultModel
                     {
@@ -146,7 +159,7 @@ namespace Services.Services.FormService
                     };
                 }
                 //Kiểm tra xem pin có tương thích với xe không
-                if( battery.Specification != batteryOfVehicle.Specification || battery.BatteryType != batteryOfVehicle.BatteryType)
+                if (battery.Specification != batteryOfVehicle.Specification || battery.BatteryType != batteryOfVehicle.BatteryType)
                 {
                     return new ResultModel
                     {
@@ -652,15 +665,21 @@ namespace Services.Services.FormService
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
-
-                existingForm.Status = updateFormStatusStaffRequest.Status.ToString();
-                existingForm.UpdateDate = TimeHepler.SystemTimeNow;
-
+                var vehicle = await _vehicleRepo.GetVehicleById(existingForm.Vin);
+                if (vehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
                 // If approved, set start date and create StationSchedule
                 if (updateFormStatusStaffRequest.Status == StaffUpdateFormEnums.Approved)
                 {
-                    existingForm.StartDate = TimeHepler.SystemTimeNow;
-
                     // Create StationSchedule logic here
                     var stationSchedule = new StationSchedule
                     {
@@ -668,15 +687,66 @@ namespace Services.Services.FormService
                         FormId = existingForm.FormId,
                         StationId = existingForm.StationId,
                         Date = existingForm.Date,
-                        StartDate = existingForm.StartDate,
                         Description = existingForm.Description,
                         Status = ScheduleStatusEnums.Pending.ToString(),
-                        UpdateDate = TimeHepler.SystemTimeNow
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow,
                     };
 
-                    await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+                    var newstationSchedule = await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+                    if (newstationSchedule == null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsForm.CREATE_STATION_SCHEDULE_FAILED,
+                            StatusCode = StatusCodes.Status500InternalServerError
+                        };
+                    }
+                    // Create ExchangeBattery record
+                    var exchangeBattery = new ExchangeBattery
+                    {
+                        ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
+                        Vin = existingForm.Vin,
+                        OldBatteryId = vehicle.BatteryId,
+                        NewBatteryId = existingForm.BatteryId,
+                        StaffAccountId = null,
+                        ScheduleId = newstationSchedule.StationScheduleId,
+                        OrderId = null,
+                        StationId = existingForm.StationId,
+                        Status = ExchangeStatusEnums.Pending.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                    };
+
+                    await _exchangeBatteryRepo.Add(exchangeBattery);
+
+                }
+                else if (updateFormStatusStaffRequest.Status == StaffUpdateFormEnums.Rejected)
+                {
+                    var battery = await _batteryRepo.GetBatteryById(existingForm.BatteryId);
+                    if (battery != null && battery.Status == BatteryStatusEnums.Booked.ToString())
+                    {
+                        battery.Status = BatteryStatusEnums.Available.ToString();
+                        battery.UpdateDate = TimeHepler.SystemTimeNow;
+                        await _batteryRepo.UpdateBattery(battery);
+                    }
+                    else
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND_OR_NOT_BOOKED,
+                            Data = null,
+                            StatusCode = StatusCodes.Status404NotFound
+                        };
+                    }
                 }
 
+                existingForm.Status = updateFormStatusStaffRequest.Status.ToString();
+                existingForm.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedForm = await _formRepo.Update(existingForm);
 
                 return new ResultModel

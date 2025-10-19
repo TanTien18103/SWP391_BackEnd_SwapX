@@ -183,26 +183,19 @@ namespace BusinessObjects.Constants
         public const string STAFF_NOT_FOUND_IN_STATION = "Nhân viên không thuộc trạm này";
         public const string REMOVE_STAFF_FROM_STATION_FAILED = "Xóa nhân viên khỏi trạm thất bại";
         public const string REMOVE_STAFF_FROM_STATION_SUCCESS = "Xóa nhân viên khỏi trạm thành công";
-
         public const string GET_STATION_BY_STAFF_SUCCESS = "Lấy trạm theo nhân viên thành công";
         public const string STAFF_NOT_ASSIGNED_TO_ANY_STATION = "Nhân viên chưa được phân công cho trạm nào.";
         public const string GET_STATION_BY_STAFF_FAILED = "Lấy trạm theo nhân viên thất bại";
         public const string STAFF_ALREADY_ASSIGNED_TO_THIS_STATION = "Nhân viên đã được phân công cho trạm này.";
         public const string STATION_BATTERY_LIMIT = "Trạm đã đạt giới hạn pin tối đa.";
-
         public const string STATION_ALREADY_IN_THIS_STATUS = "Trạng thái trạm không thay đổi";
-
         public const string CANNOT_CHANGE_STATUS_DUE_TO_SCHEDULE = "Không thể thay đổi trạng thái do đã có lịch trình";
-
         public const string INVALID_STATION_STATUS = "Trạng thái trạm không thay đổi";
-
         public const string UPDATE_STATION_STATUS_SUCCESS = "Trạng thái trạm không thay đổi";
-
         public const string UPDATE_STATION_STATUS_FAILED = "Trạng thái trạm không thay đổi";
-
         public const string STATION_HAS_FUTURE_SCHEDULES = "Trạm có lịch trình trong tương lai, không thể ngừng hoạt động";
-
         public const string STATION_INACTIVE_OR_MAINTENANCE = "Trạm đang ngừng hoạt động hoặc bảo trì";
+        public const string DefaultBatterySuffix = "STATION_EXCHANGE";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -235,14 +228,12 @@ namespace BusinessObjects.Constants
         public const string BATTERY_HISTORY_EMPTY = "Không có lịch sử cho pin này";
         public const string UPDATE_BATTERY_STATUS_SUCCESS = "Cập nhật trạng thái pin thành công";
         public const string UPDATE_BATTERY_STATUS_FAIL = "Cập nhật trạng thái pin thất bại";
-
         public const string BATTERY_ALREADY_BOOKED = "Pin đã được đặt";
-
         public const string INCOMPATIBLE_BATTERY_VEHICLE = " Pin không tương thích với xe";
-
         public const string BATTERY_DECOMMISSIONED_INUSE_CANNOT_ADD_TO_STATION = "Pin ngừng hoạt động hoặc đang sử dụng không thêm vào trạm được";
-
-        public static string BATTERY_CHARGING = "Pin đang được sạc";
+        public const string BATTERY_CHARGING = "Pin đang được sạc";
+        public const string BATTERY_NOT_FOUND_OR_NOT_BOOKED = "Không tìm thấy pin hoặc pin chưa được đặt";
+        public const string BATTERY_NOT_AVAILABLE = "Pin không khả dụng";
     }
     public static class EmailConstants
     {
@@ -262,7 +253,8 @@ namespace BusinessObjects.Constants
         public const string BATTERY_DELETED = "Pin đã bị xóa bởi admin";
         public const string BATTERY_ADDED_TO_STATION = "Pin đã được thêm vào trạm";
         public const string BATTERY_CREATED_BY_USER = "Pin đã được tạo bởi người dùng tích hợp xe";
-
+        public const string BATTERY_RETURNED_TO_STATION_AFTER_EXCHANGE = "Battery returned to station {0} after exchange.";
+        public const string BATTERY_ASSIGNED_TO_VEHICLE_AFTER_EXCHANGE = "Battery assigned to vehicle VIN: {0}, Model: {1} after exchange.";
     }
     public static class ResponseMessageConstantsForm
     {
@@ -290,6 +282,7 @@ namespace BusinessObjects.Constants
         public const string UPDATE_FORM_STATUS_FAILED = " Cập nhật trạng thái biểu mẫu thất bại";
         public const string BATTERY_ALREADY_BOOKED = "Pin đã được đặt";
         public const string VEHICLE_ALREADY_HAS_PENDING_FORM = "Xe đã có biểu mẫu đang chờ xử lý";
+        public const string CREATE_STATION_SCHEDULE_FAILED = "Tạo lịch trạm thất bại";
     }
     // For Package (0-0-1)
     public static class ResponseMessageConstantsPackage
@@ -459,6 +452,7 @@ namespace BusinessObjects.Constants
         public const string GET_BATTERY_REPORT_FAIL = "Lấy báo cáo pin thất bại";
         public const string GET_BATTERY_REPORT_SUCCESS = "Lấy báo cáo pin thành công";
         public const string DELETE_BATTERY_REPORT_FAILED = "Xóa báo cáo pin thất bại";
+        public const string BATTERY_REPORT_NOT_COMPLETED = "Báo cáo pin chưa hoàn thành";
     }
 
     public static class ExchangeMessages
@@ -503,6 +497,13 @@ namespace BusinessObjects.Constants
         public const string DeleteFailed = "Xóa giao dịch đổi pin thất bại.";
         public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
         public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
+        public const string EXCHANGE_BATTERY_NOT_FOUND = "Không tìm thấy giao dịch đổi pin";
+        public const string UPDATE_EXCHANGE_STATUS_SUCCESS = "Cập nhật trạng thái giao dịch đổi pin thành công";
+        public const string UPDATE_EXCHANGE_STATUS_FAILED = " Cập nhật trạng thái giao dịch đổi pin thất bại";
+        public const string INVALID_STATUS_UPDATE = "Trạng thái cập nhật không hợp lệ";
+        public const string EXCHANGE_BATTERY_ALREADY_FINALIZED = "Giao dịch đổi pin đã được hoàn tất";
+
+        public const string INVALID_STATUS_TYPE = "Loại trạng thái không hợp lệ";
     }
     public static class ResponseMessageBatteryHistory
     {
@@ -510,6 +511,18 @@ namespace BusinessObjects.Constants
         public const string BATTERY_HISTORY_LIST_EMPTY = "Lịch sử pin trống";
         public const string GET_BATTERY_HISTORY_SUCCESS = "Lấy lịch sử pin thành công";
         public const string GET_BATTERY_HISTORY_FAIL = "Lấy lịch sử pin thất bại";
+    }
+    public static class ResponseMessageOrder
+    {
+        public const string ORDER_NOT_FOUND = "Không tìm thấy đơn hàng";
+        public const string ORDER_LIST_EMPTY = "Danh sách đơn hàng trống";
+        public const string GET_ORDER_SUCCESS = "Lấy đơn hàng thành công";
+        public const string GET_ORDER_FAIL = "Lấy đơn hàng thất bại";
+        public const string CREATE_ORDER_SUCCESS = "Tạo đơn hàng thành công";
+        public const string CREATE_ORDER_FAIL = "Tạo đơn hàng thất bại";
+        public const string UPDATE_ORDER_SUCCESS = "Cập nhật đơn hàng thành công";
+        public const string UPDATE_ORDER_FAIL = "Cập nhật đơn hàng thất bại";
+        public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
     }
 
 }
