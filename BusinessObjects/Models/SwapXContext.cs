@@ -59,6 +59,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Address)
                 .HasMaxLength(255)
                 .HasColumnName("address");
+            entity.Property(e => e.Avatar)
+                .HasMaxLength(200)
+                .HasColumnName("avatar");
             entity.Property(e => e.Email)
                 .HasMaxLength(50)
                 .HasColumnName("email");
@@ -103,6 +106,9 @@ public partial class SwapXContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("Battery_type");
             entity.Property(e => e.Capacity).HasColumnName("capacity");
+            entity.Property(e => e.Image)
+                .HasMaxLength(200)
+                .HasColumnName("image");
             entity.Property(e => e.Specification)
                 .HasMaxLength(20)
                 .HasColumnName("specification");
@@ -458,6 +464,9 @@ public partial class SwapXContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(100)
                 .HasColumnName("description");
+            entity.Property(e => e.Image)
+                .HasMaxLength(200)
+                .HasColumnName("image");
             entity.Property(e => e.Rating1)
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("rating");
@@ -560,6 +569,9 @@ public partial class SwapXContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("stationID");
             entity.Property(e => e.BatteryNumber).HasColumnName("battery_number");
+            entity.Property(e => e.Image)
+                .HasMaxLength(200)
+                .HasColumnName("image");
             entity.Property(e => e.Location)
                 .HasMaxLength(50)
                 .HasColumnName("location");
