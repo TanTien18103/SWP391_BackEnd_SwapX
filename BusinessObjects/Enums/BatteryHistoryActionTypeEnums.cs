@@ -11,6 +11,8 @@ namespace BusinessObjects.Enums
         Created,
         Updated,
         Deleted,
-        Moved
+        Moved,
+        ReturnedToStation,
+        AssignedToVehicle
     }
 }
