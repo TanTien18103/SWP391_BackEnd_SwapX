@@ -24,17 +24,20 @@ namespace Repositories.Repositories.StationScheduleRepo
         public async Task<List<StationSchedule>> GetAllStationSchedules()
         {
             return await _context.StationSchedules
+                .Include(ss=>ss.ExchangeBatteries)
                 .ToListAsync();
         }
         public async Task<StationSchedule> GetStationScheduleById(string stationScheduleId)
         {
-            return _context.StationSchedules
-                .FirstOrDefault(ss => ss.StationScheduleId == stationScheduleId);
+            return await _context.StationSchedules
+                .Include(ss=>ss.ExchangeBatteries)
+                .FirstOrDefaultAsync(ss => ss.StationScheduleId == stationScheduleId);
         }
 
         public async Task<List<StationSchedule>> GetStationSchedulesByStationId(string stationId)
         {
             return await _context.StationSchedules
+                .Include(ss => ss.ExchangeBatteries)
                 .Where(ss => ss.StationId == stationId)
                 .ToListAsync();
         }

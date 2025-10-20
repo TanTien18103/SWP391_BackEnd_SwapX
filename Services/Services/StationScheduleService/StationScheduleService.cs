@@ -307,31 +307,31 @@ namespace Services.Services.StationScheduleService
             }
         }
 
-        public Task<ResultModel> GetStationScheduleByStationId(string stationId)
+        public async Task<ResultModel> GetStationScheduleByStationId(string stationId)
         {
             try
             {
-                var stationSchedules = _stationScheduleRepo.GetStationScheduleById(stationId);
-                return Task.FromResult(new ResultModel
+                var stationSchedules = await _stationScheduleRepo.GetStationSchedulesByStationId(stationId);
+                return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
                     Message = ResponseMessageConstantsStationSchedule.GET_STATION_SCHEDULE_BY_STATION_ID_SUCCESS,
                     Data = stationSchedules
-                });
+                };
 
             }
             catch (Exception ex)
             {
-                return Task.FromResult(new ResultModel
+              return new ResultModel
                 {
                     StatusCode = StatusCodes.Status500InternalServerError,
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsStationSchedule.GET_STATION_SCHEDULE_BY_STATION_ID_FAILED,
                     Data = ex.Message
-                });
+                };
             }
         }
 

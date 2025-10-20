@@ -28,6 +28,7 @@ namespace Repositories.Repositories.FormRepo
         {
             return await _context.Forms
                 .Include(s => s.StationSchedules)
+                .ThenInclude(ss => ss.ExchangeBatteries)
                 .ToListAsync();
         }
 
@@ -35,6 +36,7 @@ namespace Repositories.Repositories.FormRepo
         {
             return await _context.Forms
                 .Include(s => s.StationSchedules)
+                .ThenInclude(ss => ss.ExchangeBatteries)
                 .Where(f => f.AccountId == accountId)
                 .ToListAsync();
         }
@@ -43,12 +45,15 @@ namespace Repositories.Repositories.FormRepo
         {
             return await _context.Forms
                 .Include(s => s.StationSchedules)
+                .ThenInclude(ss => ss.ExchangeBatteries)
                  .FirstOrDefaultAsync(f => f.FormId == formId);
         }
 
         public async Task<List<Form>> GetByStationId(string stationId)
         {
             return await _context.Forms
+                .Include(f => f.StationSchedules)
+                .ThenInclude(ss => ss.ExchangeBatteries)
                 .Where(f => f.StationId == stationId)
                 .ToListAsync();
         }
@@ -62,6 +67,8 @@ namespace Repositories.Repositories.FormRepo
         public async Task<List<Form>> GetFormsByAccountAndStation(string accountId, string stationId)
         {
             return await _context.Forms
+                .Include(f => f.StationSchedules)
+                .ThenInclude(ss => ss.ExchangeBatteries)
                 .Where(f => f.AccountId == accountId && f.StationId == stationId)
                 .ToListAsync();
         }
@@ -69,6 +76,8 @@ namespace Repositories.Repositories.FormRepo
         public async Task<List<Form>> GetFormsByVin(string Vin)
         {
             return await _context.Forms
+                .Include(f => f.StationSchedules)
+                .ThenInclude(ss => ss.ExchangeBatteries)
                 .Where(f => f.Vin == Vin)
                 .ToListAsync();
         }
