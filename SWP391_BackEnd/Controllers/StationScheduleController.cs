@@ -58,7 +58,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("update_status_station_schedule")]
-        [Authorize(Roles = "Bsstaff")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> UpdateStatusStationSchedule([FromForm] UpdateStatusStationScheduleRequest updateStatusStationScheduleRequest)
         {
             var res = await _stationScheduleService.UpdateStatusStationSchedule(updateStatusStationScheduleRequest);

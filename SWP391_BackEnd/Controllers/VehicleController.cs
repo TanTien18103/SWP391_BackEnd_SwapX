@@ -21,18 +21,21 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_vehicle_by_id")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetVehicleById([FromQuery] string? vehicleId)
         {
             var res = await _vehicleService.GetVehicleById(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete_vehicle")]
+        [Authorize]
         public async Task<IActionResult> DeleteVehicle([FromForm] string? vehicleId)
         {
             var res = await _vehicleService.DeleteVehicle(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("update_vehicle")]
+        [Authorize(Roles = "EvDriver")]
         public async Task<IActionResult> UpdateVehicle([FromForm] Services.ApiModels.Vehicle.UpdateVehicleRequest updateVehicleRequest)
         {
             var res = await _vehicleService.UpdateVehicle(updateVehicleRequest);
@@ -46,12 +49,14 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_vehicle_by_name")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> GetVehicleByName([FromQuery] BusinessObjects.Enums.VehicleNameEnums vehicleName)
         {
             var res = await _vehicleService.GetVehicleByName(vehicleName);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_package_by_vehicle_name")]
+        [Authorize]
         public async Task<IActionResult> GetPackageByVehicleName([FromQuery] BusinessObjects.Enums.VehicleNameEnums vehicleName)
         {
             var res = await _vehicleService.GetPackageByVehicleName(vehicleName);
@@ -72,6 +77,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete_vehicle_in_package")]
+        [Authorize(Roles = "EvDriver")]
         public async Task<IActionResult> DeleteVehicleInPackage([FromForm] string? vehicleId)
         {
             var res = await _vehicleService.DeleteVehicleInPackage(vehicleId);

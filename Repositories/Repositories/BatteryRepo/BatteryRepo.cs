@@ -24,7 +24,11 @@ namespace Repositories.Repositories.BatteryRepo
 
         public async Task<List<Battery>> GetAllBatteries()
         {
-           return await _context.Batteries.Include(v=>v.Vehicles).Include(b=>b.Station).ToListAsync();
+           return await _context.Batteries
+                .Include(v=>v.Vehicles)
+                .Include(rp=>rp.BatteryReports)
+                .Include(c=>c.BatteryHistories)
+                .Include(b=>b.Station).ToListAsync();
 
         }
 
@@ -32,6 +36,8 @@ namespace Repositories.Repositories.BatteryRepo
         {
             return await _context.Batteries
                 .Include(v => v.Vehicles)
+                .Include(c => c.BatteryHistories)
+                .Include(rp => rp.BatteryReports)
                 .Include(b => b.Station)
                 .Where(b => b.StationId == stationId)
                 .ToListAsync();
@@ -41,7 +47,11 @@ namespace Repositories.Repositories.BatteryRepo
 
         public async Task<Battery> GetBatteryById(string batteryId)
         {
-            return await _context.Batteries.Include(b=>b.Station).Include(v=>v.Vehicles).FirstOrDefaultAsync(b => b.BatteryId == batteryId);
+            return await _context.Batteries
+                .Include(b=>b.Station)
+                .Include(c=>c.BatteryHistories)
+                .Include(rp => rp.BatteryReports)
+                .Include(v=>v.Vehicles).FirstOrDefaultAsync(b => b.BatteryId == batteryId);
         }
 
         public async Task<Battery> UpdateBattery(Battery battery)
@@ -54,6 +64,8 @@ namespace Repositories.Repositories.BatteryRepo
         {
             return await _context.Batteries.Include(v => v.Vehicles)
                 .Include(b => b.Station)
+                .Include(rp => rp.BatteryReports)
+                .Include(c => c.BatteryHistories)
                 .Where(b => b.StationId == stationId && b.Specification == specification&& b.BatteryType== batteryType)
                 .ToListAsync();
         }
