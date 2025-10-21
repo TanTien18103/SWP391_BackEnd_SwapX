@@ -51,6 +51,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_package_by_battery_type")]
+        [Authorize]
         public async Task<IActionResult> GetPackageByBatteryType([FromQuery] BusinessObjects.Enums.BatterySpecificationEnums batterySpecificationEnums)
         {
             var res = await _packageService.GetPackageByBatteryType(batterySpecificationEnums);

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Services.Dashboard;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace Controllers
         }
 
         [HttpGet("summary")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetDashboardSummary()
         {
             var summary = await _dashboardService.GetDashboardSummaryAsync();

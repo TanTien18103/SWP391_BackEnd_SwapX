@@ -155,6 +155,17 @@ namespace Services.Services.ReportService
                     Message = ResponseMessageConstantsReport.GET_ALL_REPORT_SUCCESS,
                     Data = reports
                 };
+                if(reports == null || reports.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsReport.REPORT_NOT_FOUND,
+                        Data = null
+                    };
+                }
 
             }
             catch (Exception ex)

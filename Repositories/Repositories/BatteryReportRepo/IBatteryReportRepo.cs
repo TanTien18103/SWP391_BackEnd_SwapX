@@ -16,5 +16,6 @@ namespace Repositories.Repositories.BatteryReportRepo
         Task<List<BatteryReport>> GetBatteryReportsByStation(string stationId);
         Task<BatteryReport?> GetByBatteryId(string batteryId);
         Task<BatteryReport?> GetByExchangeBatteryId(string exchangeBatteryId);
+        Task <List<BatteryReport?>> GetBatteryReportByBatteryId(string batteryId);
     }
 }
