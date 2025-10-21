@@ -81,5 +81,13 @@ namespace Repositories.Repositories.FormRepo
                 .Where(f => f.Vin == Vin)
                 .ToListAsync();
         }
+
+        public async Task<Form> GetByStationScheduleId(string stationscheduleId)
+        {
+            return await _context.Forms
+                .Include(f => f.StationSchedules)
+                .ThenInclude(ss => ss.ExchangeBatteries)
+                .FirstOrDefaultAsync(f => f.StationSchedules.Any(ss => ss.StationScheduleId == stationscheduleId));
+        }
     }
 }

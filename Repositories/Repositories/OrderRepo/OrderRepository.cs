@@ -14,8 +14,6 @@ public class OrderRepository : IOrderRepository
 
     public async Task<Order> CreateOrderAsync(Order order)
     {
-        order.StartDate = DateTime.UtcNow;
-        order.UpdateDate = DateTime.UtcNow;
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
         return order;
@@ -122,5 +120,11 @@ public class OrderRepository : IOrderRepository
             .ToListAsync();
     
         return (orders, total);
+    }
+
+    public async Task<Order> GetOrderByServiceId(string serviceId)
+    {
+        return await _context.Orders
+            .FirstOrDefaultAsync(o => o.ServiceId == serviceId);
     }
 }
