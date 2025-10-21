@@ -12,6 +12,6 @@ namespace Repositories.Repositories.BatteryHistoryRepo
         Task<BatteryHistory> AddBatteryHistory(BatteryHistory batteryHistory);
         Task<List<BatteryHistory>> GetBatteryHistoryByBatteryId(string batteryId);
         Task<List<BatteryHistory>> GetAllBatteryHistories();
-       
+        Task<List<BatteryHistory>>GetAllBatteryHistoryByStationId(string stationId);
     }
 }

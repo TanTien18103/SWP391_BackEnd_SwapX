@@ -27,10 +27,14 @@ namespace Repositories.Repositories.BatteryHistoryRepo
         {
             return await _context.BatteryHistories.ToListAsync();
         }
-
         public async Task<List<BatteryHistory>> GetBatteryHistoryByBatteryId(string batteryId)
         {
            return await _context.BatteryHistories.Where(bh => bh.BatteryId == batteryId).ToListAsync();
         }
+        public async Task<List<BatteryHistory>> GetAllBatteryHistoryByStationId(string stationId)
+        {
+            return await _context.BatteryHistories.Where(bh => bh.StationId == stationId).ToListAsync();
+        }
+
     }
 }

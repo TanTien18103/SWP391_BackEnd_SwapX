@@ -599,8 +599,9 @@ namespace Services.Services.BatteryService
                 {
                     BatteryHistoryId = _accountHelper.GenerateShortGuid(),
                     BatteryId = batteryDetail.BatteryId,
-                    Notes = HistoryActionConstants.BATTERY_ADDED_TO_STATION.ToString(),
+                    Notes = HistoryActionConstants.BATTERY_ADDED_TO_STATION.ToString()+" "+ batteryDetail.Station.StationName,
                     ActionType = BatteryHistoryActionTypeEnums.Moved.ToString(),
+                    StationId = batteryDetail.StationId,
                     EnergyLevel = batteryDetail.Capacity.ToString(),
                     Status = BatteryHistoryStatusEnums.Active.ToString(),
                     ActionDate = TimeHepler.SystemTimeNow,

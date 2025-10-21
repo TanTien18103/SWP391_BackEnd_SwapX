@@ -11,5 +11,6 @@ namespace Services.Services.BatteryHistoryService
     {
         Task<ResultModel> GetAllBatteryHistory();
         Task<ResultModel> GetBatteryHistoryByBatteryId(string batteryId);
+        Task<ResultModel> GetBatteryHistoryByStationId(string stationId);
     }
 }

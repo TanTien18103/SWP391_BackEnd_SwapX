@@ -196,6 +196,7 @@ namespace BusinessObjects.Constants
         public const string STATION_HAS_FUTURE_SCHEDULES = "Trạm có lịch trình trong tương lai, không thể ngừng hoạt động";
         public const string STATION_INACTIVE_OR_MAINTENANCE = "Trạm đang ngừng hoạt động hoặc bảo trì";
         public const string DefaultBatterySuffix = "STATION_EXCHANGE";
+        public const string STATION_NOT_EXIST = "Trạm không tồn tại";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -234,6 +235,7 @@ namespace BusinessObjects.Constants
         public const string BATTERY_CHARGING = "Pin đang được sạc";
         public const string BATTERY_NOT_FOUND_OR_NOT_BOOKED = "Không tìm thấy pin hoặc pin chưa được đặt";
         public const string BATTERY_NOT_AVAILABLE = "Pin không khả dụng";
+        public const string BATTERY_NOT_EXIST = "Pin không tồn tại";
     }
     public static class EmailConstants
     {

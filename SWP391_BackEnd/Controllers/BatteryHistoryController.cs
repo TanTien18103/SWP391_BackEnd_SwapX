@@ -28,5 +28,12 @@ namespace SWP391_BackEnd.Controllers
             var res = await _batteryHistoryService.GetAllBatteryHistory();
             return StatusCode(res.StatusCode, res);
         }
+        [HttpGet("get_all_battery_histories_by_stationId")]
+        [Authorize(Roles = "Admin, Bsstaff")]
+        public async Task<IActionResult> GetAllBatteryHistoriesByStationId([FromQuery] string? stationId)
+        {
+            var res = await _batteryHistoryService.GetBatteryHistoryByStationId(stationId);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }
