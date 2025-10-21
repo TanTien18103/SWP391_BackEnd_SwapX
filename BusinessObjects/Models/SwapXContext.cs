@@ -414,6 +414,9 @@ public partial class SwapXContext : DbContext
                 .HasColumnName("status");
             entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.Vin)
+                .HasMaxLength(100)
+                .HasColumnName("VIN");
 
             entity.HasOne(d => d.Account).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.AccountId)

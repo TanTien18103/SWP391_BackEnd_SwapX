@@ -1,14 +1,20 @@
-using BusinessObjects.Constants;
+﻿using BusinessObjects.Constants;
 using BusinessObjects.Dtos;
 using BusinessObjects.Enums;
+using BusinessObjects.Models;
+using Humanizer;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using Net.payOS;
 using Net.payOS.Types;
 using Repositories.Repositories.BatteryReportRepo;
 using Repositories.Repositories.ExchangeBatteryRepo;
 using Repositories.Repositories.OrderRepo;
+using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
+using Services.ApiModels.Vehicle;
 using Services.Helpers;
+using Services.Services.VehicleService;
 
 namespace Services.Payments;
 
@@ -20,7 +26,18 @@ public class PayOSService : IPayOSService
     private readonly IOrderRepository _orderRepository;
     private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
     private readonly IBatteryReportRepo _batteryRepo;
-    public PayOSService(PayOS payOs, PayOSHelper helper, IConfiguration config, IOrderRepository orderRepository, IExchangeBatteryRepo exchangeBatteryRepo, IBatteryReportRepo batteryRepo)
+    private readonly IVehicleRepo _vehicleRepo;
+    private readonly IVehicleService _vehicleService;
+    public PayOSService(
+        PayOS payOs,
+        PayOSHelper helper,
+        IConfiguration config,
+        IOrderRepository orderRepository,
+        IExchangeBatteryRepo exchangeBatteryRepo,
+        IBatteryReportRepo batteryRepo,
+        IVehicleRepo vehicleRepo,
+        IVehicleService vehicleService
+        )
     {
         _payOS = payOs;
         _helper = helper;
@@ -28,6 +45,8 @@ public class PayOSService : IPayOSService
         _orderRepository = orderRepository;
         _exchangeBatteryRepo = exchangeBatteryRepo;
         _batteryRepo = batteryRepo;
+        _vehicleRepo = vehicleRepo;
+        _vehicleService = vehicleService;
     }
 
     public async Task<ResultModel<PayOSWebhookResponseDto>> HandleWebhookAsync(PayOSWebhookRequestDto webhook)
@@ -59,9 +78,48 @@ public class PayOSService : IPayOSService
                 Data = new PayOSWebhookResponseDto { Success = false, Message = ExchangeBatteryMessages.NotFound }
             };
         }
-    
+
         // Only update the order status. Do not touch exchange battery or battery report entities here.
-        await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
+        var updateorder = await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
+
+        if (updateorder.ServiceType == PaymentType.Package.ToString() && updateorder.Status == PaymentStatus.Paid.ToString())
+        {
+            var addVehicleInPackageRequest = new AddVehicleInPackageRequest
+            {
+                Vin = updateorder.Vin,
+                PackageId = updateorder.ServiceId
+            };
+
+            var assignResult = await _vehicleService.AddVehicleInPackage(addVehicleInPackageRequest);
+
+            if (!assignResult.IsSuccess)
+            {
+                await _orderRepository.UpdateOrderStatusAsync(updateorder.OrderId, PaymentStatus.Failed.ToString());
+                return new ResultModel<PayOSWebhookResponseDto>
+                {
+                    IsSuccess = false,
+                    StatusCode = 500,
+                    Message = assignResult.Message ?? ExchangeBatteryMessages.CreatePackageFailed,
+                    Data = new PayOSWebhookResponseDto
+                    {
+                        Success = false,
+                        Message = assignResult.Message ?? ExchangeBatteryMessages.CreatePackageFailed
+                    }
+                };
+            }
+
+            return new ResultModel<PayOSWebhookResponseDto>
+            {
+                IsSuccess = assignResult.IsSuccess,
+                StatusCode = assignResult.IsSuccess ? 200 : 500,
+                Message = assignResult.IsSuccess ? ExchangeBatteryMessages.CreateSuccess : assignResult.Message,
+                Data = new PayOSWebhookResponseDto
+                {
+                    Success = status == PaymentStatus.Paid,
+                    Message = assignResult.IsSuccess ? ExchangeBatteryMessages.CreatePackageSuccess : assignResult.Message ?? ExchangeBatteryMessages.CreateFailed,
+                }
+            };
+        }
 
         var response = new PayOSWebhookResponseDto
         {
@@ -72,7 +130,7 @@ public class PayOSService : IPayOSService
         return new ResultModel<PayOSWebhookResponseDto>
         {
             IsSuccess = status == PaymentStatus.Paid,
-            StatusCode =200,
+            StatusCode = 200,
             Message = status == PaymentStatus.Paid ? ExchangeBatteryMessages.CreateSuccess : ExchangeBatteryMessages.CreateFailed,
             Data = response
         };
@@ -96,16 +154,20 @@ public class PayOSService : IPayOSService
         var orderCode = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
         orderDetail.OrderCode = long.Parse(orderCode);
         await _orderRepository.UpdateOrderByOrderCodeAsync(orderDetail.OrderId, long.Parse(orderCode));
-        
-        var description = $"Order {request.OrderId}"; 
+
+
+        static string Truncate(string? s, int max) => string.IsNullOrEmpty(s) ? string.Empty : (s.Length <= max ? s : s.Substring(0, max));
+
+        var description = Truncate(request.Description, 25);
+
 
         var paymentRequest = new PaymentData(
             orderCode: long.Parse(orderCode),
-            amount: (int)request.Amount,
+            amount: (int)orderDetail.Total,
             description: description,
             items: new List<ItemData>
             {
-                new(request.Description, 1, (int)request.Amount)
+                new(Truncate(description, 25), 1, (int)orderDetail.Total)
             },
             returnUrl: returnUrl,
             cancelUrl: cancelUrl

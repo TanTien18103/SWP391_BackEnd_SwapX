@@ -15,4 +15,6 @@ public interface IOrderRepository
 
     public Task<(List<Order> Orders, int Total)> FilterOrdersAsync(string orderId, string status, string accountId,
         string serviceType, int page, int pageSize);
+
+    Task<Order> GetOrderByServiceId(string serviceId);
 }

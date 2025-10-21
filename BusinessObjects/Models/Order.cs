@@ -29,6 +29,8 @@ public partial class Order
     public string ServiceType { get; set; }
 
     public long? OrderCode { get; set; }
+
+    public string Vin { get; set; }
     [JsonIgnore]
     public virtual Account Account { get; set; }
     [JsonIgnore]

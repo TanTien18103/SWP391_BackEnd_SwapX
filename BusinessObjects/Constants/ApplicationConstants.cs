@@ -309,12 +309,12 @@ namespace BusinessObjects.Constants
         public const string UPDATE_PACKAGE_STATUS_SUCCESS = "Cập nhật trạng thái gói thành công";
         public const string PACKAGE_IN_USE_CANNOT_INACTIVE = "Gói đang được sử dụng, không thể ngừng hoạt động";
         public const string UPDATE_PACKAGE_STATUS_FAILED = "Cập nhật trạng thái gói thất bại";
-
         public const string PACKAGE_INACTIVE_CANNOT_UPDATE = "Gói đã ngừng hoạt động, không thể cập nhật";
-
         public const string PACKAGE_ACTIVE_CANNOT_UPDATE = "Gói đang hoạt động, không thể cập nhật";
-
         public const string PACKAGE_ALREADY_INACTIVE = "Gói đang hoạt động, không thể cập nhật";
+        public const string PACKAGE_EXPIRED = "Gói đã hết hạn sử dụng";
+        public const string PACKAGE_NOT_FOUND_FOR_VEHICLE = "Xe không có gói nào được liên kết";
+        public static string PACKAGE_EXPIRED_OR_NOT_EXISTS_IN_VEHICLE = "Gói đã hết hạn sử dụng hoặc không tồn tại trong xe";
     }
     //for Vehicle (0-0-1)
     public static class ResponseMessageConstantsVehicle
@@ -502,8 +502,9 @@ namespace BusinessObjects.Constants
         public const string UPDATE_EXCHANGE_STATUS_FAILED = " Cập nhật trạng thái giao dịch đổi pin thất bại";
         public const string INVALID_STATUS_UPDATE = "Trạng thái cập nhật không hợp lệ";
         public const string EXCHANGE_BATTERY_ALREADY_FINALIZED = "Giao dịch đổi pin đã được hoàn tất";
-
         public const string INVALID_STATUS_TYPE = "Loại trạng thái không hợp lệ";
+        public const string CreatePackageSuccess = "Thanh toán gói thành công.";
+        public const string CreatePackageFailed = "Thanh toán gói thất bại.";
     }
     public static class ResponseMessageBatteryHistory
     {
@@ -523,6 +524,11 @@ namespace BusinessObjects.Constants
         public const string UPDATE_ORDER_SUCCESS = "Cập nhật đơn hàng thành công";
         public const string UPDATE_ORDER_FAIL = "Cập nhật đơn hàng thất bại";
         public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
+        public const string ORDER_CREATED_PENDING_PAYMENT = "Đơn hàng đã được tạo và đang chờ thanh toán";
+        public const string ORDER_CREATED_AND_PAID = "Đơn hàng đã được tạo và thanh toán thành công";
+        public const string ORDER_WILL_BE_CREATED_AT_STATION = "Đơn hàng sẽ được tạo tại trạm";
+        public const string INVALID_PAYMENT_METHOD = "Phương thức thanh toán không hợp lệ";
+        public const string ORDER_CREATE_FAILED = "Tạo đơn hàng thất bại";
     }
 
 }
