@@ -143,8 +143,8 @@ public class OrderService : IOrderService
                     }
 
                     //Kiểm tra Vehicle tồn tại
-                    var vehicle = await _vehicleRepo.GetVehicleById(usePackageForm.Vin);
-                    if (vehicle == null)
+                    var vehicleUsePackage = await _vehicleRepo.GetVehicleById(usePackageForm.Vin);
+                    if (vehicleUsePackage == null)
                     {
                         return new ResultModel
                         {
@@ -169,7 +169,7 @@ public class OrderService : IOrderService
                     }
 
                     //Kiểm tra Vehicle có gói không
-                    if (vehicle.PackageId == null)
+                    if (vehicleUsePackage.PackageId == null)
                     {
                         return new ResultModel
                         {
@@ -180,7 +180,7 @@ public class OrderService : IOrderService
                         };
                     }
                     //Kiểm tra hạn sử dụng gói của xe
-                    if (vehicle.PackageExpiredate < TimeHepler.SystemTimeNow)
+                    if (vehicleUsePackage.PackageExpiredate < TimeHepler.SystemTimeNow)
                     {
                         return new ResultModel
                         {

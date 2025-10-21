@@ -17,7 +17,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Bsstaff")]
     public async Task<IActionResult> GetAllOrders()
     {
         var result = await _orderService.GetAllOrders();
@@ -25,7 +25,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet("{orderId}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<IActionResult> GetOrderById(string orderId)
     {
         var result = await _orderService.GetOrderById(orderId);
@@ -33,24 +33,24 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet("filter")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> FilterOrders([FromQuery] OrderFilterRequest request)
+    [Authorize(Roles = "Admin, Bsstaff")]
+    public async Task<IActionResult> FilterOrders([FromForm] OrderFilterRequest request)
     {
         var result = await _orderService.FilterOrders(request);
         return StatusCode(result.StatusCode, result);
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request)
+    [Authorize]
+    public async Task<IActionResult> CreateOrder([FromForm] CreateOrderRequest request)
     {
         var result = await _orderService.CreateOrder(request);
         return StatusCode(result.StatusCode, result);
     }
 
     [HttpPut("{orderId}/status")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> UpdateOrderStatus(string orderId, [FromBody] string newStatus)
+    [Authorize(Roles ="Admin, Bsstaff")]
+    public async Task<IActionResult> UpdateOrderStatus(string orderId, string newStatus)
     {
         var result = await _orderService.UpdateOrderStatus(orderId, newStatus);
         return StatusCode(result.StatusCode, result);
