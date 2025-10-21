@@ -78,5 +78,11 @@ namespace Repositories.Repositories.BatteryReportRepo
         {
             return await UpdateBatteryReport(batteryReport);
         }
+
+        public async Task<List<BatteryReport?>> GetBatteryReportByBatteryId(string batteryId)
+        {
+            return await _context.BatteryReports
+                .Where(r => r.BatteryId == batteryId).ToListAsync();
+        }
     }
 }

@@ -28,14 +28,14 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete_vehicle")]
-        [Authorize]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteVehicle([FromForm] string? vehicleId)
         {
             var res = await _vehicleService.DeleteVehicle(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("update_vehicle")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> UpdateVehicle([FromForm] Services.ApiModels.Vehicle.UpdateVehicleRequest updateVehicleRequest)
         {
             var res = await _vehicleService.UpdateVehicle(updateVehicleRequest);
@@ -63,14 +63,14 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPost("link_vehicle")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> LinkVehicle([FromForm] Services.ApiModels.Vehicle.LinkVehicleRequest linkVehicleRequest)
         {
             var res = await _vehicleService.LinkVehicle(linkVehicleRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("add_vehicle_in_package")]
-        [Authorize(Roles ="EvDriver")]
+        [Authorize(Roles ="EvDriver, Admin")]
         public async Task<IActionResult> AddVehicleInPackage([FromForm] Services.ApiModels.Vehicle.AddVehicleInPackageRequest addVehicleInPackageRequest)
         {
             var res = await _vehicleService.AddVehicleInPackage(addVehicleInPackageRequest);
@@ -91,28 +91,28 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_all_vehicle_by_customer_id")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> GetAllVehicleByCustomerId()
         {
             var res = await _vehicleService.GetAllVehicleByCustomerId();
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_package_by_vehicle_id")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> GetPackageByVehicleId([FromQuery] string? vehicleId)
         {
             var res = await _vehicleService.GetPackageByVehicleId(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_battery_by_vehicle_id")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> GetBatteryByVehicleId([FromQuery] string? vehicleId)
         {
             var res = await _vehicleService.GetBatteryByVehicleId(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_vehicle_of_user_by_vehicle_id")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> GetVehicleOfUserByVehicleId([FromQuery] string? vehicleId)
         {
             var res = await _vehicleService.GetVehicleOfUserByVehicleId(vehicleId);

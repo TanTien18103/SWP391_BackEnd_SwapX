@@ -18,6 +18,7 @@ public class ExchangeBatteryController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreateExchange([FromBody] CreateExchangeBatteryRequest request)
     {
         var result = await _exchangeService.CreateExchange(request);
@@ -25,7 +26,7 @@ public class ExchangeBatteryController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Staff, Admin")]
+    [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetAll()
     {
         var result = await _exchangeService.GetAllExchanges();
@@ -33,7 +34,7 @@ public class ExchangeBatteryController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = "Staff, Admin")]
+    [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetById(string id)
     {
         var result = await _exchangeService.GetExchangeDetail(id);
@@ -41,7 +42,7 @@ public class ExchangeBatteryController : ControllerBase
     }
 
     [HttpGet("station/{stationId}")]
-    [Authorize(Roles = "Staff, Admin")]
+    [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetByStation(string stationId)
     {
         var result = await _exchangeService.GetExchangeByStation(stationId);
@@ -49,7 +50,7 @@ public class ExchangeBatteryController : ControllerBase
     }
 
     [HttpGet("driver/{accountId}")]
-    [Authorize(Roles = "Staff, Admin")]
+    [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetByDriver(string accountId)
     {
         var result = await _exchangeService.GetExchangeByDriver(accountId);
@@ -57,7 +58,7 @@ public class ExchangeBatteryController : ControllerBase
     }
 
     [HttpPut("{exchangeId}")]
-    [Authorize(Roles = "Staff, Admin")]
+    [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> UpdateExchange(string exchangeId, [FromBody] UpdateExchangeBatteryRequest request)
     {
         var result = await _exchangeService.UpdateExchange(exchangeId, request);
@@ -65,7 +66,7 @@ public class ExchangeBatteryController : ControllerBase
     }
 
     [HttpDelete("{exchangeId}")]
-    [Authorize(Roles = "Staff, Admin")]
+    [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> DeleteExchange(string exchangeId)
     {
         var result = await _exchangeService.DeleteExchange(exchangeId);
@@ -73,7 +74,7 @@ public class ExchangeBatteryController : ControllerBase
     }
     
     [HttpPut("update_exchange_battery_status")]
-    [Authorize(Roles = "Staff, Admin")]
+    [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> UpdateExchangeStatus([FromForm] UpdateExchangeStatusRequest request)
     {
         var result = await _exchangeService.UpdateExchangeStatus(request);

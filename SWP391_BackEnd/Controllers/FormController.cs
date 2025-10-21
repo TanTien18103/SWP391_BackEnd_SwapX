@@ -17,7 +17,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpPost("create-form")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> CreateForm([FromForm] AddFormRequest addFormRequest)
         {
             var res = await _formService.AddForm(addFormRequest);

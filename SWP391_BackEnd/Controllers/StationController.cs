@@ -96,14 +96,14 @@ public class StationController : ControllerBase
         return StatusCode(res.StatusCode, res);
     }
     [HttpGet("get_all_station_of_customer")]
-    [Authorize(Roles = "EvDriver")]
+    [Authorize(Roles = "EvDriver, Admin")]
     public async Task<IActionResult> GetAllStationOfCustomer()
     {
         var res = await _stationService.GetAllStationOfCustomer();
         return StatusCode(res.StatusCode, res);
     }
     [HttpGet("get_all_station_of_customer_suit_vehicle")]
-    [Authorize(Roles = "EvDriver")]
+    [Authorize]
     public async Task<IActionResult> GetAllStationOfCustomerSuitVehicle([FromQuery] string vehicleId)
     {
         var res = await _stationService.GetAllStationOfCustomerSuitVehicle(vehicleId);

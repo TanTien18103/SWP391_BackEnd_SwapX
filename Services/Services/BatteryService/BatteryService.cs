@@ -171,6 +171,7 @@ namespace Services.Services.BatteryService
                         StartDate = b.StartDate,
                         UpdateDate = b.UpdateDate,
                         Image = b.Image,
+
                         Station = b.Station == null ? null : new
                         {
                             StationId = b.Station.StationId,

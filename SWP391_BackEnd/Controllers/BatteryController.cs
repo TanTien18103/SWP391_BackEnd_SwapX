@@ -17,30 +17,35 @@ namespace SWP391_BackEnd.Controllers
             _batteryService = batteryService;
         }
         [HttpPost("add-battery")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddBattery([FromForm] Services.ApiModels.Battery.AddBatteryRequest addBatteryRequest)
         {
             var res = await _batteryService.AddBattery(addBatteryRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get-battery-by-id")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetBatteryById([FromQuery] string? batteryId)
         {
             var res = await _batteryService.GetBatteryById(batteryId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete-battery")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBattery([FromForm] string? batteryId)
         {
             var res = await _batteryService.DeleteBattery(batteryId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("update-battery")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateBattery([FromForm] Services.ApiModels.Battery.UpdateBatteryRequest updateBatteryRequest)
         {
             var res = await _batteryService.UpdateBattery(updateBatteryRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("add-battery-in-station")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> addBatteryInStation([FromForm] Services.ApiModels.Battery.AddBatteryInStationRequest addBatteryInStationRequest)
         {
             var res = await _batteryService.AddBatteryInStation(addBatteryInStationRequest);
@@ -62,7 +67,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_batteries_suit_vehicle")]
-        [Authorize(Roles ="EvDriver")]
+        [Authorize]
         public async Task<IActionResult> GetAllBatterySuitVehicle([FromQuery] GetAllBatterySuitVehicle getAllBatterySuitVehicle)
         {
             var res = await _batteryService.GetAllBatterySuitVehicle(getAllBatterySuitVehicle);

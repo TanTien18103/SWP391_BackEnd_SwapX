@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.ApiModels.GeminiAI;
 using Services.Services.GeminiService;
@@ -15,12 +16,14 @@ namespace SWP391_BackEnd.Controllers
             var apiKey = config["Gemini:ApiKey"];
         }
         [HttpPost("chat_gemini")]
+        [Authorize]
         public async Task<IActionResult> ChatGemini([FromForm] GeminiAIRequest geminiAIRequest)
         {
             var res = await _geminiService.GetGeminiData(geminiAIRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("test_gemini")]
+        [Authorize]
         public async Task<IActionResult> AnalyzeBatteryDataAsync()
         {
             var res = await _geminiService.AnalyzeBatteryDataAsync();
