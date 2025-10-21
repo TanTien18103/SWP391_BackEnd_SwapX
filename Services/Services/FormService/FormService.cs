@@ -730,7 +730,11 @@ namespace Services.Services.FormService
                         await _exchangeBatteryRepo.Add(exchangeBattery);
                     }
                     //trường hợp khách đã thanh toán trước hoặc dùng gói
-                    else
+                    else if (
+                        (order.ServiceType == PaymentType.PrePaid.ToString() ||
+                         order.ServiceType == PaymentType.UsePackage.ToString())
+                        && order.Status == PaymentStatus.Paid.ToString()
+                    )
                     {
                         // Create ExchangeBattery record
                         var exchangeBattery = new ExchangeBattery
@@ -748,6 +752,16 @@ namespace Services.Services.FormService
                             UpdateDate = TimeHepler.SystemTimeNow,
                         };
                         await _exchangeBatteryRepo.Add(exchangeBattery);
+                    }
+                    else
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsForm.ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
                     }
 
                 }
