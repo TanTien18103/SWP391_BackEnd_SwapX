@@ -17,6 +17,7 @@ public class ExchangeBatteryController : ControllerBase
         _exchangeService = exchangeService;
     }
 
+
     [HttpPost("create_exchange_battery")]
     [Authorize]
     public async Task<IActionResult> CreateExchange([FromBody] CreateExchangeBatteryRequest request)
@@ -33,6 +34,7 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
+
     [HttpGet("get_exchange_battery_by_exchange{id}")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetById(string id)
@@ -40,6 +42,7 @@ public class ExchangeBatteryController : ControllerBase
         var result = await _exchangeService.GetExchangeDetail(id);
         return StatusCode(result.StatusCode, result);
     }
+
 
     [HttpGet("get_exchange_by_station/{stationId}")]
     [Authorize(Roles = "Bsstaff, Admin")]
@@ -49,6 +52,7 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
+
     [HttpGet("get_exchange_by_driver/{accountId}")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetByDriver(string accountId)
@@ -57,6 +61,7 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
+
     [HttpPut("update_exchange{exchangeId}")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> UpdateExchange(string exchangeId, [FromBody] UpdateExchangeBatteryRequest request)
@@ -64,6 +69,7 @@ public class ExchangeBatteryController : ControllerBase
         var result = await _exchangeService.UpdateExchange(exchangeId, request);
         return StatusCode(result.StatusCode, result);
     }
+
 
     [HttpDelete("delete_exchange{exchangeId}")]
     [Authorize(Roles = "Bsstaff, Admin")]
