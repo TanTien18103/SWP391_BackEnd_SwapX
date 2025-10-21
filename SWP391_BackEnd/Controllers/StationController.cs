@@ -57,7 +57,7 @@ public class StationController : ControllerBase
     }
 
     [HttpPost("add_staff_to_station_for_admin")]
-    [Authorize(Roles = "Admin, Bsstaff")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddStaffToStationForAdmin([FromBody] AddStaffToStationRequest addStaffToStationRequest)
     {
         var res = await _stationService.AddStaffToStation(addStaffToStationRequest);

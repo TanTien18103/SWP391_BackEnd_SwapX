@@ -15,14 +15,14 @@ namespace SWP391_BackEnd.Controllers
             _batteryHistoryService = batteryHistoryService;
         }
         [HttpGet("get_battery_history_by_battery_id")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> GetBatteryHistoryByBatteryId([FromQuery] string? batteryId)
         {
             var res = await _batteryHistoryService.GetBatteryHistoryByBatteryId(batteryId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_all_battery_histories")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> GetAllBatteryHistories()
         {
             var res = await _batteryHistoryService.GetAllBatteryHistory();

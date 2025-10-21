@@ -16,7 +16,7 @@ public class OrderController : ControllerBase
         _orderService = orderService;
     }
 
-    [HttpGet]
+    [HttpGet("get_all_orders")]
     [Authorize(Roles = "Admin, Bsstaff")]
     public async Task<IActionResult> GetAllOrders()
     {
@@ -24,7 +24,7 @@ public class OrderController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpGet("{orderId}")]
+    [HttpGet("get_order_by_{orderId}")]
     [Authorize]
     public async Task<IActionResult> GetOrderById(string orderId)
     {
@@ -40,7 +40,7 @@ public class OrderController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpPost]
+    [HttpPost("create_order")]
     [Authorize]
     public async Task<IActionResult> CreateOrder([FromForm] CreateOrderRequest request)
     {
@@ -48,7 +48,7 @@ public class OrderController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpPut("{orderId}/status")]
+    [HttpPut("update_order_{orderId}/status")]
     [Authorize(Roles ="Admin, Bsstaff")]
     public async Task<IActionResult> UpdateOrderStatus(string orderId, string newStatus)
     {

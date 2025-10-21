@@ -74,7 +74,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpGet("get-form-by-id-driver/{formId}")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> GetFormByIdDriver(string formId)
         {
             var res = await _formService.GetFormByIdDriver(formId);
@@ -82,7 +82,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpGet("get-all-forms-driver")]
-        [Authorize(Roles = "EvDriver")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> GetAllFormsDriver()
         {
             var res = await _formService.GetAllFormsDriver();
@@ -90,7 +90,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpPut("update-form-status-staff")]
-        [Authorize(Roles = "Bsstaff")]
+        [Authorize(Roles = "Bsstaff, Admin")]
         public async Task<IActionResult> UpdateFormStatusStaff([FromForm] UpdateFormStatusStaffRequest updateFormStatusStaffRequest)
         {
             var res = await _formService.UpdateFormStatusStaff(updateFormStatusStaffRequest);

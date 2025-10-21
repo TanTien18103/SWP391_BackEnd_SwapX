@@ -17,7 +17,8 @@ public class ExchangeBatteryController : ControllerBase
         _exchangeService = exchangeService;
     }
 
-    [HttpPost]
+
+    [HttpPost("create_exchange_battery")]
     [Authorize]
     public async Task<IActionResult> CreateExchange([FromBody] CreateExchangeBatteryRequest request)
     {
@@ -25,7 +26,7 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpGet]
+    [HttpGet("get_all_exchange_battery")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetAll()
     {
@@ -33,7 +34,8 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpGet("{id}")]
+
+    [HttpGet("get_exchange_battery_by_exchange{id}")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetById(string id)
     {
@@ -41,7 +43,8 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpGet("station/{stationId}")]
+
+    [HttpGet("get_exchange_by_station/{stationId}")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetByStation(string stationId)
     {
@@ -49,7 +52,8 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpGet("driver/{accountId}")]
+
+    [HttpGet("get_exchange_by_driver/{accountId}")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> GetByDriver(string accountId)
     {
@@ -57,7 +61,8 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpPut("{exchangeId}")]
+
+    [HttpPut("update_exchange{exchangeId}")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> UpdateExchange(string exchangeId, [FromBody] UpdateExchangeBatteryRequest request)
     {
@@ -65,7 +70,8 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpDelete("{exchangeId}")]
+
+    [HttpDelete("delete_exchange{exchangeId}")]
     [Authorize(Roles = "Bsstaff, Admin")]
     public async Task<IActionResult> DeleteExchange(string exchangeId)
     {

@@ -13,7 +13,7 @@ namespace SWP391_BackEnd.Controllers
         {
             _vehicleService = vehicleService;
         }
-        [HttpPost("add_package_for_vehicle")]
+        [HttpPost("add_vehicle_for_package")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddVehicle([FromForm] Services.ApiModels.Vehicle.AddVehicleRequest addVehicleRequest)
         {
