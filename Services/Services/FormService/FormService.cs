@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Repositories.Repositories.ExchangeBatteryRepo;
+using Repositories.Repositories.OrderRepo;
 
 namespace Services.Services.FormService
 {
@@ -35,6 +36,7 @@ namespace Services.Services.FormService
         private readonly IEvDriverRepo _evDriverRepo;
         private readonly IBatteryRepo _batteryRepo;
         private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
+        private readonly IOrderRepository _orderRepository;
 
         public FormService(
             IFormRepo formRepo,
@@ -46,7 +48,8 @@ namespace Services.Services.FormService
             IVehicleRepo vehicleRepo,
             IEvDriverRepo evDriverRepo,
             IBatteryRepo batteryRepo,
-            IExchangeBatteryRepo exchangeBatteryRepo
+            IExchangeBatteryRepo exchangeBatteryRepo,
+            IOrderRepository orderRepository
             )
         {
             _formRepo = formRepo;
@@ -59,6 +62,7 @@ namespace Services.Services.FormService
             _evDriverRepo = evDriverRepo;
             _batteryRepo = batteryRepo;
             _exchangeBatteryRepo = exchangeBatteryRepo;
+            _orderRepository = orderRepository;
         }
         public async Task<ResultModel> AddForm(AddFormRequest addFormRequest)
         {
@@ -704,23 +708,47 @@ namespace Services.Services.FormService
                             StatusCode = StatusCodes.Status500InternalServerError
                         };
                     }
-                    // Create ExchangeBattery record
-                    var exchangeBattery = new ExchangeBattery
+                    var order = await _orderRepository.GetOrderByServiceId(existingForm.FormId);
+                    //trường hợp khách thanh toán tại trạm
+                    if (order == null)
                     {
-                        ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
-                        Vin = existingForm.Vin,
-                        OldBatteryId = vehicle.BatteryId,
-                        NewBatteryId = existingForm.BatteryId,
-                        StaffAccountId = null,
-                        ScheduleId = newstationSchedule.StationScheduleId,
-                        OrderId = null,
-                        StationId = existingForm.StationId,
-                        Status = ExchangeStatusEnums.Pending.ToString(),
-                        StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow,
-                    };
-
-                    await _exchangeBatteryRepo.Add(exchangeBattery);
+                        // Create ExchangeBattery record
+                        var exchangeBattery = new ExchangeBattery
+                        {
+                            ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
+                            Vin = existingForm.Vin,
+                            OldBatteryId = vehicle.BatteryId,
+                            NewBatteryId = existingForm.BatteryId,
+                            StaffAccountId = null,
+                            ScheduleId = newstationSchedule.StationScheduleId,
+                            OrderId = null,
+                            StationId = existingForm.StationId,
+                            Status = ExchangeStatusEnums.Pending.ToString(),
+                            StartDate = TimeHepler.SystemTimeNow,
+                            UpdateDate = TimeHepler.SystemTimeNow,
+                        };
+                        await _exchangeBatteryRepo.Add(exchangeBattery);
+                    }
+                    //trường hợp khách đã thanh toán trước hoặc dùng gói
+                    else
+                    {
+                        // Create ExchangeBattery record
+                        var exchangeBattery = new ExchangeBattery
+                        {
+                            ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
+                            Vin = existingForm.Vin,
+                            OldBatteryId = vehicle.BatteryId,
+                            NewBatteryId = existingForm.BatteryId,
+                            StaffAccountId = null,
+                            ScheduleId = newstationSchedule.StationScheduleId,
+                            OrderId = order.OrderId,
+                            StationId = existingForm.StationId,
+                            Status = ExchangeStatusEnums.Pending.ToString(),
+                            StartDate = TimeHepler.SystemTimeNow,
+                            UpdateDate = TimeHepler.SystemTimeNow,
+                        };
+                        await _exchangeBatteryRepo.Add(exchangeBattery);
+                    }
 
                 }
                 else if (updateFormStatusStaffRequest.Status == StaffUpdateFormEnums.Rejected)
