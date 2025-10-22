@@ -100,8 +100,8 @@ namespace BusinessObjects.Constants
         public const string LOGOUT_SUCCESS = "Đăng xuất thành công.";
         public const string EMAIL_IN_USE = "Email đã được sử dụng bởi người dùng khác.";
         public const string DUPLICATED_EMAIL = "Email này đang được sử dụng bởi nhiều tài khoản Active.";
-
         public const string ACCOUNT_INACTIVE = "Tài khoản của bạn hiện không hoạt động.";
+        public const string REGISTER_FAILED = "Đăng ký tài khoản thất bại. Vui lòng thử lại sau.";
     }
 
     //Auth-Account Controllers
