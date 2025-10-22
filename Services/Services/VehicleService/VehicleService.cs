@@ -415,6 +415,7 @@ namespace Services.Services.VehicleService
                 if (old_car != null)
                 {
                     // Nếu xe tồn tại nhưng đang unlinked (đã bán trước đó)
+                    //Nếu người dùng bị xóa tài khoản thì có thể dùng tài khoản mới để link xe ở bên tài khoản cũ
                     if ((old_car.Status == VehicleStatusEnums.Unlinked.ToString()&&old_car.VehicleName==linkVehicleRequest.VehicleName.ToString())||
                         (user_own_old_car.Status== AccountStatusEnums.Inactive.ToString() && old_car.VehicleName == linkVehicleRequest.VehicleName.ToString()))
                     {
