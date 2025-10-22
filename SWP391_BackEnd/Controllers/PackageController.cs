@@ -23,7 +23,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_package_by_id")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> GetPackageById([FromQuery] string? packageId)
         {
             var res = await _packageService.GetPackageById(packageId);
