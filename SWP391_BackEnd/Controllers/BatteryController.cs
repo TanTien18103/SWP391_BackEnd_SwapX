@@ -24,7 +24,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get-battery-by-id")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> GetBatteryById([FromQuery] string? batteryId)
         {
             var res = await _batteryService.GetBatteryById(batteryId);
