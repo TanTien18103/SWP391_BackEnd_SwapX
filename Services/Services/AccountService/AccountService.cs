@@ -44,7 +44,7 @@ namespace Services.Services.AccountService
             }
 
             // Nếu nhiều user trùng username -> lỗi
-            if (users.Count(u => u.Status == AccountStatusEnums.Active.ToString()) > 1)
+            if (users.Count(u=>u.Status==AccountStatusEnums.Active.ToString()) > 1)
             {
                 throw new AppException(ResponseCodeConstants.BAD_REQUEST,
                     ResponseMessageConstantsUser.USERNAME_DUPLICATED,
@@ -98,94 +98,45 @@ namespace Services.Services.AccountService
             }
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
 
-            if (registerRequest.Avatar == null)
+            var newUser = new Account
             {
-                var newUser = new Account
-                {
-                    AccountId = _accountHelper.GenerateShortGuid(),
-                    Username = registerRequest.Username,
-                    Password = hashedPassword,
-                    Name = registerRequest.Name,
-                    Phone = registerRequest.Phone,
-                    Address = registerRequest.Address,
-                    Email = registerRequest.Email,
-                    Role = RoleEnums.EvDriver.ToString(),
-                    Status = AccountStatusEnums.Active.ToString(),
-                    StartDate = TimeHepler.SystemTimeNow,
-                    UpdateDate = TimeHepler.SystemTimeNow,
-                };
+                AccountId = _accountHelper.GenerateShortGuid(),
+                Username = registerRequest.Username,
+                Password = hashedPassword,
+                Name = registerRequest.Name,
+                Phone = registerRequest.Phone,
+                Address = registerRequest.Address,
+                Email = registerRequest.Email,
+                Role = RoleEnums.EvDriver.ToString(),
+                Status = AccountStatusEnums.Active.ToString(),
+                StartDate = TimeHepler.SystemTimeNow,
+                UpdateDate = TimeHepler.SystemTimeNow,
+                Avatar = registerRequest.Avatar,
+            };
 
-                var driver = new Evdriver
-                {
-                    CustomerId = _accountHelper.GenerateShortGuid(),
-                    AccountId = newUser.AccountId,
-                    Account = newUser,
-                    StartDate = TimeHepler.SystemTimeNow,
-                    UpdateDate = TimeHepler.SystemTimeNow,
-                };
-
-                newUser.Evdrivers.Add(driver);
-
-                await _accountRepository.AddAccount(newUser);
-
-                string accessToken = _accountHelper.CreateToken(newUser);
-                string refreshToken = _accountHelper.GenerateRefreshToken();
-
-                if (_httpContextAccessor.HttpContext?.Session != null)
-                {
-                    _httpContextAccessor.HttpContext.Session.SetString("RefreshToken", refreshToken);
-                    _httpContextAccessor.HttpContext.Session.SetString("UserName", registerRequest.Username);
-                }
-
-                return accessToken;
-            }
-            else if (registerRequest.Avatar != null)
+            var driver = new Evdriver
             {
-                var newUser = new Account
-                {
-                    AccountId = _accountHelper.GenerateShortGuid(),
-                    Username = registerRequest.Username,
-                    Password = hashedPassword,
-                    Name = registerRequest.Name,
-                    Phone = registerRequest.Phone,
-                    Address = registerRequest.Address,
-                    Email = registerRequest.Email,
-                    Role = RoleEnums.EvDriver.ToString(),
-                    Status = AccountStatusEnums.Active.ToString(),
-                    StartDate = TimeHepler.SystemTimeNow,
-                    UpdateDate = TimeHepler.SystemTimeNow,
-                    Avatar = registerRequest.Avatar,
-                };
+                CustomerId = _accountHelper.GenerateShortGuid(),
+                AccountId = newUser.AccountId,
+                Account = newUser,
+                StartDate = TimeHepler.SystemTimeNow,
+                UpdateDate = TimeHepler.SystemTimeNow,
+            };
 
-                var driver = new Evdriver
-                {
-                    CustomerId = _accountHelper.GenerateShortGuid(),
-                    AccountId = newUser.AccountId,
-                    Account = newUser,
-                    StartDate = TimeHepler.SystemTimeNow,
-                    UpdateDate = TimeHepler.SystemTimeNow,
-                };
+            newUser.Evdrivers.Add(driver);
 
-                newUser.Evdrivers.Add(driver);
+            await _accountRepository.AddAccount(newUser);
 
-                await _accountRepository.AddAccount(newUser);
+            string accessToken = _accountHelper.CreateToken(newUser);
+            string refreshToken = _accountHelper.GenerateRefreshToken();
 
-                string accessToken = _accountHelper.CreateToken(newUser);
-                string refreshToken = _accountHelper.GenerateRefreshToken();
-
-                if (_httpContextAccessor.HttpContext?.Session != null)
-                {
-                    _httpContextAccessor.HttpContext.Session.SetString("RefreshToken", refreshToken);
-                    _httpContextAccessor.HttpContext.Session.SetString("UserName", registerRequest.Username);
-                }
-                return accessToken;
-            }
-            else
+            if (_httpContextAccessor.HttpContext?.Session != null)
             {
-                throw new AppException(ResponseCodeConstants.BAD_REQUEST,
-                    ResponseMessageIdentity.REGISTER_FAILED,
-                    StatusCodes.Status400BadRequest);
+                _httpContextAccessor.HttpContext.Session.SetString("RefreshToken", refreshToken);
+                _httpContextAccessor.HttpContext.Session.SetString("UserName", registerRequest.Username);
             }
+
+            return accessToken;
         }
 
         public async Task<ResultModel> CreateStaff(RegisterRequest registerRequest)
@@ -1046,9 +997,9 @@ namespace Services.Services.AccountService
                     Email = registerRequest.Email,
                     Role = RoleEnums.Admin.ToString(),
                     Status = AccountStatusEnums.Active.ToString(),
-                    Avatar = registerRequest.Avatar,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
+                    Avatar = registerRequest.Avatar,
                 };
 
                 await _accountRepository.AddAccount(newUser);
