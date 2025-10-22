@@ -350,7 +350,7 @@ namespace BusinessObjects.Constants
         public const string DELETE_VEHICLE_IN_PACKAGE_FAILED = "Hủy xe khỏi gói thất bại";
         public const string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
 
-        public const string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống";
+        public const string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống hoặc sai tên xe vui lòng liên hệ với người bán cho bạn xe cũ để được biết thêm thông tin của xe";
 
         public const string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
         public const string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";

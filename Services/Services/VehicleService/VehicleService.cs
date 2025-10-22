@@ -414,7 +414,7 @@ namespace Services.Services.VehicleService
                 if (old_car != null)
                 {
                     // Nếu xe tồn tại nhưng đang unlinked (đã bán trước đó)
-                    if (old_car.Status == VehicleStatusEnums.Unlinked.ToString())
+                    if (old_car.Status == VehicleStatusEnums.Unlinked.ToString()&&old_car.VehicleName==linkVehicleRequest.VehicleName.ToString())
                     {
                         old_car.Status = VehicleStatusEnums.linked.ToString();
                         old_car.CustomerId = evDriver.CustomerId;
