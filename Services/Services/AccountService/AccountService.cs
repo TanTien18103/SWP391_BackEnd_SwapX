@@ -469,7 +469,11 @@ namespace Services.Services.AccountService
                 }
                 // Set status to Inactive
                 existingUser.Status = AccountStatusEnums.Inactive.ToString();
+                var evdriver = await _evDriverRepository.GetDriverByAccountId(existingUser.AccountId);
+                existingUser.UpdateDate = TimeHepler.SystemTimeNow;
+                evdriver.UpdateDate = TimeHepler.SystemTimeNow;
                 await _accountRepository.UpdateAccount(existingUser);
+                await _evDriverRepository.UpdateDriver(evdriver);
                 return new ResultModel
                 {
                     IsSuccess = true,

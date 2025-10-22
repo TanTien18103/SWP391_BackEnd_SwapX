@@ -410,11 +410,13 @@ namespace Services.Services.VehicleService
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
                 var old_car = await _vehicleRepo.GetVehicleById(linkVehicleRequest.VIN);
+                var user_own_old_car = await _accountRepo.GetAccountByCustomerId(old_car.CustomerId);
 
                 if (old_car != null)
                 {
                     // Nếu xe tồn tại nhưng đang unlinked (đã bán trước đó)
-                    if (old_car.Status == VehicleStatusEnums.Unlinked.ToString()&&old_car.VehicleName==linkVehicleRequest.VehicleName.ToString())
+                    if ((old_car.Status == VehicleStatusEnums.Unlinked.ToString()&&old_car.VehicleName==linkVehicleRequest.VehicleName.ToString())||
+                        (user_own_old_car.Status== AccountStatusEnums.Inactive.ToString() && old_car.VehicleName == linkVehicleRequest.VehicleName.ToString()))
                     {
                         old_car.Status = VehicleStatusEnums.linked.ToString();
                         old_car.CustomerId = evDriver.CustomerId;
