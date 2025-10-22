@@ -44,7 +44,7 @@ namespace Services.Services.AccountService
             }
 
             // Nếu nhiều user trùng username -> lỗi
-            if (users.Count > 1)
+            if (users.Count(u=>u.Status==AccountStatusEnums.Active.ToString()) > 1)
             {
                 throw new AppException(ResponseCodeConstants.BAD_REQUEST,
                     ResponseMessageConstantsUser.USERNAME_DUPLICATED,
