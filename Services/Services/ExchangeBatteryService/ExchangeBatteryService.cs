@@ -406,6 +406,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     newBattery.UpdateDate = TimeHepler.SystemTimeNow;
 
                     vehicleOfExchange.BatteryId = newBattery.BatteryId;
+                    vehicleOfExchange.UpdateDate = TimeHepler.SystemTimeNow;
+
                     await _vehicleRepo.UpdateVehicle(vehicleOfExchange);
                     await _batteryRepo.UpdateBattery(oldBattery);
                     await _batteryRepo.UpdateBattery(newBattery);

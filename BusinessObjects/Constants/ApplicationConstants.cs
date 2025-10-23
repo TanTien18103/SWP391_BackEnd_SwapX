@@ -236,6 +236,8 @@ namespace BusinessObjects.Constants
         public const string BATTERY_NOT_FOUND_OR_NOT_BOOKED = "Không tìm thấy pin hoặc pin chưa được đặt";
         public const string BATTERY_NOT_AVAILABLE = "Pin không khả dụng";
         public const string BATTERY_NOT_EXIST = "Pin không tồn tại";
+
+        public static string BATTERY_NOT_BELONG_TO_VEHICLE { get; set; }
     }
     public static class EmailConstants
     {
@@ -317,7 +319,8 @@ namespace BusinessObjects.Constants
         public const string PACKAGE_ALREADY_INACTIVE = "Gói đang hoạt động, không thể cập nhật";
         public const string PACKAGE_EXPIRED = "Gói đã hết hạn sử dụng";
         public const string PACKAGE_NOT_FOUND_FOR_VEHICLE = "Xe không có gói nào được liên kết";
-        public static string PACKAGE_EXPIRED_OR_NOT_EXISTS_IN_VEHICLE = "Gói đã hết hạn sử dụng hoặc không tồn tại trong xe";
+        public const string PACKAGE_EXPIRED_OR_NOT_EXISTS_IN_VEHICLE = "Gói đã hết hạn sử dụng hoặc không tồn tại trong xe";
+        public const string VEHICLE_ALREADY_HAS_PACKAGE = "Xe đã có gói được liên kết";
     }
     //for Vehicle (0-0-1)
     public static class ResponseMessageConstantsVehicle
@@ -351,18 +354,14 @@ namespace BusinessObjects.Constants
         public const string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
 
         public const string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống hoặc sai tên xe vui lòng liên hệ với người bán cho bạn xe cũ để được biết thêm thông tin của xe";
-
         public const string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
         public const string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";
-
         public const string VEHICLE_ALREADY_IN_PACKAGE = "Xe đã có gói";
-
         public const string GET_PACKAGE_BY_VEHICLE_ID_SUCCESS = " Lấy gói theo xe thành công";
         public const string GET_PACKAGE_BY_VEHICLE_ID_FAILED = "Lấy gói theo xe thất bại";
-
         public const string VEHICLE_NOT_OWNED = "Xe không thuộc sở hữu của khách hàng";
-
         public const string NO_VEHICLE_FOR_USER = "Người dùng không có xe được liên kết";
+        public const string VEHICLE_NOT_BELONG_TO_ACCOUNT = "Xe không thuộc sở hữu của tài khoản";
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule
