@@ -55,7 +55,7 @@ public class OrderService : IOrderService
                 UpdateDate = TimeHepler.SystemTimeNow,
             };
 
-            // 3️⃣ Logic theo loại thanh toán
+            //Logic theo loại thanh toán
             switch (request.ServiceType)
             {
                 case PaymentType.Package:
@@ -72,7 +72,7 @@ public class OrderService : IOrderService
                     }
                     var vehicle = await _vehicleRepo.GetVehicleById(request.Vin);
 
-                    if(vehicle == null)
+                    if (vehicle == null)
                     {
                         return new ResultModel
                         {
@@ -82,11 +82,47 @@ public class OrderService : IOrderService
                             StatusCode = StatusCodes.Status404NotFound
                         };
                     }
+                    //check xe đã có gói chưa
+                    if (vehicle.PackageId != null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsPackage.VEHICLE_ALREADY_HAS_PACKAGE,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+                    //check battery có phải của xe ko
+                    if (request.BatteryId != vehicle.BatteryId)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsBattery.BATTERY_NOT_BELONG_TO_VEHICLE,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+                    //check xe đó có đúng là của user ko
+
+                    if (vehicle.Customer.AccountId != request.AccountId)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_BELONG_TO_ACCOUNT,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
 
                     newOrder.Status = PaymentStatus.Pending.ToString();
                     newOrder.ServiceType = PaymentType.Package.ToString();
                     newOrder.UpdateDate = TimeHepler.SystemTimeNow;
                     newOrder.ServiceId = request.ServiceId;
+                    newOrder.BatteryId = request.BatteryId;
+                    newOrder.Vin = request.Vin;
 
                     await _orderRepository.CreateOrderAsync(newOrder);
 
@@ -112,9 +148,35 @@ public class OrderService : IOrderService
                         };
                     }
 
+                    //Kiểm tra Vehicle tồn tại
+                    var PrePaidvehicle = await _vehicleRepo.GetVehicleById(PrePaidform.Vin);
+                    if (PrePaidvehicle == null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                            Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                            StatusCode = StatusCodes.Status404NotFound
+                        };
+                    }
+                    
+                    //Kiểm tra xe đó có đúng là của user ko
+                    if (PrePaidvehicle.Customer.AccountId != request.AccountId)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_BELONG_TO_ACCOUNT,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
                     newOrder.Status = PaymentStatus.Pending.ToString();
                     newOrder.ServiceType = PaymentType.PrePaid.ToString();
                     newOrder.ServiceId = PrePaidform.FormId; // ServiceId = FormId
+                    newOrder.BatteryId = request.BatteryId;
 
                     //Order được tạo trước, sẽ gán vào Form khi Form được approve
                     await _orderRepository.CreateOrderAsync(newOrder);
@@ -168,17 +230,6 @@ public class OrderService : IOrderService
                         };
                     }
 
-                    //Kiểm tra Vehicle có gói không
-                    if (vehicleUsePackage.PackageId == null)
-                    {
-                        return new ResultModel
-                        {
-                            IsSuccess = false,
-                            ResponseCode = ResponseCodeConstants.FAILED,
-                            Message = ResponseMessageConstantsPackage.PACKAGE_NOT_FOUND_FOR_VEHICLE,
-                            StatusCode = StatusCodes.Status400BadRequest
-                        };
-                    }
                     //Kiểm tra hạn sử dụng gói của xe
                     if (vehicleUsePackage.PackageExpiredate < TimeHepler.SystemTimeNow)
                     {
@@ -190,11 +241,34 @@ public class OrderService : IOrderService
                             StatusCode = StatusCodes.Status400BadRequest
                         };
                     }
+                    //Kiểm tra battery có phải của xe ko
+                    if (request.BatteryId != vehicleUsePackage.BatteryId)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsBattery.BATTERY_NOT_BELONG_TO_VEHICLE,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+                    //Kiểm tra xe đó có đúng là của user ko
+                    if (vehicleUsePackage.Customer.AccountId != request.AccountId)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_BELONG_TO_ACCOUNT,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
 
                     //Nếu hợp lệ → tạo Order
                     newOrder.Status = PaymentStatus.Paid.ToString();
                     newOrder.ServiceType = PaymentType.UsePackage.ToString();
                     newOrder.ServiceId = usePackageForm.FormId; // ServiceId = FormId
+                    newOrder.BatteryId = request.BatteryId;
 
                     await _orderRepository.CreateOrderAsync(newOrder);
 
@@ -230,9 +304,36 @@ public class OrderService : IOrderService
                             StatusCode = StatusCodes.Status404NotFound
                         };
                     }
+
+                    var vehiclePaidAtStation = await _vehicleRepo.GetVehicleById(PaidAtStationform.Vin);
+
+                    if (vehiclePaidAtStation == null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                            Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                            StatusCode = StatusCodes.Status404NotFound
+                        };
+                    }
+
+                    //kiểm tra xe đó có đúng là của user ko
+                    if (vehiclePaidAtStation.Customer.AccountId != request.AccountId)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_BELONG_TO_ACCOUNT,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
                     newOrder.Status = PaymentStatus.Pending.ToString();
                     newOrder.ServiceType = PaymentType.PaidAtStation.ToString();
                     newOrder.ServiceId = PaidAtStationform.FormId; // ServiceId = FormId
+                    newOrder.BatteryId = request.BatteryId;
 
                     await _orderRepository.CreateOrderAsync(newOrder);
 
