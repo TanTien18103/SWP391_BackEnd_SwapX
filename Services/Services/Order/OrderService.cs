@@ -59,6 +59,18 @@ public class OrderService : IOrderService
             switch (request.ServiceType)
             {
                 case PaymentType.Package:
+                    // Kiểm tra order đang pending cho ServiceType này
+                    if (await _orderRepository.HasPendingOrderAsync(request.AccountId, PaymentType.Package.ToString()))
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageOrder.ORDER_ALREADY_PENDING,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
                     var package = await _packageRepo.GetPackageById(request.ServiceId);
                     if (package == null)
                     {
@@ -135,6 +147,18 @@ public class OrderService : IOrderService
                         Data = newOrder
                     };
                 case PaymentType.PrePaid:
+                    // Kiểm tra order đang pending cho ServiceType này
+                    if (await _orderRepository.HasPendingOrderAsync(request.AccountId, PaymentType.PrePaid.ToString()))
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageOrder.ORDER_ALREADY_PENDING,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
                     //Kiểm tra form tồn tại
                     var PrePaidform = await _formRepo.GetById(request.ServiceId);
                     if (PrePaidform == null)
@@ -191,6 +215,18 @@ public class OrderService : IOrderService
                     };
 
                 case PaymentType.UsePackage:
+                    // Kiểm tra order đang pending cho ServiceType này
+                    if (await _orderRepository.HasPendingOrderAsync(request.AccountId, PaymentType.UsePackage.ToString()))
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageOrder.ORDER_ALREADY_PENDING,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
                     //Kiểm tra form tồn tại
                     var usePackageForm = await _formRepo.GetById(request.ServiceId);
                     if (usePackageForm == null)
@@ -282,6 +318,18 @@ public class OrderService : IOrderService
                     };
 
                 case PaymentType.PaidAtStation:
+                    // Kiểm tra order đang pending cho ServiceType này
+                    if (await _orderRepository.HasPendingOrderAsync(request.AccountId, PaymentType.PaidAtStation.ToString()))
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageOrder.ORDER_ALREADY_PENDING,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
                     var exchangeBattery = await _exchangeBatteryRepo.GetById(request.ExchangeBatteryId);
                     if (exchangeBattery == null)
                     {

@@ -531,6 +531,7 @@ namespace BusinessObjects.Constants
         public const string ORDER_WILL_BE_CREATED_AT_STATION = "Đơn hàng sẽ được tạo tại trạm";
         public const string INVALID_PAYMENT_METHOD = "Phương thức thanh toán không hợp lệ";
         public const string ORDER_CREATE_FAILED = "Tạo đơn hàng thất bại";
+        public const string ORDER_ALREADY_PENDING = "Đã có đơn hàng đã ở trạng thái đang chờ xử lý";
     }
 
 }
