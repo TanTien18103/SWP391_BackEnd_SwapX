@@ -15,6 +15,8 @@ using Services.ApiModels;
 using Services.ApiModels.Vehicle;
 using Services.Helpers;
 using Services.Services.VehicleService;
+using Repositories.Repositories.FormRepo;
+using Repositories.Repositories.BatteryRepo;
 
 namespace Services.Payments;
 
@@ -28,6 +30,8 @@ public class PayOSService : IPayOSService
     private readonly IBatteryReportRepo _batteryRepo;
     private readonly IVehicleRepo _vehicleRepo;
     private readonly IVehicleService _vehicleService;
+    private readonly IFormRepo _formRepo;
+    private readonly IBatteryRepo _batteryRepoRepo;
     public PayOSService(
         PayOS payOs,
         PayOSHelper helper,
@@ -36,7 +40,9 @@ public class PayOSService : IPayOSService
         IExchangeBatteryRepo exchangeBatteryRepo,
         IBatteryReportRepo batteryRepo,
         IVehicleRepo vehicleRepo,
-        IVehicleService vehicleService
+        IVehicleService vehicleService,
+        IFormRepo formRepo,
+        IBatteryRepo batteryRepoRepo
         )
     {
         _payOS = payOs;
@@ -47,11 +53,13 @@ public class PayOSService : IPayOSService
         _batteryRepo = batteryRepo;
         _vehicleRepo = vehicleRepo;
         _vehicleService = vehicleService;
+        _formRepo = formRepo;
+        _batteryRepoRepo = batteryRepoRepo;
     }
 
     public async Task<ResultModel<PayOSWebhookResponseDto>> HandleWebhookAsync(PayOSWebhookRequestDto webhook)
     {
-        // If webhook verification fails, do not modify other entities. Only return failure.
+       
         if (!_helper.VerifyWebhook(webhook))
         {
             return new ResultModel<PayOSWebhookResponseDto>
@@ -79,8 +87,42 @@ public class PayOSService : IPayOSService
             };
         }
 
-        // Only update the order status. Do not touch exchange battery or battery report entities here.
+        
         var updateorder = await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
+
+        
+        try
+        {
+            if (status == PaymentStatus.Failed &&
+                (updateorder.ServiceType == PaymentType.PrePaid.ToString() || updateorder.ServiceType == PaymentType.PaidAtStation.ToString()))
+            {
+                
+                var form = await _formRepo.GetById(updateorder.ServiceId);
+                if (form != null)
+                {
+                    
+                    form.Status = BusinessObjects.Enums.FormStatusEnums.Deleted.ToString();
+                    form.UpdateDate = DateTime.UtcNow;
+                    await _formRepo.Update(form);
+
+                    
+                    if (!string.IsNullOrEmpty(form.BatteryId))
+                    {
+                        var battery = await _batteryRepoRepo.GetBatteryById(form.BatteryId);
+                        if (battery != null && battery.Status == BusinessObjects.Enums.BatteryStatusEnums.Booked.ToString())
+                        {
+                            battery.Status = BusinessObjects.Enums.BatteryStatusEnums.Available.ToString();
+                            battery.UpdateDate = DateTime.UtcNow;
+                            await _batteryRepoRepo.UpdateBattery(battery);
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+           
+        }
 
         if (updateorder.ServiceType == PaymentType.Package.ToString() && updateorder.Status == PaymentStatus.Paid.ToString())
         {
