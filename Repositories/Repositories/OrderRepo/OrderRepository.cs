@@ -1,3 +1,4 @@
+using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -126,5 +127,10 @@ public class OrderRepository : IOrderRepository
     {
         return await _context.Orders
             .FirstOrDefaultAsync(o => o.ServiceId == serviceId);
+    }
+    public async Task<bool> HasPendingOrderAsync(string accountId, string serviceType)
+    {
+        return await _context.Orders
+            .AnyAsync(o => o.AccountId == accountId && o.ServiceType == serviceType && o.Status == PaymentStatus.Pending.ToString());
     }
 }
