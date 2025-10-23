@@ -1233,5 +1233,81 @@ namespace Services.Services.BatteryService
                 };
             }
         }
+
+        public async Task<ResultModel> DeleteBatteryInStation(string batteryId)
+        {
+            try
+            {
+                var existingBattery = await _batteryRepo.GetBatteryById(batteryId);
+                if (existingBattery == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                if(existingBattery.StationId == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_DONT_HAVE_STATION,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                if (existingBattery.Status == BatteryStatusEnums.Booked.ToString()) {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_BOOKED,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+                string stationName = existingBattery.Station.StationName;
+                string stationID = existingBattery.StationId;
+                existingBattery.StationId = null;
+                existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
+                var deletedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+                //record lại lịch sử pin
+                var batteryHistory = new BatteryHistory
+                {
+                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
+                    BatteryId = deletedBattery.BatteryId,
+                    Notes = "Pin đã được xóa khỏi trạm"+ stationName,
+                    ActionType = BatteryHistoryActionTypeEnums.Deleted.ToString(),
+                    EnergyLevel = deletedBattery.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    StationId = stationID,
+                    ActionDate = TimeHepler.SystemTimeNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
+
+                };
+                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBattery.DELETE_BATTERY_IN_STATION_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex) {
+
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsBattery.DELETE_BATTERY_IN_STATION_FAIL,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
     }
 }
