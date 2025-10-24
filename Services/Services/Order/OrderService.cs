@@ -215,18 +215,6 @@ public class OrderService : IOrderService
                     };
 
                 case PaymentType.UsePackage:
-                    // Kiểm tra order đang pending cho ServiceType này
-                    if (await _orderRepository.HasPendingOrderAsync(request.AccountId, PaymentType.UsePackage.ToString()))
-                    {
-                        return new ResultModel
-                        {
-                            IsSuccess = false,
-                            ResponseCode = ResponseCodeConstants.FAILED,
-                            Message = ResponseMessageOrder.ORDER_ALREADY_PENDING,
-                            StatusCode = StatusCodes.Status400BadRequest
-                        };
-                    }
-
                     //Kiểm tra form tồn tại
                     var usePackageForm = await _formRepo.GetById(request.ServiceId);
                     if (usePackageForm == null)
@@ -277,17 +265,6 @@ public class OrderService : IOrderService
                             StatusCode = StatusCodes.Status400BadRequest
                         };
                     }
-                    //Kiểm tra battery có phải của xe ko
-                    if (request.BatteryId != vehicleUsePackage.BatteryId)
-                    {
-                        return new ResultModel
-                        {
-                            IsSuccess = false,
-                            ResponseCode = ResponseCodeConstants.FAILED,
-                            Message = ResponseMessageConstantsBattery.BATTERY_NOT_BELONG_TO_VEHICLE,
-                            StatusCode = StatusCodes.Status400BadRequest
-                        };
-                    }
                     //Kiểm tra xe đó có đúng là của user ko
                     if (vehicleUsePackage.Customer.AccountId != request.AccountId)
                     {
@@ -300,7 +277,7 @@ public class OrderService : IOrderService
                         };
                     }
 
-                    //Nếu hợp lệ → tạo Order
+                    //Nếu hợp lệ thì tạo Order
                     newOrder.Status = PaymentStatus.Paid.ToString();
                     newOrder.ServiceType = PaymentType.UsePackage.ToString();
                     newOrder.ServiceId = usePackageForm.FormId; // ServiceId = FormId

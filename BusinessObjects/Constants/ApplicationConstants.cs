@@ -236,8 +236,7 @@ namespace BusinessObjects.Constants
         public const string BATTERY_NOT_FOUND_OR_NOT_BOOKED = "Không tìm thấy pin hoặc pin chưa được đặt";
         public const string BATTERY_NOT_AVAILABLE = "Pin không khả dụng";
         public const string BATTERY_NOT_EXIST = "Pin không tồn tại";
-
-        public static string BATTERY_NOT_BELONG_TO_VEHICLE { get; set; }
+        public const string BATTERY_NOT_BELONG_TO_VEHICLE = "Pin không thuộc về xe";
     }
     public static class EmailConstants
     {

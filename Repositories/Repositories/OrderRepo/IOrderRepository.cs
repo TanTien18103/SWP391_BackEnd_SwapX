@@ -18,4 +18,5 @@ public interface IOrderRepository
 
     Task<Order> GetOrderByServiceId(string serviceId);
     Task<bool> HasPendingOrderAsync(string accountId, string serviceType);
+    Task<List<Order>> GetOrdersByAccountId(string accountId);
 }

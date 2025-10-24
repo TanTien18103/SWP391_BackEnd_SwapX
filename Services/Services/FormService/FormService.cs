@@ -116,14 +116,27 @@ namespace Services.Services.FormService
                     };
                 }
 
-                // Kiểm tra số form đã trả trước ở station này
-                var paidForms = await _formRepo.GetFormsByAccountAndStation(addFormRequest.AccountId, addFormRequest.StationId);
-                int prepaidCount = paidForms.Count(f => f.Status == FormStatusEnums.SubmittedPaidFirst.ToString());
+                var orders = await _orderRepository.GetOrdersByAccountId(addFormRequest.AccountId);
+                var forms = await _formRepo.GetByAccountId(addFormRequest.AccountId);
+
+                // Lấy danh sách formId tại station hiện tại
+                var formIdsAtStation = forms
+                    .Where(f => f.StationId == addFormRequest.StationId)
+                    .Select(f => f.FormId)
+                    .ToList();
+
+                // Đếm số đơn hàng trả trước và đã thanh toán có form nằm trong danh sách formIdsAtStation
+                var paidOrdersAtStationCount = orders.Count(o =>
+                    o.ServiceType == PaymentType.PrePaid.ToString() &&
+                    o.Status == PaymentStatus.Paid.ToString() &&
+                    formIdsAtStation.Contains(o.ServiceId));
 
                 // Nếu >= 3 lần thì approve luôn
-                string formStatus = prepaidCount >= 3
+                string formStatus = paidOrdersAtStationCount >= 3
                     ? FormStatusEnums.Approved.ToString()
                     : FormStatusEnums.Submitted.ToString();
+
+
                 //Kiểm tra xe của tài khoản có phải của accountId không
                 var evDriver = await _evDriverRepo.GetDriverByAccountId(addFormRequest.AccountId);
                 if (evDriver == null)
@@ -256,6 +269,24 @@ namespace Services.Services.FormService
                     };
 
                     await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+
+                    // Create ExchangeBattery record
+                    var order = await _orderRepository.GetOrderByServiceId(addedForm.FormId);
+
+                    var exchangeBattery = new ExchangeBattery
+                    {
+                        ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
+                        Vin = addedForm.Vin,
+                        OldBatteryId = vehicle.BatteryId,
+                        NewBatteryId = addedForm.BatteryId,
+                        StaffAccountId = null,
+                        ScheduleId = stationSchedule.StationScheduleId,
+                        OrderId = order.OrderId,
+                        StationId = addedForm.StationId,
+                        Status = ExchangeStatusEnums.Pending.ToString(),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                    };
                 }
 
                 return new ResultModel
