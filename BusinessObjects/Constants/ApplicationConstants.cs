@@ -236,7 +236,8 @@ namespace BusinessObjects.Constants
         public const string BATTERY_NOT_FOUND_OR_NOT_BOOKED = "Không tìm thấy pin hoặc pin chưa được đặt";
         public const string BATTERY_NOT_AVAILABLE = "Pin không khả dụng";
         public const string BATTERY_NOT_EXIST = "Pin không tồn tại";
-        public const string BATTERY_NOT_BELONG_TO_VEHICLE = "";
+        public const string BATTERY_NOT_BELONG_TO_VEHICLE = "Pin không thuộc về xe";
+
         public const string DELETE_BATTERY_IN_STATION_FAIL = "Xóa pin khỏi trạm thất bại";
 
         public const string BATTERY_DONT_HAVE_STATION = "Pin chưa có trạm";
