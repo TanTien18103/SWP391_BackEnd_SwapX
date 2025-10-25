@@ -54,7 +54,7 @@ namespace Repositories.Repositories.StationRepo
             foreach (var station in stations)
             {
                 var ratings = await _context.Ratings
-                    .Where(r => r.StationId == station.StationId && r.Rating1 != null)
+                    .Where(r => r.StationId == station.StationId && r.Rating1 != null&&r.Status==RatingStatusEnums.Active.ToString())
                     .ToListAsync();
 
                 decimal avg = 0m;

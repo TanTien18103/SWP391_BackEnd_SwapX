@@ -14,6 +14,6 @@ namespace Repositories.Repositories.RatingRepo
         Task<Rating> AddRating(Rating rating);
         Task<Rating> UpdateRating(Rating rating);
         Task UpdateStationAverageRating(string stationId);
-        Task<Rating> GetRatingByAccountIdAndStationId(string accountId, string stationId);
+        Task <List<Rating>> GetRatingByAccountIdAndStationId(string accountId, string stationId);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +31,10 @@ namespace Repositories.Repositories.RatingRepo
             return await _context.Ratings.Include(a => a.Station).Include(b => b.Account).ToListAsync();
         }
 
-   
+        public async Task<List<Rating>> GetRatingByAccountIdAndStationId(string accountId, string stationId)
+        {
+            return await _context.Ratings.Where(a=>a.Account.AccountId==accountId).Where(b=>b.Station.StationId==stationId).Where(c=>c.Status==RatingStatusEnums.Active.ToString()).ToListAsync();
+        }
 
         public async Task<Rating> GetRatingById(string ratingId)
         {
@@ -48,7 +52,7 @@ namespace Repositories.Repositories.RatingRepo
         public async Task UpdateStationAverageRating(string stationId)
         {
             var ratings = await _context.Ratings
-                .Where(r => r.StationId == stationId && r.Rating1 != null)
+                .Where(r => r.StationId == stationId && r.Rating1 != null&&r.Status==RatingStatusEnums.Active.ToString())
                 .ToListAsync();
 
             decimal avg = 0m;
@@ -64,11 +68,7 @@ namespace Repositories.Repositories.RatingRepo
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<Rating> GetRatingByAccountIdAndStationId(string accountId, string stationId)
-        {
-            return await _context.Ratings
-                .FirstOrDefaultAsync(r => r.AccountId == accountId && r.StationId == stationId);
-        }
+
 
     }
 }
