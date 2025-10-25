@@ -2,21 +2,26 @@
 using BusinessObjects.Dtos;
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
+using BusinessObjects.TimeCoreHelper;
 using Humanizer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Net.payOS;
 using Net.payOS.Types;
+using Repositories.Repositories.BatteryRepo;
 using Repositories.Repositories.BatteryReportRepo;
+using Repositories.Repositories.EvDriverRepo;
 using Repositories.Repositories.ExchangeBatteryRepo;
+using Repositories.Repositories.FormRepo;
 using Repositories.Repositories.OrderRepo;
+using Repositories.Repositories.PackageRepo;
 using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
 using Services.ApiModels.Vehicle;
 using Services.Helpers;
 using Services.Services.VehicleService;
-using Repositories.Repositories.FormRepo;
-using Repositories.Repositories.BatteryRepo;
 
 namespace Services.Payments;
 
@@ -27,22 +32,29 @@ public class PayOSService : IPayOSService
     private readonly IConfiguration _config;
     private readonly IOrderRepository _orderRepository;
     private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
-    private readonly IBatteryReportRepo _batteryRepo;
+    private readonly IBatteryReportRepo _batteryReportRepo;
     private readonly IVehicleRepo _vehicleRepo;
     private readonly IVehicleService _vehicleService;
+    private readonly ILogger<PayOSService> _logger;
+    private readonly IPackageRepo _packageRepo;
+    private readonly IEvDriverRepo _evDriverRepo;
     private readonly IFormRepo _formRepo;
-    private readonly IBatteryRepo _batteryRepoRepo;
+    private readonly IBatteryRepo _batteryRepo;
+
     public PayOSService(
         PayOS payOs,
         PayOSHelper helper,
         IConfiguration config,
         IOrderRepository orderRepository,
         IExchangeBatteryRepo exchangeBatteryRepo,
-        IBatteryReportRepo batteryRepo,
+        IBatteryReportRepo batteryReportRepo,
         IVehicleRepo vehicleRepo,
         IVehicleService vehicleService,
+        ILogger<PayOSService> logger,
+        IPackageRepo packageRepo,
+        IEvDriverRepo evDriverRepo,
         IFormRepo formRepo,
-        IBatteryRepo batteryRepoRepo
+        IBatteryRepo batteryRepo
         )
     {
         _payOS = payOs;
@@ -50,16 +62,19 @@ public class PayOSService : IPayOSService
         _config = config;
         _orderRepository = orderRepository;
         _exchangeBatteryRepo = exchangeBatteryRepo;
-        _batteryRepo = batteryRepo;
+        _batteryReportRepo = batteryReportRepo;
         _vehicleRepo = vehicleRepo;
         _vehicleService = vehicleService;
+        _logger = logger;
+        _packageRepo = packageRepo;
+        _evDriverRepo = evDriverRepo;
         _formRepo = formRepo;
-        _batteryRepoRepo = batteryRepoRepo;
+        _batteryRepo = batteryRepo;
     }
 
     public async Task<ResultModel<PayOSWebhookResponseDto>> HandleWebhookAsync(PayOSWebhookRequestDto webhook)
     {
-       
+        // If webhook verification fails, do not modify other entities. Only return failure.
         if (!_helper.VerifyWebhook(webhook))
         {
             return new ResultModel<PayOSWebhookResponseDto>
@@ -87,80 +102,81 @@ public class PayOSService : IPayOSService
             };
         }
 
-        
+        // Only update the order status. Do not touch exchange battery or battery report entities here.
         var updateorder = await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
 
-        
-        try
+        if (updateorder.Status == PaymentStatus.Failed.ToString() &&
+        (updateorder.ServiceType == PaymentType.PrePaid.ToString() ||
+        updateorder.ServiceType == PaymentType.UsePackage.ToString()
+        ))
         {
-            if (status == PaymentStatus.Failed &&
-                (updateorder.ServiceType == PaymentType.PrePaid.ToString() || updateorder.ServiceType == PaymentType.PaidAtStation.ToString()))
+            var form = await _formRepo.GetById(updateorder.ServiceId);
+            if (form != null)
             {
-                
-                var form = await _formRepo.GetById(updateorder.ServiceId);
-                if (form != null)
-                {
-                    
-                    form.Status = BusinessObjects.Enums.FormStatusEnums.Deleted.ToString();
-                    form.UpdateDate = DateTime.UtcNow;
-                    await _formRepo.Update(form);
+                form.Status = FormStatusEnums.Deleted.ToString();
+                form.UpdateDate = TimeHepler.SystemTimeNow;
+                await _formRepo.Update(form);
 
-                    
-                    if (!string.IsNullOrEmpty(form.BatteryId))
+                if (!string.IsNullOrEmpty(form.BatteryId))
+                {
+                    var battery = await _batteryRepo.GetBatteryById(form.BatteryId);
+                    if (battery != null && battery.Status == BatteryStatusEnums.Booked.ToString())
                     {
-                        var battery = await _batteryRepoRepo.GetBatteryById(form.BatteryId);
-                        if (battery != null && battery.Status == BusinessObjects.Enums.BatteryStatusEnums.Booked.ToString())
-                        {
-                            battery.Status = BusinessObjects.Enums.BatteryStatusEnums.Available.ToString();
-                            battery.UpdateDate = DateTime.UtcNow;
-                            await _batteryRepoRepo.UpdateBattery(battery);
-                        }
+                        battery.Status = BatteryStatusEnums.Available.ToString();
+                        battery.UpdateDate = DateTime.UtcNow;
+                        await _batteryRepo.UpdateBattery(battery);
                     }
                 }
             }
         }
-        catch
+
+        if (updateorder.ServiceType == PaymentType.Package.ToString() &&
+        updateorder.Status == PaymentStatus.Paid.ToString())
         {
-           
-        }
-
-        if (updateorder.ServiceType == PaymentType.Package.ToString() && updateorder.Status == PaymentStatus.Paid.ToString())
-        {
-            var addVehicleInPackageRequest = new AddVehicleInPackageRequest
+            try
             {
-                Vin = updateorder.Vin,
-                PackageId = updateorder.ServiceId
-            };
+                var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
+                var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
 
-            var assignResult = await _vehicleService.AddVehicleInPackage(addVehicleInPackageRequest);
+                vehicle.PackageId = orderDetail2.ServiceId;
+                vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
+                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
 
-            if (!assignResult.IsSuccess)
+                await _vehicleRepo.UpdateVehicle(vehicle);
+
+                _logger.LogInformation("Vehicle {Vin} successfully assigned to package {PackageId}.", vehicle.Vin, package.PackageId);
+
+                return new ResultModel<PayOSWebhookResponseDto>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = "Vehicle assigned to package successfully",
+                    Data = new PayOSWebhookResponseDto
+                    {
+                        Success = true,
+                        Message = "Vehicle assigned to package successfully"
+                    }
+                };
+
+            }
+            catch (Exception ex)
             {
-                await _orderRepository.UpdateOrderStatusAsync(updateorder.OrderId, PaymentStatus.Failed.ToString());
+                _logger.LogError(ex, "Error while adding vehicle to package after payment. OrderId: {OrderId}", updateorder.OrderId);
+
                 return new ResultModel<PayOSWebhookResponseDto>
                 {
                     IsSuccess = false,
-                    StatusCode = 500,
-                    Message = assignResult.Message ?? ExchangeBatteryMessages.CreatePackageFailed,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = "Internal error while assigning vehicle to package",
                     Data = new PayOSWebhookResponseDto
                     {
                         Success = false,
-                        Message = assignResult.Message ?? ExchangeBatteryMessages.CreatePackageFailed
+                        Message = "Internal error while assigning vehicle to package"
                     }
                 };
             }
-
-            return new ResultModel<PayOSWebhookResponseDto>
-            {
-                IsSuccess = assignResult.IsSuccess,
-                StatusCode = assignResult.IsSuccess ? 200 : 500,
-                Message = assignResult.IsSuccess ? ExchangeBatteryMessages.CreateSuccess : assignResult.Message,
-                Data = new PayOSWebhookResponseDto
-                {
-                    Success = status == PaymentStatus.Paid,
-                    Message = assignResult.IsSuccess ? ExchangeBatteryMessages.CreatePackageSuccess : assignResult.Message ?? ExchangeBatteryMessages.CreateFailed,
-                }
-            };
         }
 
         var response = new PayOSWebhookResponseDto
