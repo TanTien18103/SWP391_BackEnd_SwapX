@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Services.ApiModels.Report;
 using Services.Services.ReportService;
 namespace SWP391_BackEnd.Controllers
 {
@@ -36,18 +37,33 @@ namespace SWP391_BackEnd.Controllers
         }
         [HttpPost("add_report")]
         [Authorize]
-        public async Task<IActionResult> AddReport([FromForm] Services.ApiModels.Report.AddReportRequest addReportRequest)
+        public async Task<IActionResult> AddReport([FromForm] AddReportRequest addReportRequest)
         {
             var res = await _reportService.AddReport(addReportRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("update_report")]
         [Authorize]
-        public async Task<IActionResult> UpdateReport([FromForm] Services.ApiModels.Report.UpdateReportRequest updateReportRequest)
+        public async Task<IActionResult> UpdateReport([FromForm] UpdateReportRequest updateReportRequest)
         {
             var res = await _reportService.UpdateReport(updateReportRequest);
             return StatusCode(res.StatusCode, res);
         }
 
+        [HttpPut("update_report_status")]
+        [Authorize(Roles = "Admin, Bsstaff")]
+        public async Task<IActionResult> UpdateReportStatus([FromForm] UpdateReportStatusRequest updateReportStatusRequest)
+        {
+            var res = await _reportService.UpdateReportStatus(updateReportStatusRequest);
+            return StatusCode(res.StatusCode, res);
+        }
+
+        [HttpGet("get_reports_by_station_id")]
+        [Authorize(Roles = "Admin, Bsstaff")]
+        public async Task<IActionResult> GetReportsByStationId([FromQuery] string stationId)
+        {
+            var res = await _reportService.GetReportsByStationId(stationId);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

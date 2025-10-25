@@ -15,5 +15,7 @@ namespace Services.Services.ReportService
         Task<ResultModel> AddReport(AddReportRequest addReportRequest);
         Task<ResultModel> UpdateReport(UpdateReportRequest updateReportRequest);
         Task<ResultModel> DeleteReport(string reportId);
+        Task<ResultModel> UpdateReportStatus(UpdateReportStatusRequest updateReportStatusRequest);
+        Task<ResultModel> GetReportsByStationId(string stationId);
     }
 }
