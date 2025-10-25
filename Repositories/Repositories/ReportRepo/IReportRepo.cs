@@ -13,5 +13,6 @@ namespace Repositories.Repositories.ReportRepo
         Task<Report> GetReportById(string reportId);
         Task<Report> AddReport(Report report);
         Task<Report> UpdateReport(Report report);
+        Task<List<Report>> GetReportsByStationId(string stationId);
     }
 }

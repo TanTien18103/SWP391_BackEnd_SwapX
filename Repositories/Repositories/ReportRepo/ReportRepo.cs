@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +27,14 @@ namespace Repositories.Repositories.ReportRepo
         }
         public async Task<Report> GetReportById(string reportId)
         {
-            return _context.Reports.FirstOrDefault(r => r.ReportId == reportId);
+            return await _context.Reports.FirstOrDefaultAsync(r => r.ReportId == reportId);
         }
+
+        public async Task<List<Report>> GetReportsByStationId(string stationId)
+        {
+            return await _context.Reports.Where(r => r.StationId == stationId).ToListAsync();
+        }
+
         public async Task<Report> UpdateReport(Report report)
         {
             _context.Reports.Update(report);

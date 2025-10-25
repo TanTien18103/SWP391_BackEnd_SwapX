@@ -441,6 +441,12 @@ namespace BusinessObjects.Constants
         public const string GET_REPORT_FAIL = "Lấy báo cáo thất bại";
         public const string GET_REPORT_SUCCESS = "Lấy báo cáo thành công";
         public const string DELETE_REPORT_FAILED = "Xóa báo cáo thất bại";
+        public const string UPDATE_REPORT_STATUS_SUCCESS = "Cập nhật trạng thái báo cáo thành công";
+        public const string REPORT_ALREADY_COMPLETED = "Báo cáo đã được hoàn thành";
+        public const string REPORT_STATUS_SAME = "Báo cáo đã ở trạng thái này";
+        public const string UPDATE_REPORT_STATUS_FAILED = "Cập nhật trạng thái báo cáo thất bại";
+        public const string GET_REPORTS_BY_STATION_FAIL= "Lấy báo cáo theo trạm thất bại";
+        public const string GET_REPORTS_BY_STATION_SUCCESS = "Lấy báo cáo theo trạm thành công";
     }
     //for BatteryReport (0-0-1)
     public static class ResponseMessageConstantsBatteryReport
