@@ -55,8 +55,8 @@ namespace Services.Services.RatingService
                         Data = null
                     };
                 }
-                var exitstRating = await _ratingRepo.GetRatingByAccountIdAndStationId(addRatingRequest.AccountId, addRatingRequest.StationId);
-                if (exitstRating != null)
+                var existingRatings = await _ratingRepo.GetRatingByAccountIdAndStationId(addRatingRequest.AccountId, addRatingRequest.StationId);
+                if (existingRatings != null && existingRatings.Any())
                 {
                     return new ResultModel
                     {
@@ -184,6 +184,7 @@ namespace Services.Services.RatingService
                         Rating1 = rating.Rating1,
                         Description = rating.Description,
                         StationId = rating.StationId,
+                        Image = rating.Image,
                         Status = rating.Status,
                         StartDate = rating.StartDate,
                         UpdateDate = rating.UpdateDate,
