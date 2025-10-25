@@ -155,7 +155,7 @@ namespace Services.Services.ReportService
                     Message = ResponseMessageConstantsReport.GET_ALL_REPORT_SUCCESS,
                     Data = reports
                 };
-                if(reports == null || reports.Count == 0)
+                if (reports == null || reports.Count == 0)
                 {
                     return new ResultModel
                     {
@@ -221,6 +221,46 @@ namespace Services.Services.ReportService
             }
         }
 
+        public async Task<ResultModel> GetReportsByStationId(string stationId)
+        {
+            try
+            {
+
+                var reports = await _reportReport.GetReportsByStationId(stationId);
+                if (reports == null || reports.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsReport.REPORT_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsReport.GET_REPORTS_BY_STATION_SUCCESS,
+                    Data = reports
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsReport.GET_REPORTS_BY_STATION_FAIL,
+                    Data = null
+                };
+            }
+        }
+
         public async Task<ResultModel> UpdateReport(UpdateReportRequest updateReportRequest)
         {
             try
@@ -259,6 +299,69 @@ namespace Services.Services.ReportService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsReport.UPDATE_REPORT_FAILED,
+                    Data = null
+                };
+            }
+        }
+
+        public async Task<ResultModel> UpdateReportStatus(UpdateReportStatusRequest updateReportStatusRequest)
+        {
+            try
+            {
+                var report = await _reportReport.GetReportById(updateReportStatusRequest.ReportId);
+                if (report == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsReport.REPORT_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if (report.Status == updateReportStatusRequest.Status.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsReport.REPORT_STATUS_SAME,
+                        Data = null
+                    };
+                }
+                if (report.Status == ReportStatusEnums.Completed.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsReport.REPORT_ALREADY_COMPLETED,
+                        Data = null
+                    };
+                }
+                report.Status = updateReportStatusRequest.Status.ToString();
+                report.UpdateDate = TimeHepler.SystemTimeNow;
+                await _reportReport.UpdateReport(report);
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsReport.UPDATE_REPORT_STATUS_SUCCESS,
+                    Data = report
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsReport.UPDATE_REPORT_STATUS_FAILED,
                     Data = null
                 };
             }

@@ -80,5 +80,12 @@ namespace SWP391_BackEnd.Controllers
             var res = await _batteryService.CreateBatteryByVehicleName(createBatteryByVehicleName);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpPut("delete_battery_in_station")]
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> DeleteBatteryInStation([FromForm] string? batteryId)
+        {
+            var res = await _batteryService.DeleteBatteryInStation(batteryId);
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }

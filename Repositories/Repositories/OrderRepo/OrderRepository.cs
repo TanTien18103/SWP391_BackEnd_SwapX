@@ -133,4 +133,10 @@ public class OrderRepository : IOrderRepository
         return await _context.Orders
             .AnyAsync(o => o.AccountId == accountId && o.ServiceType == serviceType && o.Status == PaymentStatus.Pending.ToString());
     }
+    public async Task<List<Order>> GetOrdersByAccountId(string accountId)
+    {
+        return await _context.Orders
+            .Where(o => o.AccountId == accountId)
+            .ToListAsync();
+    }
 }

@@ -236,8 +236,15 @@ namespace BusinessObjects.Constants
         public const string BATTERY_NOT_FOUND_OR_NOT_BOOKED = "Không tìm thấy pin hoặc pin chưa được đặt";
         public const string BATTERY_NOT_AVAILABLE = "Pin không khả dụng";
         public const string BATTERY_NOT_EXIST = "Pin không tồn tại";
+        public const string BATTERY_NOT_BELONG_TO_VEHICLE = "Pin không thuộc về xe";
 
-        public static string BATTERY_NOT_BELONG_TO_VEHICLE { get; set; }
+        public const string DELETE_BATTERY_IN_STATION_FAIL = "Xóa pin khỏi trạm thất bại";
+
+        public const string BATTERY_DONT_HAVE_STATION = "Pin chưa có trạm";
+
+        public const string DELETE_BATTERY_IN_STATION_SUCCESS = "Xóa pin khỏi trạm thành công";
+
+        public const string BATTERY_BOOKED = "Pin đã được đặt không thể rời khỏi trạm";
     }
     public static class EmailConstants
     {
@@ -434,6 +441,12 @@ namespace BusinessObjects.Constants
         public const string GET_REPORT_FAIL = "Lấy báo cáo thất bại";
         public const string GET_REPORT_SUCCESS = "Lấy báo cáo thành công";
         public const string DELETE_REPORT_FAILED = "Xóa báo cáo thất bại";
+        public const string UPDATE_REPORT_STATUS_SUCCESS = "Cập nhật trạng thái báo cáo thành công";
+        public const string REPORT_ALREADY_COMPLETED = "Báo cáo đã được hoàn thành";
+        public const string REPORT_STATUS_SAME = "Báo cáo đã ở trạng thái này";
+        public const string UPDATE_REPORT_STATUS_FAILED = "Cập nhật trạng thái báo cáo thất bại";
+        public const string GET_REPORTS_BY_STATION_FAIL= "Lấy báo cáo theo trạm thất bại";
+        public const string GET_REPORTS_BY_STATION_SUCCESS = "Lấy báo cáo theo trạm thành công";
     }
     //for BatteryReport (0-0-1)
     public static class ResponseMessageConstantsBatteryReport
