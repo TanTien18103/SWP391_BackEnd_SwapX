@@ -167,6 +167,17 @@ public class PayOSService : IPayOSService
             };
         }
 
+        if (orderDetail2.Status.ToLower() == PaymentStatus.Paid.ToString().ToLower())
+        {
+            return new ResultModel<PayOSWebhookResponseDto>
+            {
+                IsSuccess = false,
+                StatusCode = 200,
+                Message = ExchangeBatteryMessages.NotFound,
+                Data = new PayOSWebhookResponseDto { Success = false, Message = ExchangeBatteryMessages.NotFound }
+            };
+        }
+
         // Only update the order status. Do not touch exchange battery or battery report entities here.
         var updateorder = await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
 
