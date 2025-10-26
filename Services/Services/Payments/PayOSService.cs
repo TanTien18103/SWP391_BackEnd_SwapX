@@ -22,6 +22,7 @@ using Services.ApiModels;
 using Services.ApiModels.Vehicle;
 using Services.Helpers;
 using Services.Services.VehicleService;
+using System.Text.Json;
 
 namespace Services.Payments;
 
@@ -74,9 +75,20 @@ public class PayOSService : IPayOSService
 
     public async Task<ResultModel<PayOSWebhookResponseDto>> HandleWebhookAsync(PayOSWebhookRequestDto webhook)
     {
+        // Log incoming webhook for diagnostics (safe to log in non-sensitive environments).
+        try
+        {
+            _logger.LogInformation("Received PayOS webhook: {Webhook}", JsonSerializer.Serialize(webhook));
+        }
+        catch
+        {
+            // Ignore logging errors
+        }
+
         // If webhook verification fails, do not modify other entities. Only return failure.
         if (!_helper.VerifyWebhook(webhook))
         {
+            _logger.LogWarning("PayOS webhook verification failed for payload: {Payload}", JsonSerializer.Serialize(webhook));
             return new ResultModel<PayOSWebhookResponseDto>
             {
                 IsSuccess = false,
@@ -86,23 +98,39 @@ public class PayOSService : IPayOSService
             };
         }
 
+        // Determine success using multiple potential fields/values (robust against provider variations)
         var code = webhook.Data?.Code ?? webhook.Code;
         var desc = webhook.Data?.Desc ?? webhook.Desc;
+        var rawCode = code?.Trim();
 
-        // Dựa trên Code hoặc Desc hoặc Success flag
-        bool isSuccess = webhook.Success
-            || string.Equals(code, "00", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(code, "PAYMENT_SUCCESS", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(code, "SUCCESS", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(desc, "Giao dịch thành công", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(desc, "Success", StringComparison.OrdinalIgnoreCase);
+        var isSuccessCode = rawCode is not null && (
+            string.Equals(rawCode, "00", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(rawCode, "0", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(rawCode, "PAYMENT_SUCCESS", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(rawCode, "SUCCESS", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(rawCode, "200", StringComparison.OrdinalIgnoreCase)
+        );
 
-        var status = isSuccess ? PaymentStatus.Paid : PaymentStatus.Failed;
+        var isSuccessDesc = !string.IsNullOrEmpty(desc) && (
+            string.Equals(desc, "Giao dịch thành công", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(desc, "Success", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(desc, "Payment successful", StringComparison.OrdinalIgnoreCase)
+        );
+
+        var status = (webhook.Success || isSuccessCode || isSuccessDesc)
+            ? PaymentStatus.Paid
+            : PaymentStatus.Failed;
+
+        _logger.LogInformation("Computed payment status from webhook. Code='{Code}', Desc='{Desc}', SuccessFlag={SuccessFlag} => Status={Status}", rawCode, desc, webhook.Success, status);
+
+        var orderCode = webhook.Data?.OrderCode ?? 0;
+        _logger.LogInformation("Looking up order by orderCode: {OrderCode}", orderCode);
 
         var orderDetail2 = await _orderRepository.GetOrderByOrderCodeAsync(webhook.Data.OrderCode);
 
         if (orderDetail2 == null)
         {
+            _logger.LogWarning("Order not found for orderCode: {OrderCode}", orderCode);
             return new ResultModel<PayOSWebhookResponseDto>
             {
                 IsSuccess = false,
@@ -114,6 +142,8 @@ public class PayOSService : IPayOSService
 
         // Only update the order status. Do not touch exchange battery or battery report entities here.
         var updateorder = await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
+
+        _logger.LogInformation("Order {OrderId} status updated to {StatusInDb}", updateorder.OrderId, updateorder.Status);
 
         if (updateorder.Status == PaymentStatus.Failed.ToString() &&
         (updateorder.ServiceType == PaymentType.PrePaid.ToString() ||
@@ -143,15 +173,50 @@ public class PayOSService : IPayOSService
         if (updateorder.ServiceType == PaymentType.Package.ToString() &&
         updateorder.Status == PaymentStatus.Paid.ToString())
         {
+            try
+            {
+                var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
+                var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
 
-            var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
-            var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
+                vehicle.PackageId = orderDetail2.ServiceId;
+                vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
+                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
 
-            vehicle.PackageId = orderDetail2.ServiceId;
-            vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
-            vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+                await _vehicleRepo.UpdateVehicle(vehicle);
 
-            await _vehicleRepo.UpdateVehicle(vehicle);
+                _logger.LogInformation("Vehicle {Vin} successfully assigned to package {PackageId}.", vehicle.Vin, package.PackageId);
+
+                return new ResultModel<PayOSWebhookResponseDto>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = "Vehicle assigned to package successfully",
+                    Data = new PayOSWebhookResponseDto
+                    {
+                        Success = true,
+                        Message = "Vehicle assigned to package successfully"
+                    }
+                };
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while adding vehicle to package after payment. OrderId: {OrderId}", updateorder.OrderId);
+
+                return new ResultModel<PayOSWebhookResponseDto>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = "Internal error while assigning vehicle to package",
+                    Data = new PayOSWebhookResponseDto
+                    {
+                        Success = false,
+                        Message = "Internal error while assigning vehicle to package"
+                    }
+                };
+            }
         }
 
         var response = new PayOSWebhookResponseDto
@@ -159,6 +224,8 @@ public class PayOSService : IPayOSService
             Success = status == PaymentStatus.Paid,
             Message = status == PaymentStatus.Paid ? ExchangeBatteryMessages.CreateSuccess : ExchangeBatteryMessages.CreateFailed
         };
+
+        _logger.LogInformation("Finished handling PayOS webhook for order {OrderId}. Success={Success}", orderDetail2.OrderId, response.Success);
 
         return new ResultModel<PayOSWebhookResponseDto>
         {
