@@ -86,9 +86,18 @@ public class PayOSService : IPayOSService
             };
         }
 
-        var status = webhook.Code == "00"
-            ? PaymentStatus.Paid
-            : PaymentStatus.Failed;
+        var code = webhook.Data?.Code ?? webhook.Code;
+        var desc = webhook.Data?.Desc ?? webhook.Desc;
+
+        // Dựa trên Code hoặc Desc hoặc Success flag
+        bool isSuccess = webhook.Success
+            || string.Equals(code, "00", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(code, "PAYMENT_SUCCESS", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(code, "SUCCESS", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(desc, "Giao dịch thành công", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(desc, "Success", StringComparison.OrdinalIgnoreCase);
+
+        var status = isSuccess ? PaymentStatus.Paid : PaymentStatus.Failed;
 
         var orderDetail2 = await _orderRepository.GetOrderByOrderCodeAsync(webhook.Data.OrderCode);
 
@@ -134,50 +143,15 @@ public class PayOSService : IPayOSService
         if (updateorder.ServiceType == PaymentType.Package.ToString() &&
         updateorder.Status == PaymentStatus.Paid.ToString())
         {
-            try
-            {
-                var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
-                var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
 
-                vehicle.PackageId = orderDetail2.ServiceId;
-                vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
-                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+            var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
+            var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
 
-                await _vehicleRepo.UpdateVehicle(vehicle);
+            vehicle.PackageId = orderDetail2.ServiceId;
+            vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
+            vehicle.UpdateDate = TimeHepler.SystemTimeNow;
 
-                _logger.LogInformation("Vehicle {Vin} successfully assigned to package {PackageId}.", vehicle.Vin, package.PackageId);
-
-                return new ResultModel<PayOSWebhookResponseDto>
-                {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status200OK,
-                    ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = "Vehicle assigned to package successfully",
-                    Data = new PayOSWebhookResponseDto
-                    {
-                        Success = true,
-                        Message = "Vehicle assigned to package successfully"
-                    }
-                };
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while adding vehicle to package after payment. OrderId: {OrderId}", updateorder.OrderId);
-
-                return new ResultModel<PayOSWebhookResponseDto>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = "Internal error while assigning vehicle to package",
-                    Data = new PayOSWebhookResponseDto
-                    {
-                        Success = false,
-                        Message = "Internal error while assigning vehicle to package"
-                    }
-                };
-            }
+            await _vehicleRepo.UpdateVehicle(vehicle);
         }
 
         var response = new PayOSWebhookResponseDto
