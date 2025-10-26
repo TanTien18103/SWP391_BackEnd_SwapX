@@ -23,6 +23,8 @@ using Services.ApiModels.Vehicle;
 using Services.Helpers;
 using Services.Services.VehicleService;
 using System.Text.Json;
+using System.Globalization;
+using System.Text;
 
 namespace Services.Payments;
 
@@ -111,10 +113,35 @@ public class PayOSService : IPayOSService
             string.Equals(rawCode, "200", StringComparison.OrdinalIgnoreCase)
         );
 
-        var isSuccessDesc = !string.IsNullOrEmpty(desc) && (
-            string.Equals(desc, "Giao dịch thành công", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(desc, "Success", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(desc, "Payment successful", StringComparison.OrdinalIgnoreCase)
+        // Normalize and sanitize description to improve matching (remove diacritics, question marks, lower-case)
+        var descNormalized = string.Empty;
+        if (!string.IsNullOrEmpty(desc))
+        {
+            try
+            {
+                var formD = desc.Normalize(NormalizationForm.FormD);
+                var sb = new StringBuilder();
+                foreach (var ch in formD)
+                {
+                    var uc = CharUnicodeInfo.GetUnicodeCategory(ch);
+                    if (uc != UnicodeCategory.NonSpacingMark)
+                        sb.Append(ch);
+                }
+                descNormalized = sb.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant();
+                // remove stray question marks and non-letter/digit characters that sometimes appear due to encoding
+                descNormalized = new string(descNormalized.Where(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)).ToArray());
+            }
+            catch
+            {
+                descNormalized = desc.ToLowerInvariant();
+            }
+        }
+
+        var isSuccessDesc = !string.IsNullOrEmpty(descNormalized) && (
+            descNormalized.Contains("thanh cong") || // matches 'thành công' after normalization
+            descNormalized.Contains("success") ||
+            descNormalized.Contains("payment successful") ||
+            descNormalized.Contains("giao dich thanh cong")
         );
 
         var status = (webhook.Success || isSuccessCode || isSuccessDesc)
@@ -170,54 +197,77 @@ public class PayOSService : IPayOSService
             }
         }
 
-        if (updateorder.ServiceType == PaymentType.Package.ToString() &&
-        updateorder.Status == PaymentStatus.Paid.ToString())
+        // If a package payment failed, ensure any pre-assigned package on the vehicle is reverted.
+        if (updateorder.Status == PaymentStatus.Failed.ToString() &&
+            updateorder.ServiceType == PaymentType.Package.ToString())
         {
             try
             {
-                var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
-                var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
-
-                vehicle.PackageId = orderDetail2.ServiceId;
-                vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
-                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
-
-                await _vehicleRepo.UpdateVehicle(vehicle);
-
-                _logger.LogInformation("Vehicle {Vin} successfully assigned to package {PackageId}.", vehicle.Vin, package.PackageId);
-
-                return new ResultModel<PayOSWebhookResponseDto>
+                var vehicleToRevert = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
+                if (vehicleToRevert != null && !string.IsNullOrEmpty(vehicleToRevert.PackageId) &&
+                    vehicleToRevert.PackageId == updateorder.ServiceId)
                 {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status200OK,
-                    ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = "Vehicle assigned to package successfully",
-                    Data = new PayOSWebhookResponseDto
-                    {
-                        Success = true,
-                        Message = "Vehicle assigned to package successfully"
-                    }
-                };
-
+                    _logger.LogInformation("Reverting package {PackageId} on vehicle {Vin} due to failed payment for order {OrderId}", vehicleToRevert.PackageId, vehicleToRevert.Vin, updateorder.OrderId);
+                    vehicleToRevert.PackageId = null;
+                    vehicleToRevert.PackageExpiredate = null;
+                    vehicleToRevert.UpdateDate = TimeHepler.SystemTimeNow;
+                    await _vehicleRepo.UpdateVehicle(vehicleToRevert);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while adding vehicle to package after payment. OrderId: {OrderId}", updateorder.OrderId);
-
-                return new ResultModel<PayOSWebhookResponseDto>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = "Internal error while assigning vehicle to package",
-                    Data = new PayOSWebhookResponseDto
-                    {
-                        Success = false,
-                        Message = "Internal error while assigning vehicle to package"
-                    }
-                };
+                _logger.LogError(ex, "Error while reverting package on vehicle after failed payment. OrderId: {OrderId}", updateorder.OrderId);
             }
         }
+
+        if (updateorder.ServiceType == PaymentType.Package.ToString() &&
+         updateorder.Status == PaymentStatus.Paid.ToString())
+         {
+             try
+             {
+                 var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
+                 var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
+
+                 vehicle.PackageId = orderDetail2.ServiceId;
+                 vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
+                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+
+                 await _vehicleRepo.UpdateVehicle(vehicle);
+
+                 _logger.LogInformation("Vehicle {Vin} successfully assigned to package {PackageId}.", vehicle.Vin, package.PackageId);
+
+                 return new ResultModel<PayOSWebhookResponseDto>
+                 {
+                     IsSuccess = true,
+                     StatusCode = StatusCodes.Status200OK,
+                     ResponseCode = ResponseCodeConstants.SUCCESS,
+                     Message = "Vehicle assigned to package successfully",
+                     Data = new PayOSWebhookResponseDto
+                     {
+                         Success = true,
+                         Message = "Vehicle assigned to package successfully"
+                     }
+                 };
+
+             }
+             catch (Exception ex)
+             {
+                 _logger.LogError(ex, "Error while adding vehicle to package after payment. OrderId: {OrderId}", updateorder.OrderId);
+
+                 return new ResultModel<PayOSWebhookResponseDto>
+                 {
+                     IsSuccess = false,
+                     StatusCode = StatusCodes.Status500InternalServerError,
+                     ResponseCode = ResponseCodeConstants.FAILED,
+                     Message = "Internal error while assigning vehicle to package",
+                     Data = new PayOSWebhookResponseDto
+                     {
+                         Success = false,
+                         Message = "Internal error while assigning vehicle to package"
+                     }
+                 };
+             }
+         }
 
         var response = new PayOSWebhookResponseDto
         {
