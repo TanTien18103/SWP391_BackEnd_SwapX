@@ -498,4 +498,12 @@ public class ExchangeBatteryService : IExchangeBatteryService
         }
     }
 
+    public async Task<ResultModel> GetExchangesByScheduleId(string stationscheduleId)
+    {
+        var list = await _exchangeRepo.GetByScheduleId(stationscheduleId);
+        if (list == null || !list.Any())
+            return new ResultModel { StatusCode = 204, Message = ExchangeMessages.ListEmpty };
+        var response = list.Select(MapToResponse).ToList();
+        return new ResultModel { StatusCode = 200, IsSuccess = true, Data = response };
+    }
 }

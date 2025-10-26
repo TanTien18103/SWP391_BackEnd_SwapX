@@ -118,5 +118,20 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Include(e => e.VinNavigation)
                 .FirstOrDefaultAsync(e => e.OrderId == orderId);
         }
+
+        public async Task<List<ExchangeBattery>> GetByScheduleId(string stationscheduleId)
+        {
+            return await _context.ExchangeBatteries
+                .AsNoTracking()
+                .Include(e => e.Station)
+                .Include(e => e.Order)
+                .Include(e => e.NewBattery)
+                .Include(e => e.OldBattery)
+                .Include(e => e.StaffAccount)
+                .Include(e => e.Schedule)
+                .Include(e => e.VinNavigation)
+                .Where(e => e.ScheduleId == stationscheduleId)
+                .ToListAsync();
+        }
     }
 }

@@ -458,4 +458,11 @@ public class OrderService : IOrderService
 
         return new ResultModel { StatusCode = 200, IsSuccess = true, Message = "Order deleted" };
     }
+
+    public async Task<ResultModel> GetOrderByServiceId(string serviceId)
+    {
+        var orders = await _orderRepository.GetOrdersByServiceIdAsync(serviceId);
+        var response = orders.Select(order => new OrderResponse(order)).ToList();
+        return new ResultModel { StatusCode = 200, IsSuccess = true, Data = response };
+    }
 }

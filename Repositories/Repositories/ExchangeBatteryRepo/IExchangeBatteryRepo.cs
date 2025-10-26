@@ -12,4 +12,5 @@ public interface IExchangeBatteryRepo
     Task<List<ExchangeBattery>> GetByStationId(string stationId);
     Task<List<ExchangeBattery>> GetByDriverId(string driverId);
     Task<ExchangeBattery?> GetByOrderId(string orderId);
+    Task<List<ExchangeBattery>> GetByScheduleId(string stationscheduleId);
 }
