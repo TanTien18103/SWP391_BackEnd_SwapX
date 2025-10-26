@@ -112,6 +112,18 @@ public class PayOSService : IPayOSService
             };
         }
 
+        if (string.Equals(orderDetail2.Status, PaymentStatus.Paid.ToString(), StringComparison.OrdinalIgnoreCase))
+        {
+            // Đơn hàng đã được xử lý thành công trước đó. Bỏ qua các bước update.
+            return new ResultModel<PayOSWebhookResponseDto>
+            {
+                IsSuccess = true, // Trả về thành công để báo PayOS không cần retry
+                StatusCode = 200,
+                Message = ExchangeBatteryMessages.CreateSuccess + " (Already Paid)",
+                Data = new PayOSWebhookResponseDto { Success = true, Message = ExchangeBatteryMessages.CreateSuccess }
+            };
+        }
+
         // Only update the order status. Do not touch exchange battery or battery report entities here.
         var updateorder = await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
 
@@ -141,19 +153,35 @@ public class PayOSService : IPayOSService
         }
 
         if (updateorder.ServiceType == PaymentType.Package.ToString() &&
-        updateorder.Status == PaymentStatus.Paid.ToString())
+       updateorder.Status == PaymentStatus.Paid.ToString())
         {
+            try
+            {
+                var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
+                var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
 
-            var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
-            var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
-
-            vehicle.PackageId = orderDetail2.ServiceId;
-            vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
-            vehicle.UpdateDate = TimeHepler.SystemTimeNow;
-
-            await _vehicleRepo.UpdateVehicle(vehicle);
+                // ĐẢM BẢO vehicle VÀ package KHÔNG NULL TRƯỚC KHI TRUY CẬP THUỘC TÍNH
+                if (vehicle != null && package != null)
+                {
+                    vehicle.PackageId = orderDetail2.ServiceId;
+                    vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
+                    vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+                    await _vehicleRepo.UpdateVehicle(vehicle);
+                }
+                else
+                {
+                    // Xử lý khi vehicle hoặc package không tìm thấy
+                    _logger.LogError($"[PayOS Webhook] Failed to update Vehicle package. Vin: {orderDetail2.Vin}, PackageId: {orderDetail2.ServiceId}");
+                    // KHÔNG THROW EXCEPTION Ở ĐÂY. Nếu muốn thất bại, cần có logic rõ ràng.
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[PayOS Webhook] Error processing Package update for Order ID: {updateorder.OrderId}");
+                // Có thể muốn cập nhật lại status thành InternalError hoặc để nguyên Paid nếu đã ghi nhận thành công, 
+                // tùy thuộc vào quy tắc kinh doanh.
+            }
         }
-
         var response = new PayOSWebhookResponseDto
         {
             Success = status == PaymentStatus.Paid,
