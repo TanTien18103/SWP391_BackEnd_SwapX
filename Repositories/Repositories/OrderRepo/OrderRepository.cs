@@ -139,4 +139,11 @@ public class OrderRepository : IOrderRepository
             .Where(o => o.AccountId == accountId)
             .ToListAsync();
     }
+
+    public async Task<List<Order>> GetOrdersByServiceIdAsync(string serviceId)
+    {
+        return await _context.Orders
+            .Where(o => o.ServiceId == serviceId)
+            .ToListAsync();
+    }
 }

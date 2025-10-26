@@ -324,7 +324,7 @@ namespace Services.Services.StationScheduleService
             }
             catch (Exception ex)
             {
-              return new ResultModel
+                return new ResultModel
                 {
                     StatusCode = StatusCodes.Status500InternalServerError,
                     IsSuccess = false,
@@ -363,7 +363,9 @@ namespace Services.Services.StationScheduleService
                         Data = null
                     };
                 }
-                if (updateStatusStationScheduleRequest.Status == StationScheduleStatusEnums.Completed || updateStatusStationScheduleRequest.Status == StationScheduleStatusEnums.Completed && stationSchedule.Date > TimeHepler.SystemTimeNow)
+                if (updateStatusStationScheduleRequest.Status == StationScheduleStatusEnums.Completed &&
+                    stationSchedule.Date.HasValue &&
+                    stationSchedule.Date!.Value.Date > TimeHepler.SystemTimeNow.Date)
                 {
                     return new ResultModel
                     {
@@ -374,6 +376,7 @@ namespace Services.Services.StationScheduleService
                         Data = null
                     };
                 }
+
                 if (stationSchedule.Status == StationScheduleStatusEnums.Completed.ToString())
                 {
                     return new ResultModel

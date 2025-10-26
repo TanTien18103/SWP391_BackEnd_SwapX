@@ -87,4 +87,12 @@ public class ExchangeBatteryController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
+    [HttpGet("get_exchanges_by_schedule/{stationscheduleId}")]
+    [Authorize(Roles = "Bsstaff, Admin")]
+    public async Task<IActionResult> GetExchangesByScheduleId(string stationscheduleId)
+    {
+        var result = await _exchangeService.GetExchangesByScheduleId(stationscheduleId);
+        return StatusCode(result.StatusCode, result);
+    }
+
 }

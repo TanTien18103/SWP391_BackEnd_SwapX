@@ -11,4 +11,5 @@ public interface IOrderService
     Task<ResultModel> GetAllOrders();
     Task<ResultModel> FilterOrders(OrderFilterRequest filter);
     Task<ResultModel> DeleteOrder(string orderId);
+    Task<ResultModel> GetOrderByServiceId(string serviceId);
 }
