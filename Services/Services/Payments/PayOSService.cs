@@ -22,6 +22,7 @@ using Services.ApiModels;
 using Services.ApiModels.Vehicle;
 using Services.Helpers;
 using Services.Services.VehicleService;
+using System.Text.Json;
 
 namespace Services.Payments;
 
@@ -74,9 +75,20 @@ public class PayOSService : IPayOSService
 
     public async Task<ResultModel<PayOSWebhookResponseDto>> HandleWebhookAsync(PayOSWebhookRequestDto webhook)
     {
+        // Log incoming webhook for diagnostics (safe to log in non-sensitive environments).
+        try
+        {
+            _logger.LogInformation("Received PayOS webhook: {Webhook}", JsonSerializer.Serialize(webhook));
+        }
+        catch
+        {
+            // Ignore logging errors
+        }
+
         // If webhook verification fails, do not modify other entities. Only return failure.
         if (!_helper.VerifyWebhook(webhook))
         {
+            _logger.LogWarning("PayOS webhook verification failed for payload: {Payload}", JsonSerializer.Serialize(webhook));
             return new ResultModel<PayOSWebhookResponseDto>
             {
                 IsSuccess = false,
@@ -86,14 +98,29 @@ public class PayOSService : IPayOSService
             };
         }
 
-        var status = webhook.Code == "00"
+        // Make success-code check more tolerant: trim, accept common success variants and the boolean 'Success' flag
+        var rawCode = webhook.Code?.Trim();
+        var isSuccessCode = rawCode is not null && (
+            rawCode == "00" ||
+            rawCode == "0" ||
+            string.Equals(rawCode, "SUCCESS", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(rawCode, "200", StringComparison.OrdinalIgnoreCase)
+        );
+
+        var status = (webhook.Success || isSuccessCode)
             ? PaymentStatus.Paid
             : PaymentStatus.Failed;
+
+        _logger.LogInformation("Computed payment status from webhook. Code='{Code}', SuccessFlag={SuccessFlag} => Status={Status}", rawCode, webhook.Success, status);
+
+        var orderCode = webhook.Data?.OrderCode ?? 0;
+        _logger.LogInformation("Looking up order by orderCode: {OrderCode}", orderCode);
 
         var orderDetail2 = await _orderRepository.GetOrderByOrderCodeAsync(webhook.Data.OrderCode);
 
         if (orderDetail2 == null)
         {
+            _logger.LogWarning("Order not found for orderCode: {OrderCode}", orderCode);
             return new ResultModel<PayOSWebhookResponseDto>
             {
                 IsSuccess = false,
@@ -105,6 +132,8 @@ public class PayOSService : IPayOSService
 
         // Only update the order status. Do not touch exchange battery or battery report entities here.
         var updateorder = await _orderRepository.UpdateOrderStatusAsync(orderDetail2.OrderId, status.ToString());
+
+        _logger.LogInformation("Order {OrderId} status updated to {StatusInDb}", updateorder.OrderId, updateorder.Status);
 
         if (updateorder.Status == PaymentStatus.Failed.ToString() &&
         (updateorder.ServiceType == PaymentType.PrePaid.ToString() ||
@@ -185,6 +214,8 @@ public class PayOSService : IPayOSService
             Success = status == PaymentStatus.Paid,
             Message = status == PaymentStatus.Paid ? ExchangeBatteryMessages.CreateSuccess : ExchangeBatteryMessages.CreateFailed
         };
+
+        _logger.LogInformation("Finished handling PayOS webhook for order {OrderId}. Success={Success}", orderDetail2.OrderId, response.Success);
 
         return new ResultModel<PayOSWebhookResponseDto>
         {
