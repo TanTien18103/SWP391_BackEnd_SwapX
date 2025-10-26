@@ -86,11 +86,12 @@ public class PayOSService : IPayOSService
             };
         }
 
-        var status = webhook.Code == "00" && webhook.Success
+        var status = webhook.Code == "00"
             ? PaymentStatus.Paid
             : PaymentStatus.Failed;
 
         var orderDetail2 = await _orderRepository.GetOrderByOrderCodeAsync(webhook.Data.OrderCode);
+
         if (orderDetail2 == null)
         {
             return new ResultModel<PayOSWebhookResponseDto>

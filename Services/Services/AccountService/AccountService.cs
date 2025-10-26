@@ -50,8 +50,10 @@ namespace Services.Services.AccountService
                     ResponseMessageConstantsUser.USERNAME_DUPLICATED,
                     StatusCodes.Status400BadRequest);
             }
-            var user = users.FirstOrDefault(u=>u.Status==AccountStatusEnums.Active.ToString() && u.Username==username);
-            if (user.Status != AccountStatusEnums.Active.ToString())
+
+            var user = users.FirstOrDefault(u => u.Status == AccountStatusEnums.Active.ToString() && u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+
+            if (user == null)
             {
                 throw new AppException(ResponseCodeConstants.BAD_REQUEST,
                     ResponseMessageIdentity.ACCOUNT_INACTIVE,
