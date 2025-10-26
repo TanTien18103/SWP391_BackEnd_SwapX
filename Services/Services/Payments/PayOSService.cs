@@ -98,7 +98,7 @@ public class PayOSService : IPayOSService
             };
         }
 
-        // Determine success using multiple potential fields/values (robust against provider variations)
+        
         var code = webhook.Data?.Code ?? webhook.Code;
         var desc = webhook.Data?.Desc ?? webhook.Desc;
         var rawCode = code?.Trim();
