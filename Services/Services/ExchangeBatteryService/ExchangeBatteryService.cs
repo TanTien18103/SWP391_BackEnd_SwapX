@@ -15,6 +15,7 @@ using Services.ServicesHelpers;
 using Microsoft.AspNetCore.Http;
 using Repositories.Repositories.VehicleRepo;
 using Repositories.Repositories.BatteryHistoryRepo;
+using Repositories.Repositories.StationScheduleRepo;
 
 namespace Services.Services.ExchangeBatteryService;
 
@@ -27,6 +28,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
     private readonly IBatteryReportRepo _batteryReportRepository;
     private readonly IVehicleRepo _vehicleRepo;
     private readonly IBatteryHistoryRepo _batteryHistoryRepo;
+    private readonly IStationScheduleRepo _stationScheduleRepo;
 
     public ExchangeBatteryService(
         IExchangeBatteryRepo exchangeRepo,
@@ -35,7 +37,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
         IOrderRepository orderRepo,
         IBatteryReportRepo batteryReportRepository,
         IVehicleRepo vehicleRepo,
-        IBatteryHistoryRepo batteryHistoryRepo
+        IBatteryHistoryRepo batteryHistoryRepo,
+        IStationScheduleRepo stationScheduleRepo
         )
     {
         _exchangeRepo = exchangeRepo;
@@ -45,6 +48,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
         _batteryReportRepository = batteryReportRepository;
         _vehicleRepo = vehicleRepo;
         _batteryHistoryRepo = batteryHistoryRepo;
+        _stationScheduleRepo = stationScheduleRepo;
     }
 
     private ExchangeBatteryResponse MapToResponse(ExchangeBattery entity)
@@ -388,6 +392,18 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     StatusCode = StatusCodes.Status404NotFound
                 };
             }
+            //Lấy lịch trình liên quan
+            var schedule = await _stationScheduleRepo.GetStationScheduleById(exchange.ScheduleId);
+            if (schedule == null)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                    Message = ResponseMessageConstantsStationSchedule.STATION_SCHEDULE_NOT_FOUND,
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+            }
             //Xử lý logic theo trạng thái yêu cầu
             switch (request.Status)
             {
@@ -408,9 +424,13 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     vehicleOfExchange.BatteryId = newBattery.BatteryId;
                     vehicleOfExchange.UpdateDate = TimeHepler.SystemTimeNow;
 
+                    schedule.Status = StationScheduleStatusEnums.Completed.ToString();
+                    schedule.UpdateDate = TimeHepler.SystemTimeNow;
+
                     await _vehicleRepo.UpdateVehicle(vehicleOfExchange);
                     await _batteryRepo.UpdateBattery(oldBattery);
                     await _batteryRepo.UpdateBattery(newBattery);
+                    await _stationScheduleRepo.UpdateStationSchedule(schedule);
 
                     var oldbatteryhistory = new BatteryHistory
                     {
@@ -449,9 +469,14 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     exchange.StaffAccountId = request.StaffId;
                     exchange.UpdateDate = TimeHepler.SystemTimeNow;
 
+                    schedule.Status = StationScheduleStatusEnums.Cancelled.ToString();
+                    schedule.UpdateDate = TimeHepler.SystemTimeNow;
+
                     newBattery.Status = BatteryStatusEnums.Available.ToString();
                     newBattery.UpdateDate = TimeHepler.SystemTimeNow;
+
                     await _batteryRepo.UpdateBattery(newBattery);
+                    await _stationScheduleRepo.UpdateStationSchedule(schedule);
                     break;
 
                 case ExchangeStatusEnums.Pending:
