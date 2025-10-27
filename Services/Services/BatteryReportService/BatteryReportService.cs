@@ -93,7 +93,7 @@ namespace Services.Services.BatteryReportService
                     Description = addBatteryReportRequest.Description,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
-                    Status = BatteryReportStatusEnums.Pending.ToString(),
+                    Status = BatteryReportStatusEnums.Completed.ToString(),
                 };
 
                 // If ExchangeBatteryId provided, link it
