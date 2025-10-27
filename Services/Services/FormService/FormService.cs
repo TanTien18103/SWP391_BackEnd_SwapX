@@ -264,6 +264,7 @@ namespace Services.Services.FormService
                         StationId = addedForm.StationId,
                         Date = addedForm.Date,
                         StartDate = addedForm.StartDate,
+                        Description = addedForm.Description,
                         Status = ScheduleStatusEnums.Pending.ToString(),
                         UpdateDate = TimeHepler.SystemTimeNow
                     };
@@ -712,6 +713,21 @@ namespace Services.Services.FormService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+                var orders = await _orderRepository.GetOrdersByAccountId(existingForm.AccountId);
+                var forms = await _formRepo.GetByAccountId(existingForm.AccountId);
+
+                // Lấy danh sách formId tại station hiện tại
+                var formIdsAtStation = forms
+                    .Where(f => f.StationId == existingForm.StationId)
+                    .Select(f => f.FormId)
+                    .ToList();
+
+                // Đếm số đơn hàng trả trước và đã thanh toán có form nằm trong danh sách formIdsAtStation
+                var paidOrdersAtStationCount = orders.Count(o =>
+                    o.ServiceType == PaymentType.PrePaid.ToString() &&
+                    o.Status == PaymentStatus.Paid.ToString() &&
+                    formIdsAtStation.Contains(o.ServiceId));
+
                 // If approved, set start date and create StationSchedule
                 if (updateFormStatusStaffRequest.Status == StaffUpdateFormEnums.Approved)
                 {
@@ -740,8 +756,9 @@ namespace Services.Services.FormService
                         };
                     }
                     var order = await _orderRepository.GetOrderByServiceId(existingForm.FormId);
-                    //trường hợp khách thanh toán tại trạm
-                    if (order == null)
+
+                    //trường hợp khách thanh toán tại trạm hoặc PrePaid đã trả >= 3 lần
+                    if (order == null || paidOrdersAtStationCount >= 3)
                     {
                         // Create ExchangeBattery record
                         var exchangeBattery = new ExchangeBattery
@@ -752,7 +769,7 @@ namespace Services.Services.FormService
                             NewBatteryId = existingForm.BatteryId,
                             StaffAccountId = null,
                             ScheduleId = newstationSchedule.StationScheduleId,
-                            OrderId = null,
+                            OrderId = order.OrderId,
                             StationId = existingForm.StationId,
                             Status = ExchangeStatusEnums.Pending.ToString(),
                             StartDate = TimeHepler.SystemTimeNow,
