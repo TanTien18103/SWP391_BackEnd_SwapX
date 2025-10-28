@@ -365,7 +365,7 @@ namespace Services.Services.StationScheduleService
                 }
                 if (updateStatusStationScheduleRequest.Status == StationScheduleStatusEnums.Completed &&
                     stationSchedule.Date.HasValue &&
-                    stationSchedule.Date!.Value.Date >= TimeHepler.SystemTimeNow.Date)
+                    stationSchedule.Date!.Value.Date > TimeHepler.SystemTimeNow.Date)
                 {
                     return new ResultModel
                     {
