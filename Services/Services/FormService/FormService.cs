@@ -273,21 +273,34 @@ namespace Services.Services.FormService
 
                     // Create ExchangeBattery record
                     var order = await _orderRepository.GetOrderByServiceId(addedForm.FormId);
-
-                    var exchangeBattery = new ExchangeBattery
+                    if (order.Status == PaymentStatus.Paid.ToString())
                     {
-                        ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
-                        Vin = addedForm.Vin,
-                        OldBatteryId = vehicle.BatteryId,
-                        NewBatteryId = addedForm.BatteryId,
-                        StaffAccountId = null,
-                        ScheduleId = stationSchedule.StationScheduleId,
-                        OrderId = order.OrderId,
-                        StationId = addedForm.StationId,
-                        Status = ExchangeStatusEnums.Pending.ToString(),
-                        StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow,
-                    };
+                        var exchangeBattery = new ExchangeBattery
+                        {
+                            ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
+                            Vin = addedForm.Vin,
+                            OldBatteryId = vehicle.BatteryId,
+                            NewBatteryId = addedForm.BatteryId,
+                            StaffAccountId = null,
+                            ScheduleId = stationSchedule.StationScheduleId,
+                            OrderId = order.OrderId,
+                            StationId = addedForm.StationId,
+                            Status = ExchangeStatusEnums.Pending.ToString(),
+                            StartDate = TimeHepler.SystemTimeNow,
+                            UpdateDate = TimeHepler.SystemTimeNow,
+                        };
+                        await _exchangeBatteryRepo.Add(exchangeBattery);
+                    }
+                    else
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsForm.ORDER_NOT_PAID,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
                 }
 
                 return new ResultModel
@@ -759,26 +772,39 @@ namespace Services.Services.FormService
 
                     if (paidOrdersAtStationCount >= 3)
                     {
-                        // Create ExchangeBattery record
-                        var exchangeBattery = new ExchangeBattery
+                        if (order != null && (order.Status == PaymentStatus.Paid.ToString() && order.ServiceType == PaymentType.PrePaid.ToString()))
                         {
-                            ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
-                            Vin = existingForm.Vin,
-                            OldBatteryId = vehicle.BatteryId,
-                            NewBatteryId = existingForm.BatteryId,
-                            StaffAccountId = null,
-                            ScheduleId = newstationSchedule.StationScheduleId,
-                            OrderId = order.OrderId,
-                            StationId = existingForm.StationId,
-                            Status = ExchangeStatusEnums.Pending.ToString(),
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow,
-                        };
-                        await _exchangeBatteryRepo.Add(exchangeBattery);
+                            // Create ExchangeBattery record
+                            var exchangeBattery = new ExchangeBattery
+                            {
+                                ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
+                                Vin = existingForm.Vin,
+                                OldBatteryId = vehicle.BatteryId,
+                                NewBatteryId = existingForm.BatteryId,
+                                StaffAccountId = null,
+                                ScheduleId = newstationSchedule.StationScheduleId,
+                                OrderId = order.OrderId,
+                                StationId = existingForm.StationId,
+                                Status = ExchangeStatusEnums.Pending.ToString(),
+                                StartDate = TimeHepler.SystemTimeNow,
+                                UpdateDate = TimeHepler.SystemTimeNow,
+                            };
+                            await _exchangeBatteryRepo.Add(exchangeBattery);
+                        }
+                        else
+                        {
+                            return new ResultModel
+                            {
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsForm.ORDER_NOT_PAID,
+                                StatusCode = StatusCodes.Status400BadRequest
+                            };
+                        }
                     }
 
-                    //trường hợp khách thanh toán tại trạm hoặc PrePaid đã trả >= 3 lần
-                    if (order == null )
+                    //trường hợp khách thanh toán tại trạm
+                    if (order == null)
                     {
                         // Create ExchangeBattery record
                         var exchangeBattery = new ExchangeBattery

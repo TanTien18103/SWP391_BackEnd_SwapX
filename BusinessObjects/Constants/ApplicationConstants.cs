@@ -294,7 +294,8 @@ namespace BusinessObjects.Constants
         public const string BATTERY_ALREADY_BOOKED = "Pin đã được đặt";
         public const string VEHICLE_ALREADY_HAS_PENDING_FORM = "Xe đã có biểu mẫu đang chờ xử lý";
         public const string CREATE_STATION_SCHEDULE_FAILED = "Tạo lịch trạm thất bại";
-        public static string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
+        public const string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
+        public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
     }
     // For Package (0-0-1)
     public static class ResponseMessageConstantsPackage
