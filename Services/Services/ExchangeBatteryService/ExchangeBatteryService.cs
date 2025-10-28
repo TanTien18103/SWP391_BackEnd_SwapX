@@ -163,7 +163,6 @@ public class ExchangeBatteryService : IExchangeBatteryService
         }
     }
 
-
     public async Task<ResultModel> GetExchangeByStation(string stationId)
     {
         var list = await _exchangeRepo.GetByStationId(stationId);
@@ -442,7 +441,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
             }
             //Kiểm tra lịch trình chưa hoàn thành hoặc hủy
             if (schedule.Date.HasValue &&
-                schedule.Date!.Value.Date >= TimeHepler.SystemTimeNow.Date)
+                schedule.Date!.Value.Date > TimeHepler.SystemTimeNow.Date)
             {
                 return new ResultModel
                 {
