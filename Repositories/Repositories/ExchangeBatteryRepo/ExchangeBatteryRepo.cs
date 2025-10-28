@@ -36,13 +36,6 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
         {
             return await _context.ExchangeBatteries
                 .AsNoTracking()
-                .Include(e => e.Station)
-                .Include(e => e.Order)
-                .Include(e => e.NewBattery)
-                .Include(e => e.OldBattery)
-                .Include(e => e.StaffAccount)
-                .Include(e => e.Schedule)
-                .Include(e => e.VinNavigation)
                 .FirstOrDefaultAsync(e => e.ExchangeBatteryId == exchangeId);
         }
 
