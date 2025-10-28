@@ -471,6 +471,7 @@ namespace BusinessObjects.Constants
         public const string GET_BATTERY_REPORT_SUCCESS = "Lấy báo cáo pin thành công";
         public const string DELETE_BATTERY_REPORT_FAILED = "Xóa báo cáo pin thất bại";
         public const string BATTERY_REPORT_NOT_COMPLETED = "Báo cáo pin chưa hoàn thành";
+        public const string BATTERY_MISMATCH_WITH_EXCHANGE = "Pin trong báo cáo không khớp với pin trong giao dịch đổi pin";
     }
 
     public static class ExchangeMessages

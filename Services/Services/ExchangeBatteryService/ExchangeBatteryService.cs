@@ -476,11 +476,6 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     schedule.Status = StationScheduleStatusEnums.Completed.ToString();
                     schedule.UpdateDate = TimeHepler.SystemTimeNow;
 
-                    await _vehicleRepo.UpdateVehicle(vehicleOfExchange);
-                    await _batteryRepo.UpdateBattery(oldBattery);
-                    await _batteryRepo.UpdateBattery(newBattery);
-                    await _stationScheduleRepo.UpdateStationSchedule(schedule);
-
                     var oldbatteryhistory = new BatteryHistory
                     {
                         BatteryHistoryId = Guid.NewGuid().ToString(),
@@ -508,6 +503,11 @@ public class ExchangeBatteryService : IExchangeBatteryService
                         UpdateDate = TimeHepler.SystemTimeNow
                     };
 
+                    await _vehicleRepo.UpdateVehicle(vehicleOfExchange);
+                    await _batteryRepo.UpdateBattery(oldBattery);
+                    await _batteryRepo.UpdateBattery(newBattery);
+                    await _stationScheduleRepo.UpdateStationSchedule(schedule);
+                    await _exchangeRepo.Update(exchange);
                     await _batteryHistoryRepo.AddBatteryHistory(oldbatteryhistory);
                     await _batteryHistoryRepo.AddBatteryHistory(newbatteryhistory);
 
@@ -526,6 +526,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
 
                     await _batteryRepo.UpdateBattery(newBattery);
                     await _stationScheduleRepo.UpdateStationSchedule(schedule);
+                    await _exchangeRepo.Update(exchange);
                     break;
 
                 case ExchangeStatusEnums.Pending:
@@ -547,16 +548,13 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     };
             }
 
-            // 🔟 Cập nhật ExchangeBattery
-            var updatedExchange = await _exchangeRepo.Update(exchange);
-
             return new ResultModel
             {
                 IsSuccess = true,
                 ResponseCode = ResponseCodeConstants.SUCCESS,
                 Message = ExchangeBatteryMessages.UPDATE_EXCHANGE_STATUS_SUCCESS,
                 StatusCode = StatusCodes.Status200OK,
-                Data = updatedExchange
+                Data = exchange
             };
         }
         catch (Exception ex)
