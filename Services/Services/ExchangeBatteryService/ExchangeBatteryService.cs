@@ -17,6 +17,7 @@ using Repositories.Repositories.VehicleRepo;
 using Repositories.Repositories.BatteryHistoryRepo;
 using Repositories.Repositories.StationScheduleRepo;
 using Services.ApiModels.StationSchedule;
+using Repositories.Repositories.FormRepo;
 
 namespace Services.Services.ExchangeBatteryService;
 
@@ -30,6 +31,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
     private readonly IVehicleRepo _vehicleRepo;
     private readonly IBatteryHistoryRepo _batteryHistoryRepo;
     private readonly IStationScheduleRepo _stationScheduleRepo;
+    private readonly IFormRepo _formRepo;
 
     public ExchangeBatteryService(
         IExchangeBatteryRepo exchangeRepo,
@@ -39,7 +41,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
         IBatteryReportRepo batteryReportRepository,
         IVehicleRepo vehicleRepo,
         IBatteryHistoryRepo batteryHistoryRepo,
-        IStationScheduleRepo stationScheduleRepo
+        IStationScheduleRepo stationScheduleRepo,
+        IFormRepo formRepo
         )
     {
         _exchangeRepo = exchangeRepo;
@@ -50,6 +53,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
         _vehicleRepo = vehicleRepo;
         _batteryHistoryRepo = batteryHistoryRepo;
         _stationScheduleRepo = stationScheduleRepo;
+        _formRepo = formRepo;
     }
 
     private ExchangeBatteryResponse MapToResponse(ExchangeBattery entity)
@@ -369,18 +373,38 @@ public class ExchangeBatteryService : IExchangeBatteryService
                 };
             }
 
-            //Check pin mới phải đang khả dụng
-            if (newBattery.Status != BatteryStatusEnums.Available.ToString())
+            //Check form trong station schedule xem có phải id pin trong form giống với của id pin new trong exchange, pin new phải ở trạng thái Booked
+            var formInSchdeule = await _formRepo.GetByStationScheduleId(exchange.ScheduleId);
+            if (formInSchdeule == null)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                    Message = ResponseMessageConstantsForm.FORM_NOT_FOUND,
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+            }
+            if (formInSchdeule.BatteryId != newBattery.BatteryId)
             {
                 return new ResultModel
                 {
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageConstantsBattery.BATTERY_NOT_AVAILABLE,
+                    Message = ExchangeBatteryMessages.NEW_BATTERY_ID_NOT_MATCHED_WITH_FORM_BATTERY_ID,
                     StatusCode = StatusCodes.Status400BadRequest
                 };
             }
-
+            if (newBattery.Status != BatteryStatusEnums.Booked.ToString())
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ExchangeBatteryMessages.NEW_BATTERY_NOT_IN_BOOKED_STATUS,
+                    StatusCode = StatusCodes.Status400BadRequest
+                };
+            }
             //Kiểm tra trạm tồn tại
             var station = await _stationRepo.GetStationById(exchange.StationId);
             if (station == null)
@@ -391,6 +415,17 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     ResponseCode = ResponseCodeConstants.NOT_FOUND,
                     Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
                     StatusCode = StatusCodes.Status404NotFound
+                };
+            }
+            //kiểm tra newbattery có trong trạm không
+            if (newBattery.StationId != station.StationId)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ExchangeBatteryMessages.NEW_BATTERY_NOT_IN_STATION,
+                    StatusCode = StatusCodes.Status400BadRequest
                 };
             }
             //Lấy lịch trình liên quan
@@ -406,7 +441,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
                 };
             }
             //Kiểm tra lịch trình chưa hoàn thành hoặc hủy
-            if (schedule.Date.HasValue && 
+            if (schedule.Date.HasValue &&
                 schedule.Date!.Value.Date >= TimeHepler.SystemTimeNow.Date)
             {
                 return new ResultModel

@@ -523,6 +523,9 @@ namespace BusinessObjects.Constants
         public const string INVALID_STATUS_TYPE = "Loại trạng thái không hợp lệ";
         public const string CreatePackageSuccess = "Thanh toán gói thành công.";
         public const string CreatePackageFailed = "Thanh toán gói thất bại.";
+        public const string NEW_BATTERY_ID_NOT_MATCHED_WITH_FORM_BATTERY_ID = "ID pin mới không khớp với ID pin trong biểu mẫu.";
+        public const string NEW_BATTERY_NOT_IN_BOOKED_STATUS = "Pin mới không ở trạng thái đã đặt.";
+        public const string NEW_BATTERY_NOT_IN_STATION = "Pin mới không có trong trạm.";
     }
     public static class ResponseMessageBatteryHistory
     {
