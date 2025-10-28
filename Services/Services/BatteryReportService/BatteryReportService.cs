@@ -108,7 +108,19 @@ namespace Services.Services.BatteryReportService
                         await _exchangeBatteryRepo.Update(exchange);
                     }
                 }
+                var exchangeBattery = await _exchangeBatteryRepo.GetById(addBatteryReportRequest.ExchangeBatteryId);
 
+                if (exchangeBattery.OldBatteryId != addBatteryReportRequest.BatteryId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBatteryReport.BATTERY_MISMATCH_WITH_EXCHANGE,
+                        Data = null
+                    };
+                }
                 await _batteryReportRepository.AddBatteryReport(batteryReport);
                 return new ResultModel
                 {
