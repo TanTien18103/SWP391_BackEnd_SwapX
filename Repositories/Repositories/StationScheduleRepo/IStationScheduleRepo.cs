@@ -14,5 +14,6 @@ namespace Repositories.Repositories.StationScheduleRepo
         Task<StationSchedule> AddStationSchedule(StationSchedule stationSchedule);
         Task<StationSchedule> UpdateStationSchedule(StationSchedule stationSchedule);
         Task<List<StationSchedule>> GetStationSchedulesByStationId(string stationId);
+        Task<List<StationSchedule>> GetStationSchedulesByAccountId(string accountId);
     }
 }

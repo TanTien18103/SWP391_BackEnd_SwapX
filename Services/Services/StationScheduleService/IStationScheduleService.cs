@@ -18,5 +18,6 @@ namespace Services.Services.StationScheduleService
         Task<ResultModel> DeleteStationSchedule(string stationScheduleId);
         Task<ResultModel> GetStationScheduleByStationId(string stationId);
         Task<ResultModel> UpdateStatusStationSchedule(UpdateStatusStationScheduleRequest updateStatusStationScheduleRequest);
+        Task<ResultModel> GetStationSchedulesByAccountId(string accountId);
     }
 }

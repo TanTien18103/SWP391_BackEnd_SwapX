@@ -399,6 +399,8 @@ namespace BusinessObjects.Constants
         public const string CANNOT_COMPLETE_BEFORE_DATE = "Không thể hoàn thành lịch trạm trước ngày hiện tại";
         public const string STATION_SCHEDULE_ALREADY_COMPLETED = "Lịch trạm đã được hoàn thành";
         public const string CANNOT_UPDATE_STATUS_FROM_INACTIVE = "Không thể cập nhật trạng thái từ ngừng hoạt động";
+        public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_SUCCESS = "Lấy lịch trạm theo ID tài khoản thành công";
+        public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_FAILED = "Lấy lịch trạm theo ID tài khoản thất bại";
     }
     //for Rating (0-0-1)
     public static class ResponseMessageConstantsRating

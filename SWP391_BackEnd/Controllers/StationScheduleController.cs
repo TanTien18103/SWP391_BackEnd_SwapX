@@ -65,5 +65,13 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
 
+        [HttpGet("get_station_schedules_by_account_id")]
+        [Authorize]
+        public async Task<IActionResult> GetStationSchedulesByAccountId([FromQuery] string accountId)
+        {
+            var res = await _stationScheduleService.GetStationSchedulesByAccountId(accountId);
+            return StatusCode(res.StatusCode, res);
+        }
+
     }
 }
