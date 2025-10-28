@@ -294,7 +294,8 @@ namespace BusinessObjects.Constants
         public const string BATTERY_ALREADY_BOOKED = "Pin đã được đặt";
         public const string VEHICLE_ALREADY_HAS_PENDING_FORM = "Xe đã có biểu mẫu đang chờ xử lý";
         public const string CREATE_STATION_SCHEDULE_FAILED = "Tạo lịch trạm thất bại";
-        public static string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
+        public const string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
+        public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
     }
     // For Package (0-0-1)
     public static class ResponseMessageConstantsPackage
@@ -398,6 +399,8 @@ namespace BusinessObjects.Constants
         public const string CANNOT_COMPLETE_BEFORE_DATE = "Không thể hoàn thành lịch trạm trước ngày hiện tại";
         public const string STATION_SCHEDULE_ALREADY_COMPLETED = "Lịch trạm đã được hoàn thành";
         public const string CANNOT_UPDATE_STATUS_FROM_INACTIVE = "Không thể cập nhật trạng thái từ ngừng hoạt động";
+        public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_SUCCESS = "Lấy lịch trạm theo ID tài khoản thành công";
+        public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_FAILED = "Lấy lịch trạm theo ID tài khoản thất bại";
     }
     //for Rating (0-0-1)
     public static class ResponseMessageConstantsRating

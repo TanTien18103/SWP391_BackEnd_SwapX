@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Repositories.Repositories.VehicleRepo;
 using Repositories.Repositories.BatteryHistoryRepo;
 using Repositories.Repositories.StationScheduleRepo;
+using Services.ApiModels.StationSchedule;
 
 namespace Services.Services.ExchangeBatteryService;
 
@@ -402,6 +403,19 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     ResponseCode = ResponseCodeConstants.NOT_FOUND,
                     Message = ResponseMessageConstantsStationSchedule.STATION_SCHEDULE_NOT_FOUND,
                     StatusCode = StatusCodes.Status404NotFound
+                };
+            }
+            //Kiểm tra lịch trình chưa hoàn thành hoặc hủy
+            if (schedule.Date.HasValue && 
+                schedule.Date!.Value.Date >= TimeHepler.SystemTimeNow.Date)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStationSchedule.CANNOT_COMPLETE_BEFORE_DATE,
+                    Data = null
                 };
             }
             //Xử lý logic theo trạng thái yêu cầu

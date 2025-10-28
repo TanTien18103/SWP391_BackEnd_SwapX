@@ -34,6 +34,16 @@ namespace Repositories.Repositories.StationScheduleRepo
                 .FirstOrDefaultAsync(ss => ss.StationScheduleId == stationScheduleId);
         }
 
+        public async Task<List<StationSchedule>> GetStationSchedulesByAccountId(string accountId)
+        {
+            return await _context.StationSchedules
+                .Include(ss => ss.ExchangeBatteries)
+                .Include(ss => ss.Form)
+                .Where(ss => ss.Form.AccountId == accountId)
+                .ToListAsync();
+        }
+
+
         public async Task<List<StationSchedule>> GetStationSchedulesByStationId(string stationId)
         {
             return await _context.StationSchedules
