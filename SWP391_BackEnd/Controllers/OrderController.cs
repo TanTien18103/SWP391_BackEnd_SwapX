@@ -49,7 +49,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpPut("update_order_{orderId}/status")]
-    [Authorize(Roles ="Admin, Bsstaff")]
+    [Authorize(Roles = "Admin, Bsstaff")]
     public async Task<IActionResult> UpdateOrderStatus(string orderId, string newStatus)
     {
         var result = await _orderService.UpdateOrderStatus(orderId, newStatus);
@@ -61,6 +61,14 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetOrderByServiceId([FromQuery] string serviceId)
     {
         var result = await _orderService.GetOrderByServiceId(serviceId);
+        return StatusCode(result.StatusCode, result);
+    }
+
+    [HttpGet("get_order_by_order_code")]
+    [Authorize]
+    public async Task<IActionResult> GetOrderByOrderCode([FromQuery] long orderCode)
+    {
+        var result = await _orderService.GetOrderByOrderCode(orderCode);
         return StatusCode(result.StatusCode, result);
     }
 }

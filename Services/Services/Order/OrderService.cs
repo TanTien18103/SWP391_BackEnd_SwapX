@@ -463,4 +463,14 @@ public class OrderService : IOrderService
         var response = orders.Select(order => new OrderResponse(order)).ToList();
         return new ResultModel { StatusCode = 200, IsSuccess = true, Data = response };
     }
+
+    public async Task<ResultModel> GetOrderByOrderCode(long orderCode)
+    {
+        var order = await _orderRepository.GetOrderByOrderCodeAsync(orderCode);
+        if (order == null)
+            return new ResultModel { StatusCode = 404, IsSuccess = false, Message = "Order not found" };
+
+        var response = new OrderResponse(order);
+        return new ResultModel { StatusCode = 200, IsSuccess = true, Data = response };
+    }
 }
