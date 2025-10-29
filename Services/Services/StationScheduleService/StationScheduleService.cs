@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Repositories.Repositories.FormRepo;
 using BusinessObjects.TimeCoreHelper;
+using Repositories.Repositories.AccountRepo;
 
 namespace Services.Services.StationScheduleService
 {
@@ -25,7 +26,16 @@ namespace Services.Services.StationScheduleService
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AccountHelper _accountHelper;
-        public StationScheduleService(IStationScheduleRepo stationScheduleRepo, IStationRepo stationRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IFormRepo formRepo)
+        private readonly IAccountRepo _accountRepo;
+        public StationScheduleService(
+            IStationScheduleRepo stationScheduleRepo, 
+            IStationRepo stationRepo, 
+            IConfiguration configuration, 
+            IHttpContextAccessor httpContextAccessor, 
+            AccountHelper accountHelper, 
+            IFormRepo formRepo,
+            IAccountRepo accountRepo
+            )
         {
             _stationScheduleRepo = stationScheduleRepo;
             _stationRepo = stationRepo;
@@ -33,6 +43,7 @@ namespace Services.Services.StationScheduleService
             _httpContextAccessor = httpContextAccessor;
             _accountHelper = accountHelper;
             _formRepo = formRepo;
+            _accountRepo = accountRepo;
         }
 
         public async Task<ResultModel> AddStationSchedule(AddStationScheduleRequest addStationScheduleRequest)
@@ -429,6 +440,18 @@ namespace Services.Services.StationScheduleService
         {
             try
             {
+                var account = await _accountRepo.GetAccountById(accountId);
+                if (account == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        Data = null
+                    };
+                }
                 var stationSchedules = await _stationScheduleRepo.GetStationSchedulesByAccountId(accountId);
                 if (stationSchedules == null || !stationSchedules.Any())
                 {
