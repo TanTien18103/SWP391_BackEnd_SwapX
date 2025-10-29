@@ -25,6 +25,8 @@ using Services.Services.VehicleService;
 using System.Text.Json;
 using System.Globalization;
 using System.Text;
+using Services.ServicesHelpers;
+using Repositories.Repositories.StationScheduleRepo;
 
 namespace Services.Payments;
 
@@ -43,6 +45,8 @@ public class PayOSService : IPayOSService
     private readonly IEvDriverRepo _evDriverRepo;
     private readonly IFormRepo _formRepo;
     private readonly IBatteryRepo _batteryRepo;
+    private readonly AccountHelper _accountHelper;
+    private readonly IStationScheduleRepo _stationScheduleRepo;
 
     public PayOSService(
         PayOS payOs,
@@ -57,7 +61,9 @@ public class PayOSService : IPayOSService
         IPackageRepo packageRepo,
         IEvDriverRepo evDriverRepo,
         IFormRepo formRepo,
-        IBatteryRepo batteryRepo
+        IBatteryRepo batteryRepo,
+        AccountHelper accountHelper,
+        IStationScheduleRepo stationScheduleRepo
         )
     {
         _payOS = payOs;
@@ -73,6 +79,8 @@ public class PayOSService : IPayOSService
         _evDriverRepo = evDriverRepo;
         _formRepo = formRepo;
         _batteryRepo = batteryRepo;
+        _accountHelper = accountHelper;
+        _stationScheduleRepo = stationScheduleRepo;
     }
 
     public async Task<ResultModel<PayOSWebhookResponseDto>> HandleWebhookAsync(PayOSWebhookRequestDto webhook)
@@ -100,7 +108,7 @@ public class PayOSService : IPayOSService
             };
         }
 
-        
+
         var code = webhook.Data?.Code ?? webhook.Code;
         var desc = webhook.Data?.Desc ?? webhook.Desc;
         var rawCode = code?.Trim();
@@ -183,10 +191,9 @@ public class PayOSService : IPayOSService
 
         _logger.LogInformation("Order {OrderId} status updated to {StatusInDb}", updateorder.OrderId, updateorder.Status);
 
-        if (updateorder.Status == PaymentStatus.Failed.ToString() &&
-        (updateorder.ServiceType == PaymentType.PrePaid.ToString() ||
-        updateorder.ServiceType == PaymentType.UsePackage.ToString()
-        ))
+        if (updateorder.Status == PaymentStatus.Failed.ToString() && 
+            (updateorder.ServiceType == PaymentType.PrePaid.ToString() || 
+            updateorder.ServiceType == PaymentType.UsePackage.ToString()))
         {
             var form = await _formRepo.GetById(updateorder.ServiceId);
             if (form != null)
@@ -203,6 +210,73 @@ public class PayOSService : IPayOSService
                         battery.Status = BatteryStatusEnums.Available.ToString();
                         battery.UpdateDate = DateTime.UtcNow;
                         await _batteryRepo.UpdateBattery(battery);
+                    }
+                }
+            }
+        }
+
+        if (updateorder.Status == PaymentStatus.Paid.ToString() &&
+            updateorder.ServiceType == PaymentType.PrePaid.ToString())
+        {
+            // Lấy form liên quan đến order này
+            var form = await _formRepo.GetById(updateorder.ServiceId);
+            if (form != null)
+            {
+                // Lấy tất cả form tại cùng station
+                var formsAtStation = await _formRepo.GetAll();
+                var formIdsAtStation = formsAtStation
+                    .Where(f => f.StationId == form.StationId)
+                    .Select(f => f.FormId)
+                    .ToList();
+
+                // Đếm số order PrePaid đã thanh toán thành công tại station này
+                var allOrders = await _orderRepository.GetAllOrdersAsync();
+                var paidOrdersAtStationCount = allOrders.Count(o =>
+                    o.ServiceType == PaymentType.PrePaid.ToString() &&
+                    o.Status == PaymentStatus.Paid.ToString() &&
+                    formIdsAtStation.Contains(o.ServiceId));
+
+                // Nếu đã có >= 3 lần thanh toán PrePaid thành công
+                if (paidOrdersAtStationCount >= 3)
+                {
+                    form.Status = FormStatusEnums.Approved.ToString();
+                    form.UpdateDate = TimeHepler.SystemTimeNow;
+                    await _formRepo.Update(form);
+
+                    // ✅ Tạo StationSchedule sau khi auto-approve
+                    var stationSchedule = new StationSchedule
+                    {
+                        StationScheduleId = _accountHelper.GenerateShortGuid(),
+                        FormId = form.FormId,
+                        StationId = form.StationId,
+                        Date = form.Date,
+                        StartDate = form.StartDate,
+                        Description = form.Description,
+                        Status = ScheduleStatusEnums.Pending.ToString(),
+                        UpdateDate = TimeHepler.SystemTimeNow
+                    };
+
+                    await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+
+                    // ✅ Tạo ExchangeBattery nếu order đã thanh toán
+                    var vehicle = await _vehicleRepo.GetVehicleById(form.Vin);
+                    if (vehicle != null)
+                    {
+                        var exchangeBattery = new ExchangeBattery
+                        {
+                            ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
+                            Vin = form.Vin,
+                            OldBatteryId = vehicle.BatteryId,
+                            NewBatteryId = form.BatteryId,
+                            StaffAccountId = null,
+                            ScheduleId = stationSchedule.StationScheduleId,
+                            OrderId = updateorder.OrderId,
+                            StationId = form.StationId,
+                            Status = ExchangeStatusEnums.Pending.ToString(),
+                            StartDate = TimeHepler.SystemTimeNow,
+                            UpdateDate = TimeHepler.SystemTimeNow,
+                        };
+                        await _exchangeBatteryRepo.Add(exchangeBattery);
                     }
                 }
             }
@@ -233,52 +307,52 @@ public class PayOSService : IPayOSService
 
         if (updateorder.ServiceType == PaymentType.Package.ToString() &&
          updateorder.Status == PaymentStatus.Paid.ToString())
-         {
-             try
-             {
-                 var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
-                 var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
+        {
+            try
+            {
+                var vehicle = await _vehicleRepo.GetVehicleById(orderDetail2.Vin);
+                var package = await _packageRepo.GetPackageById(orderDetail2.ServiceId);
 
-                 vehicle.PackageId = orderDetail2.ServiceId;
-                 vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
-                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+                vehicle.PackageId = orderDetail2.ServiceId;
+                vehicle.PackageExpiredate = TimeHepler.SystemTimeNow.AddDays((double)package.ExpiredDate);
+                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
 
-                 await _vehicleRepo.UpdateVehicle(vehicle);
+                await _vehicleRepo.UpdateVehicle(vehicle);
 
-                 _logger.LogInformation("Vehicle {Vin} successfully assigned to package {PackageId}.", vehicle.Vin, package.PackageId);
+                _logger.LogInformation("Vehicle {Vin} successfully assigned to package {PackageId}.", vehicle.Vin, package.PackageId);
 
-                 return new ResultModel<PayOSWebhookResponseDto>
-                 {
-                     IsSuccess = true,
-                     StatusCode = StatusCodes.Status200OK,
-                     ResponseCode = ResponseCodeConstants.SUCCESS,
-                     Message = "Vehicle assigned to package successfully",
-                     Data = new PayOSWebhookResponseDto
-                     {
-                         Success = true,
-                         Message = "Vehicle assigned to package successfully"
-                     }
-                 };
+                return new ResultModel<PayOSWebhookResponseDto>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = "Vehicle assigned to package successfully",
+                    Data = new PayOSWebhookResponseDto
+                    {
+                        Success = true,
+                        Message = "Vehicle assigned to package successfully"
+                    }
+                };
 
-             }
-             catch (Exception ex)
-             {
-                 _logger.LogError(ex, "Error while adding vehicle to package after payment. OrderId: {OrderId}", updateorder.OrderId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while adding vehicle to package after payment. OrderId: {OrderId}", updateorder.OrderId);
 
-                 return new ResultModel<PayOSWebhookResponseDto>
-                 {
-                     IsSuccess = false,
-                     StatusCode = StatusCodes.Status500InternalServerError,
-                     ResponseCode = ResponseCodeConstants.FAILED,
-                     Message = "Internal error while assigning vehicle to package",
-                     Data = new PayOSWebhookResponseDto
-                     {
-                         Success = false,
-                         Message = "Internal error while assigning vehicle to package"
-                     }
-                 };
-             }
-         }
+                return new ResultModel<PayOSWebhookResponseDto>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = "Internal error while assigning vehicle to package",
+                    Data = new PayOSWebhookResponseDto
+                    {
+                        Success = false,
+                        Message = "Internal error while assigning vehicle to package"
+                    }
+                };
+            }
+        }
 
         var response = new PayOSWebhookResponseDto
         {

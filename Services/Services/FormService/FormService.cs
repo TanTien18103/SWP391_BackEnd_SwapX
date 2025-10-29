@@ -116,27 +116,6 @@ namespace Services.Services.FormService
                     };
                 }
 
-                var orders = await _orderRepository.GetOrdersByAccountId(addFormRequest.AccountId);
-                var forms = await _formRepo.GetByAccountId(addFormRequest.AccountId);
-
-                // Lấy danh sách formId tại station hiện tại
-                var formIdsAtStation = forms
-                    .Where(f => f.StationId == addFormRequest.StationId)
-                    .Select(f => f.FormId)
-                    .ToList();
-
-                // Đếm số đơn hàng trả trước và đã thanh toán có form nằm trong danh sách formIdsAtStation
-                var paidOrdersAtStationCount = orders.Count(o =>
-                    o.ServiceType == PaymentType.PrePaid.ToString() &&
-                    o.Status == PaymentStatus.Paid.ToString() &&
-                    formIdsAtStation.Contains(o.ServiceId));
-
-                // Nếu >= 3 lần thì approve luôn
-                string formStatus = paidOrdersAtStationCount >= 3
-                    ? FormStatusEnums.Approved.ToString()
-                    : FormStatusEnums.Submitted.ToString();
-
-
                 //Kiểm tra xe của tài khoản có phải của accountId không
                 var evDriver = await _evDriverRepo.GetDriverByAccountId(addFormRequest.AccountId);
                 if (evDriver == null)
@@ -234,9 +213,11 @@ namespace Services.Services.FormService
                         Data = null
                     };
                 }
+
                 battery.Status = BatteryStatusEnums.Booked.ToString();
                 battery.UpdateDate = TimeHepler.SystemTimeNow;
                 await _batteryRepo.UpdateBattery(battery);
+
                 var form = new Form
                 {
                     FormId = _accountHelper.GenerateShortGuid(),
@@ -245,7 +226,7 @@ namespace Services.Services.FormService
                     Title = addFormRequest.Title,
                     Description = addFormRequest.Description,
                     Date = addFormRequest.Date,
-                    Status = formStatus,
+                    Status = FormStatusEnums.Submitted.ToString(),
                     Vin = addFormRequest.Vin,
                     BatteryId = addFormRequest.BatteryId,
                     StartDate = TimeHepler.SystemTimeNow,
@@ -253,55 +234,6 @@ namespace Services.Services.FormService
                 };
 
                 var addedForm = await _formRepo.Add(form);
-
-                // Create StationSchedule if approved
-                if (formStatus == FormStatusEnums.Approved.ToString())
-                {
-                    var stationSchedule = new StationSchedule
-                    {
-                        StationScheduleId = _accountHelper.GenerateShortGuid(),
-                        FormId = addedForm.FormId,
-                        StationId = addedForm.StationId,
-                        Date = addedForm.Date,
-                        StartDate = addedForm.StartDate,
-                        Description = addedForm.Description,
-                        Status = ScheduleStatusEnums.Pending.ToString(),
-                        UpdateDate = TimeHepler.SystemTimeNow
-                    };
-
-                    await _stationScheduleRepo.AddStationSchedule(stationSchedule);
-
-                    // Create ExchangeBattery record
-                    var order = await _orderRepository.GetOrderByServiceId(addedForm.FormId);
-                    if (order.Status == PaymentStatus.Paid.ToString())
-                    {
-                        var exchangeBattery = new ExchangeBattery
-                        {
-                            ExchangeBatteryId = _accountHelper.GenerateShortGuid(),
-                            Vin = addedForm.Vin,
-                            OldBatteryId = vehicle.BatteryId,
-                            NewBatteryId = addedForm.BatteryId,
-                            StaffAccountId = null,
-                            ScheduleId = stationSchedule.StationScheduleId,
-                            OrderId = order.OrderId,
-                            StationId = addedForm.StationId,
-                            Status = ExchangeStatusEnums.Pending.ToString(),
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow,
-                        };
-                        await _exchangeBatteryRepo.Add(exchangeBattery);
-                    }
-                    else
-                    {
-                        return new ResultModel
-                        {
-                            IsSuccess = false,
-                            ResponseCode = ResponseCodeConstants.FAILED,
-                            Message = ResponseMessageConstantsForm.ORDER_NOT_PAID,
-                            StatusCode = StatusCodes.Status400BadRequest
-                        };
-                    }
-                }
 
                 return new ResultModel
                 {
