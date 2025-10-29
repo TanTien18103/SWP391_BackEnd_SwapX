@@ -12,4 +12,5 @@ public interface IOrderService
     Task<ResultModel> FilterOrders(OrderFilterRequest filter);
     Task<ResultModel> DeleteOrder(string orderId);
     Task<ResultModel> GetOrderByServiceId(string serviceId);
+    Task<ResultModel> GetOrderByOrderCode(long orderCode);
 }
