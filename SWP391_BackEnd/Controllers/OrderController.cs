@@ -63,4 +63,11 @@ public class OrderController : ControllerBase
         var result = await _orderService.GetOrderByServiceId(serviceId);
         return StatusCode(result.StatusCode, result);
     }
+    [HttpGet("get_orders_by_account_id")]
+    [Authorize]
+    public async Task<IActionResult> GetOrdersByAccountId([FromQuery] string accountId)
+    {
+        var result = await _orderService.GetOrdersByAccountId(accountId);
+        return StatusCode(result.StatusCode, result);
+    }
 }

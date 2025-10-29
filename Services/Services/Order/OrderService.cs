@@ -184,7 +184,7 @@ public class OrderService : IOrderService
                             StatusCode = StatusCodes.Status404NotFound
                         };
                     }
-                    
+
                     //Kiểm tra xe đó có đúng là của user ko
                     if (PrePaidvehicle.Customer.AccountId != request.AccountId)
                     {
@@ -464,5 +464,34 @@ public class OrderService : IOrderService
         var orders = await _orderRepository.GetOrdersByServiceIdAsync(serviceId);
         var response = orders.Select(order => new OrderResponse(order)).ToList();
         return new ResultModel { StatusCode = 200, IsSuccess = true, Data = response };
+    }
+
+    public async Task<ResultModel> GetOrdersByAccountId(string accountId)
+    {
+        try
+        {
+            var orders = await _orderRepository.GetOrdersByAccountId(accountId);
+            var response = orders.Select(order => new OrderResponse(order)).ToList();
+            return new ResultModel
+            {
+                IsSuccess = true,
+                ResponseCode = ResponseCodeConstants.SUCCESS,
+                Message = ResponseMessageOrder.GET_ORDER_SUCCESS,
+                StatusCode = StatusCodes.Status200OK,
+                Data = response
+            };
+
+        }
+        catch (Exception ex)
+        {
+            return new ResultModel
+            {
+                IsSuccess = false,
+                ResponseCode = ResponseCodeConstants.FAILED,
+                Message = ResponseMessageOrder.GET_ORDER_FAIL,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Data = ex.InnerException?.Message ?? ex.Message
+            };
+        }
     }
 }
