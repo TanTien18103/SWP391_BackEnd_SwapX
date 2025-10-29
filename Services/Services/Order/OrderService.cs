@@ -213,7 +213,6 @@ public class OrderService : IOrderService
                         StatusCode = StatusCodes.Status200OK,
                         Data = newOrder
                     };
-
                 case PaymentType.UsePackage:
                     //Kiểm tra form tồn tại
                     var usePackageForm = await _formRepo.GetById(request.ServiceId);
@@ -293,7 +292,6 @@ public class OrderService : IOrderService
                         StatusCode = StatusCodes.Status200OK,
                         Data = newOrder
                     };
-
                 case PaymentType.PaidAtStation:
                     // Kiểm tra order đang pending cho ServiceType này
                     if (await _orderRepository.HasPendingOrderAsync(request.AccountId, PaymentType.PaidAtStation.ToString()))
