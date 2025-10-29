@@ -294,7 +294,8 @@ namespace BusinessObjects.Constants
         public const string BATTERY_ALREADY_BOOKED = "Pin đã được đặt";
         public const string VEHICLE_ALREADY_HAS_PENDING_FORM = "Xe đã có biểu mẫu đang chờ xử lý";
         public const string CREATE_STATION_SCHEDULE_FAILED = "Tạo lịch trạm thất bại";
-        public static string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
+        public const string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
+        public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
     }
     // For Package (0-0-1)
     public static class ResponseMessageConstantsPackage
@@ -398,6 +399,8 @@ namespace BusinessObjects.Constants
         public const string CANNOT_COMPLETE_BEFORE_DATE = "Không thể hoàn thành lịch trạm trước ngày hiện tại";
         public const string STATION_SCHEDULE_ALREADY_COMPLETED = "Lịch trạm đã được hoàn thành";
         public const string CANNOT_UPDATE_STATUS_FROM_INACTIVE = "Không thể cập nhật trạng thái từ ngừng hoạt động";
+        public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_SUCCESS = "Lấy lịch trạm theo ID tài khoản thành công";
+        public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_FAILED = "Lấy lịch trạm theo ID tài khoản thất bại";
     }
     //for Rating (0-0-1)
     public static class ResponseMessageConstantsRating
@@ -468,6 +471,7 @@ namespace BusinessObjects.Constants
         public const string GET_BATTERY_REPORT_SUCCESS = "Lấy báo cáo pin thành công";
         public const string DELETE_BATTERY_REPORT_FAILED = "Xóa báo cáo pin thất bại";
         public const string BATTERY_REPORT_NOT_COMPLETED = "Báo cáo pin chưa hoàn thành";
+        public const string BATTERY_MISMATCH_WITH_EXCHANGE = "Pin trong báo cáo không khớp với pin trong giao dịch đổi pin";
     }
 
     public static class ExchangeMessages
@@ -520,6 +524,9 @@ namespace BusinessObjects.Constants
         public const string INVALID_STATUS_TYPE = "Loại trạng thái không hợp lệ";
         public const string CreatePackageSuccess = "Thanh toán gói thành công.";
         public const string CreatePackageFailed = "Thanh toán gói thất bại.";
+        public const string NEW_BATTERY_ID_NOT_MATCHED_WITH_FORM_BATTERY_ID = "ID pin mới không khớp với ID pin trong biểu mẫu.";
+        public const string NEW_BATTERY_NOT_IN_BOOKED_STATUS = "Pin mới không ở trạng thái đã đặt.";
+        public const string NEW_BATTERY_NOT_IN_STATION = "Pin mới không có trong trạm.";
     }
     public static class ResponseMessageBatteryHistory
     {

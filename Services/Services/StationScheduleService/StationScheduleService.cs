@@ -424,5 +424,45 @@ namespace Services.Services.StationScheduleService
                 };
             }
         }
+
+        public async Task<ResultModel> GetStationSchedulesByAccountId(string accountId)
+        {
+            try
+            {
+                var stationSchedules = await _stationScheduleRepo.GetStationSchedulesByAccountId(accountId);
+                if (stationSchedules == null || !stationSchedules.Any())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStationSchedule.STATION_SCHEDULE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsStationSchedule.GET_STATION_SCHEDULE_BY_ACCOUNT_ID_SUCCESS,
+                    Data = stationSchedules
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsStationSchedule.GET_STATION_SCHEDULE_BY_ACCOUNT_ID_FAILED,
+                    Data = ex.Message
+                };
+            }
+        }
     }
 }

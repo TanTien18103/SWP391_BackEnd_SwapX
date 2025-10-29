@@ -102,13 +102,24 @@ namespace Services.Services.BatteryReportService
                     var exchange = await _exchangeBatteryRepo.GetById(addBatteryReportRequest.ExchangeBatteryId);
                     if (exchange != null)
                     {
+                        if(battery.BatteryId != exchange.OldBatteryId)
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBatteryReport.BATTERY_MISMATCH_WITH_EXCHANGE,
+                                Data = null
+                            };
+                        }
                         batteryReport.ExchangeBatteryId = exchange.ExchangeBatteryId;
                         // Optionally update exchange record update date
                         exchange.UpdateDate = TimeHepler.SystemTimeNow;
                         await _exchangeBatteryRepo.Update(exchange);
                     }
                 }
-
+                
                 await _batteryReportRepository.AddBatteryReport(batteryReport);
                 return new ResultModel
                 {

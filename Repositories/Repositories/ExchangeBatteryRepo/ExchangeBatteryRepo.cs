@@ -21,25 +21,23 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
 
         public async Task<ExchangeBattery> Update(ExchangeBattery exchange)
         {
-            var trackedExchange = await _context.ExchangeBatteries
+            var trackedEntity = await _context.ExchangeBatteries
                 .FirstOrDefaultAsync(e => e.ExchangeBatteryId == exchange.ExchangeBatteryId);
 
-            if (trackedExchange != null)
+            if (trackedEntity != null)
             {
-                trackedExchange.Status = exchange.Status;
-                trackedExchange.UpdateDate = exchange.UpdateDate;
-                trackedExchange.Notes = exchange.Notes;
-                trackedExchange.OrderId = exchange.OrderId;
-                trackedExchange.NewBatteryId = exchange.NewBatteryId;
-                trackedExchange.OldBatteryId = exchange.OldBatteryId;
-                trackedExchange.ScheduleId = exchange.ScheduleId;
-                trackedExchange.StaffAccountId = exchange.StaffAccountId;
-                trackedExchange.StationId = exchange.StationId;
-                trackedExchange.Vin = exchange.Vin;
-                await _context.SaveChangesAsync();
+                _context.Entry(trackedEntity).CurrentValues.SetValues(exchange);
             }
-            return trackedExchange!;
+            else
+            {
+                _context.ExchangeBatteries.Update(exchange);
+            }
+
+            await _context.SaveChangesAsync();
+            return exchange;
         }
+
+
 
         public async Task Delete(ExchangeBattery exchange)
         {
@@ -51,13 +49,6 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
         {
             return await _context.ExchangeBatteries
                 .AsNoTracking()
-                .Include(e => e.Station)
-                .Include(e => e.Order)
-                .Include(e => e.NewBattery)
-                .Include(e => e.OldBattery)
-                .Include(e => e.StaffAccount)
-                .Include(e => e.Schedule)
-                .Include(e => e.VinNavigation)
                 .FirstOrDefaultAsync(e => e.ExchangeBatteryId == exchangeId);
         }
 
