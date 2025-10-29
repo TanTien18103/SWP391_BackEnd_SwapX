@@ -280,31 +280,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     StatusCode = StatusCodes.Status404NotFound
                 };
             }
-
-            //Kiểm tra Order tồn tại
             var order = await _orderRepo.GetOrderByIdAsync(exchange.OrderId);
-            if (order == null)
-            {
-                return new ResultModel
-                {
-                    IsSuccess = false,
-                    ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                    Message = ResponseMessageOrder.ORDER_NOT_FOUND,
-                    StatusCode = StatusCodes.Status404NotFound
-                };
-            }
-
-            //Kiểm tra Order đã thanh toán
-            if (order.Status != PaymentStatus.Paid.ToString())
-            {
-                return new ResultModel
-                {
-                    IsSuccess = false,
-                    ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageOrder.ORDER_NOT_PAID,
-                    StatusCode = StatusCodes.Status400BadRequest
-                };
-            }
 
             //Kiểm tra BatteryReport tồn tại
             var report = await _batteryReportRepository.GetByExchangeBatteryId(request.ExchangeBatteryId);
@@ -456,8 +432,33 @@ public class ExchangeBatteryService : IExchangeBatteryService
             switch (request.Status)
             {
                 case ExchangeStatusEnums.Completed:
+
+                    if (order == null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                            Message = ResponseMessageOrder.ORDER_NOT_FOUND,
+                            StatusCode = StatusCodes.Status404NotFound
+                        };
+                    }
+
+                    //Kiểm tra Order đã thanh toán
+                    if (order.Status != PaymentStatus.Paid.ToString())
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageOrder.ORDER_NOT_PAID,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
                     exchange.Status = ExchangeStatusEnums.Completed.ToString();
                     exchange.StaffAccountId = request.StaffId;
+                    exchange.Notes = request.Note;
                     exchange.UpdateDate = TimeHepler.SystemTimeNow;
 
                     oldBattery.BatteryName = $"{oldBattery.BatteryType}_{oldBattery.Specification}_{ResponseMessageConstantsStation.DefaultBatterySuffix}";
@@ -516,12 +517,20 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     exchange.Status = ExchangeStatusEnums.Cancelled.ToString();
                     exchange.StaffAccountId = request.StaffId;
                     exchange.UpdateDate = TimeHepler.SystemTimeNow;
+                    exchange.Notes = request.Note;
 
                     schedule.Status = StationScheduleStatusEnums.Cancelled.ToString();
                     schedule.UpdateDate = TimeHepler.SystemTimeNow;
 
                     newBattery.Status = BatteryStatusEnums.Available.ToString();
                     newBattery.UpdateDate = TimeHepler.SystemTimeNow;
+
+                    if(order != null)
+                    {
+                        order.Status = PaymentStatus.Failed.ToString();
+                        order.UpdateDate = TimeHepler.SystemTimeNow;
+                        await _orderRepo.UpdateOrderStatusAsync(order.OrderId, order.Status);
+                    }
 
                     await _batteryRepo.UpdateBattery(newBattery);
                     await _stationScheduleRepo.UpdateStationSchedule(schedule);
