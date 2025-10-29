@@ -18,6 +18,7 @@ using Repositories.Repositories.BatteryHistoryRepo;
 using Repositories.Repositories.StationScheduleRepo;
 using Services.ApiModels.StationSchedule;
 using Repositories.Repositories.FormRepo;
+using Repositories.Repositories.AccountRepo;
 
 namespace Services.Services.ExchangeBatteryService;
 
@@ -32,6 +33,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
     private readonly IBatteryHistoryRepo _batteryHistoryRepo;
     private readonly IStationScheduleRepo _stationScheduleRepo;
     private readonly IFormRepo _formRepo;
+    private readonly IAccountRepo _accountRepo;
 
     public ExchangeBatteryService(
         IExchangeBatteryRepo exchangeRepo,
@@ -42,7 +44,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
         IVehicleRepo vehicleRepo,
         IBatteryHistoryRepo batteryHistoryRepo,
         IStationScheduleRepo stationScheduleRepo,
-        IFormRepo formRepo
+        IFormRepo formRepo,
+        IAccountRepo accountRepo
         )
     {
         _exchangeRepo = exchangeRepo;
@@ -54,6 +57,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
         _batteryHistoryRepo = batteryHistoryRepo;
         _stationScheduleRepo = stationScheduleRepo;
         _formRepo = formRepo;
+        _accountRepo = accountRepo;
     }
 
     private ExchangeBatteryResponse MapToResponse(ExchangeBattery entity)
@@ -280,8 +284,32 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     StatusCode = StatusCodes.Status404NotFound
                 };
             }
-            var order = await _orderRepo.GetOrderByIdAsync(exchange.OrderId);
+            //Lấy thông tin của staff
+            var staff = await _accountRepo.GetAccountById(request.StaffId);
+            if (staff == null)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                    Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+            }
 
+            if (staff.Role != RoleEnums.Bsstaff.ToString())
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsUser.USER_NOT_STAFF,
+                    StatusCode = StatusCodes.Status400BadRequest
+                };
+            }
+
+            //Lấy thông tin order liên quan
+            var order = await _orderRepo.GetOrderByIdAsync(exchange.OrderId);
             //Kiểm tra BatteryReport tồn tại
             var report = await _batteryReportRepository.GetByExchangeBatteryId(request.ExchangeBatteryId);
             if (report == null)
@@ -525,7 +553,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     newBattery.Status = BatteryStatusEnums.Available.ToString();
                     newBattery.UpdateDate = TimeHepler.SystemTimeNow;
 
-                    if(order != null)
+                    if (order != null)
                     {
                         order.Status = PaymentStatus.Failed.ToString();
                         order.UpdateDate = TimeHepler.SystemTimeNow;
