@@ -1464,6 +1464,16 @@ namespace Services.Services.BatteryService
                 existingBattery.StationId = null;
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var deletedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+
+                var slot = await _slotRepo.GetByBatteryId(deletedBattery.BatteryId);
+                if (slot != null)
+                {
+                    slot.BatteryId = null;
+                    slot.Status = SlotStatusEnum.Empty.ToString();
+                    slot.UpdateDate = TimeHepler.SystemTimeNow;
+                    await _slotRepo.UpdateSlot(slot);
+                }
+
                 //record lại lịch sử pin
                 var batteryHistory = new BatteryHistory
                 {
