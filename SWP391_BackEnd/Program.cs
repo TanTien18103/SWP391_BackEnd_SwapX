@@ -172,6 +172,7 @@ builder.Services.AddScoped<IGeminiService, GeminiService>();
 
 //Register Helper
 builder.Services.AddScoped<AccountHelper>();
+builder.Services.AddScoped<BatteryHelper>();
 
 builder.Services.AddControllers();
 //*************** I KNEW YOU WERE HERE ***************//
