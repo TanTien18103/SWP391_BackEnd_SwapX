@@ -31,28 +31,28 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete-battery")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> DeleteBattery([FromForm] string? batteryId)
         {
             var res = await _batteryService.DeleteBattery(batteryId);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("update-battery")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateBattery([FromForm] Services.ApiModels.Battery.UpdateBatteryRequest updateBatteryRequest)
+        [Authorize(Roles = "Admin, Bsstaff")]
+        public async Task<IActionResult> UpdateBattery([FromForm] UpdateBatteryRequest updateBatteryRequest)
         {
             var res = await _batteryService.UpdateBattery(updateBatteryRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("add-battery-in-station")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> addBatteryInStation([FromForm] Services.ApiModels.Battery.AddBatteryInStationRequest addBatteryInStationRequest)
+        public async Task<IActionResult> addBatteryInStation([FromForm] AddBatteryInStationRequest addBatteryInStationRequest)
         {
             var res = await _batteryService.AddBatteryInStation(addBatteryInStationRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get-all-batteries")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> GetAllBatteries()
         {
             var res = await _batteryService.GetAllBatteries();
@@ -60,7 +60,7 @@ namespace SWP391_BackEnd.Controllers
         }
 
         [HttpPut("update_battery_in_station_status")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> UpdateBatteryStatus([FromForm] UpdateBatteryStatusRequest updateBatteryStatusRequest)
         {
             var res = await _batteryService.UpdateBatteryStatusInStation(updateBatteryStatusRequest);
@@ -81,7 +81,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete_battery_in_station")]
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> DeleteBatteryInStation([FromForm] string? batteryId)
         {
             var res = await _batteryService.DeleteBatteryInStation(batteryId);

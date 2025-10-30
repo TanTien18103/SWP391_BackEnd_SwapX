@@ -57,6 +57,12 @@ namespace Services.Services.BatteryReportService
                         Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
                         Data = null
                     };
+                }else
+                {
+                    battery.Capacity = addBatteryReportRequest.Capacity;
+                    battery.BatteryQuality = addBatteryReportRequest.BatteryQuality;
+                    battery.UpdateDate = TimeHepler.SystemTimeNow;
+                    await _batteryRepo.UpdateBattery(battery);
                 }
                 var account = await _accountRepo.GetAccountById(addBatteryReportRequest.AccountId);
                 if (account == null)

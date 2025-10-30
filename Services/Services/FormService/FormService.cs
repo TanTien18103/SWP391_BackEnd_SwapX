@@ -166,6 +166,17 @@ namespace Services.Services.FormService
                         Data = null
                     };
                 }
+                if (batteryOfVehicle.BatteryQuality > battery.BatteryQuality)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_QUALITY_LOWER_THAN_CURRENT_BATTERY,
+                        Data = null
+                    };
+                }
                 //kiểm tra xem xe đó đã lên tạo form trước đó nhưng chưa được approve
                 var existingForms = await _formRepo.GetFormsByVin(addFormRequest.Vin);
                 if (existingForms.Any(f => f.Status == FormStatusEnums.Submitted.ToString()))
@@ -662,6 +673,19 @@ namespace Services.Services.FormService
                 // If approved, set start date and create StationSchedule
                 if (updateFormStatusStaffRequest.Status == StaffUpdateFormEnums.Approved)
                 {
+                    var battery = await _batteryRepo.GetBatteryById(existingForm.BatteryId);
+                    var batteryOfVehicle = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
+                    if (batteryOfVehicle.BatteryQuality > battery.BatteryQuality)
+                    {
+                        return new ResultModel
+                        {
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsBattery.BATTERY_QUALITY_LOWER_THAN_CURRENT_BATTERY,
+                            Data = null
+                        };
+                    }
                     // Create StationSchedule logic here
                     var stationSchedule = new StationSchedule
                     {
@@ -676,6 +700,7 @@ namespace Services.Services.FormService
                     };
 
                     var newstationSchedule = await _stationScheduleRepo.AddStationSchedule(stationSchedule);
+
                     if (newstationSchedule == null)
                     {
                         return new ResultModel
