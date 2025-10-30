@@ -34,6 +34,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
     private readonly IStationScheduleRepo _stationScheduleRepo;
     private readonly IFormRepo _formRepo;
     private readonly IAccountRepo _accountRepo;
+    private readonly BatteryHelper _batteryHelper;
 
     public ExchangeBatteryService(
         IExchangeBatteryRepo exchangeRepo,
@@ -45,7 +46,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
         IBatteryHistoryRepo batteryHistoryRepo,
         IStationScheduleRepo stationScheduleRepo,
         IFormRepo formRepo,
-        IAccountRepo accountRepo
+        IAccountRepo accountRepo,
+        BatteryHelper batteryHelper
         )
     {
         _exchangeRepo = exchangeRepo;
@@ -58,6 +60,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
         _stationScheduleRepo = stationScheduleRepo;
         _formRepo = formRepo;
         _accountRepo = accountRepo;
+        _batteryHelper = batteryHelper;
     }
 
     private ExchangeBatteryResponse MapToResponse(ExchangeBattery entity)
@@ -489,11 +492,12 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     exchange.Notes = request.Note;
                     exchange.UpdateDate = TimeHepler.SystemTimeNow;
 
-                    oldBattery.BatteryName = $"{oldBattery.BatteryType}_{oldBattery.Specification}_{ResponseMessageConstantsStation.DefaultBatterySuffix}";
+                    oldBattery.BatteryName = _batteryHelper.GenBatteryName(oldBattery.BatteryType, oldBattery.Specification, "EX");
                     oldBattery.StationId = exchange.StationId;
                     oldBattery.Status = BatteryStatusEnums.Maintenance.ToString();
                     oldBattery.UpdateDate = TimeHepler.SystemTimeNow;
 
+                    newBattery.BatteryName = _batteryHelper.GenBatteryName(newBattery.BatteryType, newBattery.Specification, "USE");
                     newBattery.StationId = null;
                     newBattery.Status = BatteryStatusEnums.InUse.ToString();
                     newBattery.UpdateDate = TimeHepler.SystemTimeNow;
