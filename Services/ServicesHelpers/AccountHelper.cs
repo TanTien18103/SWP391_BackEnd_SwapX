@@ -14,7 +14,7 @@ namespace Services.ServicesHelpers
     public class AccountHelper
     {
         private readonly IConfiguration _configuration;
-        
+
         public AccountHelper(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -59,7 +59,14 @@ namespace Services.ServicesHelpers
             string base64 = Convert.ToBase64String(guid.ToByteArray());
             return base64.Replace("/", "_").Replace("+", "-").Substring(0, 20);
         }
-        
 
+        public long? GenerateOrderCode()
+        {
+            Random random = new Random();
+            int randomNumber = random.Next(100000, 999999);
+            string datePart = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string orderCodeString = datePart + randomNumber.ToString();
+            return long.Parse(orderCodeString);
+        }
     }
 }

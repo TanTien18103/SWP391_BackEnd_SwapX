@@ -13,5 +13,6 @@ public interface IOrderService
     Task<ResultModel> DeleteOrder(string orderId);
     Task<ResultModel> GetOrderByServiceId(string serviceId);
     Task<ResultModel> GetOrderByOrderCode(long orderCode);
+    Task<ResultModel> PaidInCash(PaidInCashRequest paidInCashRequest);
     Task<ResultModel> GetOrdersByAccountId(string accountId);
 }

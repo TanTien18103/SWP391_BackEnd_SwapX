@@ -237,22 +237,16 @@ namespace BusinessObjects.Constants
         public const string BATTERY_NOT_AVAILABLE = "Pin không khả dụng";
         public const string BATTERY_NOT_EXIST = "Pin không tồn tại";
         public const string BATTERY_NOT_BELONG_TO_VEHICLE = "Pin không thuộc về xe";
-
         public const string DELETE_BATTERY_IN_STATION_FAIL = "Xóa pin khỏi trạm thất bại";
-
         public const string BATTERY_DONT_HAVE_STATION = "Pin chưa có trạm";
-
         public const string DELETE_BATTERY_IN_STATION_SUCCESS = "Xóa pin khỏi trạm thành công";
-
         public const string BATTERY_BOOKED = "Pin đã được đặt không thể rời khỏi trạm";
+        public const string BATTERY_QUALITY_LOWER_THAN_CURRENT_BATTERY = "Chất lượng pin mới phải cao hơn pin hiện tại";
     }
     public static class EmailConstants
     {
-        // OTP
         public const string OtpSubject = "Otp xác nhận đổi mật khẩu mới của bạn";
         public const string OtpBodyTemplate = "Otp xác nhận đổi mật khẩu mới của bạn là: <b>{0}</b>. Hãy nhập otp để nhận mật khẩu mới ngay.";
-
-        // New Password
         public const string NewPasswordSubject = "Mật khẩu mới của bạn";
         public const string NewPasswordBodyTemplate = "Mật khẩu mới của bạn là: <b>{0}</b>. Hãy đăng nhập và đổi mật khẩu ngay.";
     }
@@ -351,16 +345,12 @@ namespace BusinessObjects.Constants
         public const string DELETE_VEHICLE_FAILED = "Xóa xe thất bại";
         public const string GET_VEHICLES_BY_PACKAGE_ID_FAILED = "Lấy xe theo gói thất bại";
         public const string GET_VEHICLES_BY_PACKAGE_ID_SUCCESS = "Lấy xe theo gói thành công";
-
         public const string LINK_VEHICLE_FAILED = "Liên kết xe thất bại";
         public const string LINK_VEHICLE_SUCCESS = "Liên kết xe thành công";
-
         public const string ADD_VEHICLE_IN_PACKAGE_SUCCESS = "Thêm xe vào gói thành công";
         public const string ADD_VEHICLE_IN_PACKAGE_FAILED = "Thêm xe vào gói thất bại";
-
         public const string DELETE_VEHICLE_IN_PACKAGE_FAILED = "Hủy xe khỏi gói thất bại";
         public const string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
-
         public const string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống hoặc sai tên xe vui lòng liên hệ với người bán cho bạn xe cũ để được biết thêm thông tin của xe";
         public const string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
         public const string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";
@@ -448,7 +438,7 @@ namespace BusinessObjects.Constants
         public const string REPORT_ALREADY_COMPLETED = "Báo cáo đã được hoàn thành";
         public const string REPORT_STATUS_SAME = "Báo cáo đã ở trạng thái này";
         public const string UPDATE_REPORT_STATUS_FAILED = "Cập nhật trạng thái báo cáo thất bại";
-        public const string GET_REPORTS_BY_STATION_FAIL= "Lấy báo cáo theo trạm thất bại";
+        public const string GET_REPORTS_BY_STATION_FAIL = "Lấy báo cáo theo trạm thất bại";
         public const string GET_REPORTS_BY_STATION_SUCCESS = "Lấy báo cáo theo trạm thành công";
     }
     //for BatteryReport (0-0-1)
@@ -478,20 +468,15 @@ namespace BusinessObjects.Constants
     {
         public const string CreateSuccess = "Tạo giao dịch đổi pin thành công.";
         public const string CreateFailed = "Không thể tạo giao dịch đổi pin.";
-
         public const string NotFound = "Không tìm thấy thông tin giao dịch đổi pin.";
         public const string ListEmpty = "Không có bản ghi giao dịch đổi pin nào.";
-
         public const string InvalidStation = "Mã trạm không hợp lệ.";
         public const string InvalidOrder = "Mã đơn hàng không hợp lệ.";
         public const string InvalidBattery = "Thông tin pin không hợp lệ.";
-
         public const string UpdateSuccess = "Cập nhật giao dịch đổi pin thành công.";
         public const string UpdateFailed = "Cập nhật giao dịch đổi pin thất bại.";
-
         public const string DeleteSuccess = "Xóa giao dịch đổi pin thành công.";
         public const string DeleteFailed = "Xóa giao dịch đổi pin thất bại.";
-
         public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
         public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
     }
@@ -527,6 +512,8 @@ namespace BusinessObjects.Constants
         public const string NEW_BATTERY_ID_NOT_MATCHED_WITH_FORM_BATTERY_ID = "ID pin mới không khớp với ID pin trong biểu mẫu.";
         public const string NEW_BATTERY_NOT_IN_BOOKED_STATUS = "Pin mới không ở trạng thái đã đặt.";
         public const string NEW_BATTERY_NOT_IN_STATION = "Pin mới không có trong trạm.";
+        public const string EXCHANGE_BATTERY_UPDATE_FAILED = "Cập nhật giao dịch đổi pin thất bại.";
+        public const string FORM_NOT_BELONG_TO_EXCHANGE_BATTERY = "Biểu mẫu không thuộc về giao dịch đổi pin.";
     }
     public static class ResponseMessageBatteryHistory
     {
@@ -552,6 +539,9 @@ namespace BusinessObjects.Constants
         public const string INVALID_PAYMENT_METHOD = "Phương thức thanh toán không hợp lệ";
         public const string ORDER_CREATE_FAILED = "Tạo đơn hàng thất bại";
         public const string ORDER_ALREADY_PENDING = "Đã có đơn hàng đã ở trạng thái đang chờ xử lý";
+        public const string PAID_IN_CASH_FAILED = "Thanh toán bằng tiền mặt thất bại";
+        public const string PAID_IN_CASH_SUCCESS = "Thanh toán bằng tiền mặt thành công";
+        public const string ORDER_ALREADY_EXISTS_FOR_EXCHANGE_BATTERY = "Đơn hàng đã tồn tại cho giao dịch đổi pin";
     }
 
 }

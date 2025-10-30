@@ -500,4 +500,121 @@ public class OrderService : IOrderService
         var response = new OrderResponse(order);
         return new ResultModel { StatusCode = 200, IsSuccess = true, Data = response };
     }
+
+    public async Task<ResultModel> PaidInCash(PaidInCashRequest paidInCashRequest)
+    {
+        try
+        {
+            var exchangeBattery = await _exchangeBatteryRepo.GetById(paidInCashRequest.ExchangeBatteryId);
+            if (exchangeBattery == null)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                    Message = ExchangeBatteryMessages.EXCHANGE_BATTERY_NOT_FOUND,
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+            }
+            var form = await _formRepo.GetById(paidInCashRequest.FormId);
+            if (form == null)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                    Message = ResponseMessageConstantsForm.FORM_NOT_FOUND,
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+            }
+            if (paidInCashRequest.FormId != exchangeBattery.Schedule.FormId)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ExchangeBatteryMessages.FORM_NOT_BELONG_TO_EXCHANGE_BATTERY,
+                    StatusCode = StatusCodes.Status400BadRequest
+                };
+            }
+            var order = await _orderRepository.GetOrderByIdAsync(exchangeBattery.OrderId);
+            if (order == null)
+            {
+                var newOrder = new Order
+                {
+                    OrderId = _accountHelper.GenerateShortGuid(),
+                    AccountId = form.AccountId,
+                    ServiceId = form.FormId,
+                    ServiceType = PaymentType.PaidAtStation.ToString(),
+                    BatteryId = form.BatteryId,
+                    Total = paidInCashRequest.Total,
+                    Status = PaymentStatus.Paid.ToString(),
+                    Date = TimeHepler.SystemTimeNow,
+                    Vin = form.Vin,
+                    OrderCode = _accountHelper.GenerateOrderCode(),
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
+                };
+                var createdOrder = await _orderRepository.CreateOrderAsync(newOrder);
+                if (createdOrder != null)
+                {
+                    exchangeBattery.OrderId = createdOrder.OrderId;
+                    var updatedExchange = await _exchangeBatteryRepo.Update(exchangeBattery);
+                    if (updatedExchange != null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = true,
+                            ResponseCode = ResponseCodeConstants.SUCCESS,
+                            Message = ResponseMessageOrder.PAID_IN_CASH_SUCCESS,
+                            StatusCode = StatusCodes.Status200OK,
+                            Data = createdOrder
+                        };
+                    }
+                    else
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ExchangeBatteryMessages.EXCHANGE_BATTERY_UPDATE_FAILED,
+                            StatusCode = StatusCodes.Status500InternalServerError
+                        };
+                    }
+                }
+                else
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageOrder.PAID_IN_CASH_FAILED,
+                        StatusCode = StatusCodes.Status500InternalServerError
+                    };
+                }
+            }
+            else
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageOrder.ORDER_ALREADY_EXISTS_FOR_EXCHANGE_BATTERY,
+                    StatusCode = StatusCodes.Status400BadRequest
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new ResultModel
+            {
+                IsSuccess = false,
+                ResponseCode = ResponseCodeConstants.FAILED,
+                Message = ResponseMessageOrder.PAID_IN_CASH_FAILED,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Data = ex.InnerException?.Message ?? ex.Message
+            };
+
+        }
+    }
 }

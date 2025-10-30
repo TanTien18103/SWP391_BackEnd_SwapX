@@ -77,4 +77,12 @@ public class OrderController : ControllerBase
         var result = await _orderService.GetOrderByOrderCode(orderCode);
         return StatusCode(result.StatusCode, result);
     }
+
+    [HttpPost("paid_in_cash_at_station")]
+    [Authorize(Roles = "Bsstaff, Admin")]
+    public async Task<IActionResult> PaidInCashAtStation([FromForm] PaidInCashRequest request)
+    {
+        var result = await _orderService.PaidInCash(request);
+        return StatusCode(result.StatusCode, result);
+    }
 }
