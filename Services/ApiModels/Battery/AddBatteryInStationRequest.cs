@@ -13,5 +13,6 @@ namespace Services.ApiModels.Battery
         public string? BatteryId { get; set; }
         [Required]
         public string StationId { get; set; }
+        public string? SlotId { get; set; }
     }
 }

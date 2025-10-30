@@ -29,13 +29,17 @@ namespace Repositories.Repositories.StationRepo
             return await _context.Stations
                 .Include(b=>b.Batteries)
                 .Include(s => s.BssStaffs)
+                .Include(s => s.Slots)
                 .ToListAsync();
         }
 
         public async Task<Station> GetStationById(string stationId)
         {
             await UpdateAllStationsAverageRating();
-            return await _context.Stations.Include(b=>b.Batteries).FirstOrDefaultAsync(s => s.StationId == stationId);
+            return await _context.Stations
+                .Include(b=>b.Batteries)
+                .Include(s => s.Slots)
+                .FirstOrDefaultAsync(s => s.StationId == stationId);
         }
 
        
@@ -75,6 +79,7 @@ namespace Repositories.Repositories.StationRepo
                 .Where(s => s.Status == StationStatusEnum.Active.ToString())
                 .Include(b => b.Batteries)
                 .Include(s => s.BssStaffs)
+                .Include(s => s.Slots)
                 .ToListAsync();
         }
 
