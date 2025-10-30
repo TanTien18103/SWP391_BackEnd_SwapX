@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.BssStaffRepo;
 using Repositories.Repositories.EvDriverRepo;
+using Repositories.Repositories.SlotRepo;
 using Repositories.Repositories.StationRepo;
 using Repositories.Repositories.StationScheduleRepo;
 using Repositories.Repositories.VehicleRepo;
@@ -35,8 +36,20 @@ namespace Services.Services.StationService
         private readonly AccountHelper _accountHelper;
         private readonly IEvDriverRepo _evDriverRepo;
         private readonly IVehicleRepo _vehicleRepo;
+        private readonly ISlotRepo _slotRepo;
 
-        public StationService(IStationRepo stationRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBssStaffRepo bssStaffRepository, IAccountRepo accountRepository, AccountHelper accountHelper,IStationScheduleRepo stationScheduleRepo, IEvDriverRepo evDriverRepo, IVehicleRepo vehicleRepo)
+        public StationService(
+            IStationRepo stationRepository,
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor,
+            IBssStaffRepo bssStaffRepository,
+            IAccountRepo accountRepository,
+            AccountHelper accountHelper,
+            IStationScheduleRepo stationScheduleRepo,
+            IEvDriverRepo evDriverRepo,
+            IVehicleRepo vehicleRepo,
+            ISlotRepo slotRepo
+            )
         {
             _stationRepository = stationRepository;
             _configuration = configuration;
@@ -47,6 +60,7 @@ namespace Services.Services.StationService
             _stationScheduleRepository = stationScheduleRepo;
             _evDriverRepo = evDriverRepo;
             _vehicleRepo = vehicleRepo;
+            _slotRepo = slotRepo;
         }
 
         public async Task<ResultModel> AddStation(AddStationRequest addStationRequest)
@@ -60,19 +74,42 @@ namespace Services.Services.StationService
                     Location = addStationRequest.Location,
                     Status = StationStatusEnum.Active.ToString(),
                     Rating = 0m,
-                    BatteryNumber = 0, 
+                    BatteryNumber = 0,
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow,
                     Image = addStationRequest.Image
                 };
 
                 await _stationRepository.AddStation(station);
+
+                //30 slot layout 6 cột × 5 hàng
+                var slots = new List<Slot>();
+                for (int y = 1; y <= 5; y++) // hàng
+                {
+                    for (int x = 1; x <= 6; x++) // cột
+                    {
+                        slots.Add(new Slot
+                        {
+                            SlotId = _accountHelper.GenerateShortGuid(),
+                            StationId = station.StationId,
+                            Status = SlotStatusEnum.Empty.ToString(),
+                            CordinateX = x,
+                            CordinateY = y,
+                            StartDate = TimeHepler.SystemTimeNow,
+                            UpdateDate = TimeHepler.SystemTimeNow
+                        });
+                    }
+                }
+
+                await _slotRepo.AddRange(slots);
+
                 var createdStation = await _stationRepository.GetStationById(station.StationId);
+
                 return new ResultModel
                 {
                     IsSuccess = true,
                     ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsStation.ADD_STATION_SUCCESS,
+                    Message = $"{ResponseMessageConstantsStation.ADD_STATION_SUCCESS} (Tự động tạo {slots.Count} slot layout 6x5)",
                     Data = createdStation,
                     StatusCode = StatusCodes.Status201Created
                 };
@@ -119,7 +156,7 @@ namespace Services.Services.StationService
                     UpdateDate = station.UpdateDate,
                     BssStaffs = station.BssStaffs.Select(s => new
                     {
-                        StaffId= s.StaffId,
+                        StaffId = s.StaffId,
                     }).ToList(),
                     Batteries = station.Batteries.Select(b => new
                     {
@@ -133,7 +170,16 @@ namespace Services.Services.StationService
                         StartDate = b.StartDate,
                         UpdateDate = b.UpdateDate
                         // KHÔNG có trường station ở đây!
-                    }).ToList()
+                    }).ToList(),
+                    Slots = station.Slots.Select(sl => new
+                    {
+                        SlotId = sl.SlotId,
+                        Status = sl.Status,
+                        CordinateX = sl.CordinateX,
+                        CordinateY = sl.CordinateY,
+                        StartDate = sl.StartDate,
+                        UpdateDate = sl.UpdateDate
+                    }).ToList(),
                 }).ToList();
 
                 return new ResultModel
@@ -183,7 +229,7 @@ namespace Services.Services.StationService
                     StationName = station.StationName,
                     Location = station.Location,
                     Status = station.Status,
-                    Rating =station.Rating,
+                    Rating = station.Rating,
                     BatteryNumber = station.BatteryNumber,
                     StartDate = station.StartDate,
                     UpdateDate = station.UpdateDate,
@@ -203,7 +249,16 @@ namespace Services.Services.StationService
                         StartDate = b.StartDate,
                         UpdateDate = b.UpdateDate
                         // KHÔNG có trường station ở đây!
-                    }).ToList()
+                    }).ToList(),
+                    Slots = station.Slots.Select(sl => new
+                    {
+                        SlotId = sl.SlotId,
+                        Status = sl.Status,
+                        CordinateX = sl.CordinateX,
+                        CordinateY = sl.CordinateY,
+                        StartDate = sl.StartDate,
+                        UpdateDate = sl.UpdateDate
+                    }).ToList(),
                 };
 
                 return new ResultModel
@@ -579,7 +634,7 @@ namespace Services.Services.StationService
                     };
                 }
 
-                if(existingStation.Status == updateStationStatusRequest.Status.ToString())
+                if (existingStation.Status == updateStationStatusRequest.Status.ToString())
                 {
                     return new ResultModel
                     {
@@ -783,7 +838,7 @@ namespace Services.Services.StationService
                     };
                 }
                 var stations = await _stationRepository.GetAllStationsOfCustomerSuitVehicle(vehicleId);
-                if(stations==null|| stations.Count == 0)
+                if (stations == null || stations.Count == 0)
                 {
                     return new ResultModel
                     {

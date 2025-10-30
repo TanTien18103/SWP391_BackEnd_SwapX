@@ -19,6 +19,7 @@ using Repositories.Repositories.StationScheduleRepo;
 using Services.ApiModels.StationSchedule;
 using Repositories.Repositories.FormRepo;
 using Repositories.Repositories.AccountRepo;
+using Repositories.Repositories.SlotRepo;
 
 namespace Services.Services.ExchangeBatteryService;
 
@@ -35,6 +36,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
     private readonly IFormRepo _formRepo;
     private readonly IAccountRepo _accountRepo;
     private readonly BatteryHelper _batteryHelper;
+    private readonly ISlotRepo _slotRepo;
 
     public ExchangeBatteryService(
         IExchangeBatteryRepo exchangeRepo,
@@ -47,7 +49,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
         IStationScheduleRepo stationScheduleRepo,
         IFormRepo formRepo,
         IAccountRepo accountRepo,
-        BatteryHelper batteryHelper
+        BatteryHelper batteryHelper,
+        ISlotRepo slotRepo
         )
     {
         _exchangeRepo = exchangeRepo;
@@ -61,6 +64,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
         _formRepo = formRepo;
         _accountRepo = accountRepo;
         _batteryHelper = batteryHelper;
+        _slotRepo = slotRepo;
     }
 
     private ExchangeBatteryResponse MapToResponse(ExchangeBattery entity)
@@ -487,6 +491,33 @@ public class ExchangeBatteryService : IExchangeBatteryService
                         };
                     }
 
+                    var slotWithNewBattery = await _slotRepo.GetByBatteryId(newBattery.BatteryId);
+                    if (slotWithNewBattery != null)
+                    {
+                        slotWithNewBattery.BatteryId = null;
+                        slotWithNewBattery.Status = SlotStatusEnum.Empty.ToString();
+                        slotWithNewBattery.UpdateDate = TimeHepler.SystemTimeNow;
+
+                        await _slotRepo.UpdateSlot(slotWithNewBattery);
+                    }
+
+                    var emptySlot = await _slotRepo.GetFirstAvailableSlot(exchange.StationId);
+                    if (emptySlot == null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ExchangeBatteryMessages.NO_EMPTY_SLOT_FOR_OLD_BATTERY,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+                    else
+                    {
+                        emptySlot.BatteryId = oldBattery.BatteryId;
+                        emptySlot.Status = SlotStatusEnum.Occupied.ToString();
+                        emptySlot.UpdateDate = TimeHepler.SystemTimeNow;
+                    }
                     exchange.Status = ExchangeStatusEnums.Completed.ToString();
                     exchange.StaffAccountId = request.StaffId;
                     exchange.Notes = request.Note;
@@ -507,6 +538,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
 
                     schedule.Status = StationScheduleStatusEnums.Completed.ToString();
                     schedule.UpdateDate = TimeHepler.SystemTimeNow;
+
+
 
                     var oldbatteryhistory = new BatteryHistory
                     {
@@ -542,6 +575,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     await _exchangeRepo.Update(exchange);
                     await _batteryHistoryRepo.AddBatteryHistory(oldbatteryhistory);
                     await _batteryHistoryRepo.AddBatteryHistory(newbatteryhistory);
+                    await _slotRepo.UpdateSlot(emptySlot);
 
                     break;
 

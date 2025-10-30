@@ -45,6 +45,7 @@ using Services.Services.ExchangeBatteryService;
 using Services.Payments;
 using Services.Services.BatteryHistoryService;
 using Services.Services.GeminiService;
+using Repositories.Repositories.SlotRepo;
 
 //*************** I KNEW YOU WERE HERE ***************//
 
@@ -144,6 +145,7 @@ builder.Services.AddScoped<IBssStaffRepo, BssStaffRepo>();
 builder.Services.AddScoped<IBatteryHistoryRepo, BatteryHistoryRepo>();
 builder.Services.AddScoped<IExchangeBatteryRepo, ExchangeBatteryRepo>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<ISlotRepo, SlotRepo>();
 
 //*************** I KNEW YOU WERE HERE ***************//
 
@@ -170,6 +172,7 @@ builder.Services.AddScoped<IGeminiService, GeminiService>();
 
 //Register Helper
 builder.Services.AddScoped<AccountHelper>();
+builder.Services.AddScoped<BatteryHelper>();
 
 builder.Services.AddControllers();
 //*************** I KNEW YOU WERE HERE ***************//

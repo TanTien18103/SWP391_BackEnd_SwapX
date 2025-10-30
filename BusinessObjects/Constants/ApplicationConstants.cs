@@ -197,6 +197,10 @@ namespace BusinessObjects.Constants
         public const string STATION_INACTIVE_OR_MAINTENANCE = "Trạm đang ngừng hoạt động hoặc bảo trì";
         public const string DefaultBatterySuffix = "STATION_EXCHANGE";
         public const string STATION_NOT_EXIST = "Trạm không tồn tại";
+        public const string STATION_NO_EMPTY_SLOT = "Trạm không có chỗ trống để thêm pin mới.";
+        public const string SLOT_NOT_BELONG_TO_STATION = "Vị trí không thuộc về trạm này";
+        public const string SLOT_NOT_FOUND = "Không tìm thấy vị trí";
+        public const string SLOT_NOT_EMPTY = "Vị trí không trống";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -514,6 +518,8 @@ namespace BusinessObjects.Constants
         public const string NEW_BATTERY_NOT_IN_STATION = "Pin mới không có trong trạm.";
         public const string EXCHANGE_BATTERY_UPDATE_FAILED = "Cập nhật giao dịch đổi pin thất bại.";
         public const string FORM_NOT_BELONG_TO_EXCHANGE_BATTERY = "Biểu mẫu không thuộc về giao dịch đổi pin.";
+        public const string SLOT_WITH_NEW_BATTERY_NOT_FOUND = "Không tìm thấy vị trí chứa pin mới trong trạm.";
+        public const string NO_EMPTY_SLOT_FOR_OLD_BATTERY = "Không có vị trí trống trong trạm để đặt pin cũ.";
     }
     public static class ResponseMessageBatteryHistory
     {

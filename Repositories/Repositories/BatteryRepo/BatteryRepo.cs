@@ -39,6 +39,7 @@ namespace Repositories.Repositories.BatteryRepo
                 .Include(c => c.BatteryHistories)
                 .Include(rp => rp.BatteryReports)
                 .Include(b => b.Station)
+                .Include(b => b.Slots)
                 .Where(b => b.StationId == stationId)
                 .ToListAsync();
         }

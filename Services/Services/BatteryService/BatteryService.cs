@@ -9,6 +9,7 @@ using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.BatteryHistoryRepo;
 using Repositories.Repositories.BatteryRepo;
 using Repositories.Repositories.EvDriverRepo;
+using Repositories.Repositories.SlotRepo;
 using Repositories.Repositories.StationRepo;
 using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
@@ -35,9 +36,21 @@ namespace Services.Services.BatteryService
         private readonly IBatteryHistoryRepo _batteryHistoryRepo;
         private readonly IEvDriverRepo _evDriverRepo;
         private readonly IAccountRepo _accountRepo;
+        private readonly ISlotRepo _slotRepo;
 
         //--------------------------------------------------------------
-        public BatteryService(IBatteryRepo batteryRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IStationRepo stationRepo, IVehicleRepo vehicleRepo, IBatteryHistoryRepo batteryHistoryRepo, IEvDriverRepo evDriverRepo, IAccountRepo accountRepo)
+        public BatteryService(
+            IBatteryRepo batteryRepo,
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor,
+            AccountHelper accountHelper,
+            IStationRepo stationRepo,
+            IVehicleRepo vehicleRepo,
+            IBatteryHistoryRepo batteryHistoryRepo,
+            IEvDriverRepo evDriverRepo,
+            IAccountRepo accountRepo,
+            ISlotRepo slotRepo
+            )
         {
             _batteryRepo = batteryRepo;
             _configuration = configuration;
@@ -48,6 +61,7 @@ namespace Services.Services.BatteryService
             _batteryHistoryRepo = batteryHistoryRepo;
             _evDriverRepo = evDriverRepo;
             _accountRepo = accountRepo;
+            _slotRepo = slotRepo;
         }
         //--------------------------------------------------------------
         public async Task<ResultModel> AddBattery(AddBatteryRequest addBatteryRequest)
@@ -123,7 +137,7 @@ namespace Services.Services.BatteryService
                         Status = batteryHistory.Status,
                         StartDate = batteryHistory.StartDate,
                         UpdateDate = batteryHistory.UpdateDate
-                    }
+                    },
                 };
                 return new ResultModel
                 {
@@ -158,6 +172,7 @@ namespace Services.Services.BatteryService
                 foreach (var b in batteries)
                 {
                     var vehicle = await _vehicleRepo.GetVehicleByBatteryId(b.BatteryId);
+                    var slot = await _slotRepo.GetByBatteryId(b.BatteryId);
 
                     response.Add(new
                     {
@@ -189,6 +204,17 @@ namespace Services.Services.BatteryService
                             Vin = vehicle.Vin,
                             VehicleName = vehicle.VehicleName,
                             CustomerId = vehicle.CustomerId
+                        },
+                        Slot = slot == null ? null : new
+                        {
+                            SlotId = slot.SlotId,
+                            StationId = slot.StationId,
+                            BatteryId = slot.BatteryId,
+                            CordinateX = slot.CordinateX,
+                            CordinateY = slot.CordinateY,
+                            Status = slot.Status,
+                            StartDate = slot.StartDate,
+                            UpdateDate = slot.UpdateDate
                         }
                     });
                 }
@@ -274,6 +300,18 @@ namespace Services.Services.BatteryService
                     };
                 }
                 var vehicle = await _vehicleRepo.GetVehicleByBatteryId(b.BatteryId);
+                if (vehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                var slot = await _slotRepo.GetByBatteryId(b.BatteryId);
 
                 // Map sang object mới, station chỉ chứa thông tin cơ bản, không có batteries
                 // Before creating the response object
@@ -309,6 +347,17 @@ namespace Services.Services.BatteryService
                         Vin = vehicle?.Vin,
                         VehicleName = vehicle?.VehicleName,
                         CustomerId = vehicle?.CustomerId,
+                    },
+                    Slot = slot == null ? null : new
+                    {
+                        SlotId = slot.SlotId,
+                        StationId = slot.StationId,
+                        BatteryId = slot.BatteryId,
+                        CordinateX = slot.CordinateX,
+                        CordinateY = slot.CordinateY,
+                        Status = slot.Status,
+                        StartDate = slot.StartDate,
+                        UpdateDate = slot.UpdateDate
                     }
                 };
 
@@ -364,6 +413,7 @@ namespace Services.Services.BatteryService
                     existingBattery.Image = updateBatteryRequest.Image;
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+                var slot = await _slotRepo.GetByBatteryId(updatedBattery.BatteryId);
                 //record lại lịch sử pin
                 var batteryHistory = new BatteryHistory
                 {
@@ -415,6 +465,17 @@ namespace Services.Services.BatteryService
                         Status = batteryHistory.Status,
                         StartDate = batteryHistory.StartDate,
                         UpdateDate = batteryHistory.UpdateDate
+                    },
+                    Slot = slot == null ? null : new
+                    {
+                        SlotId = slot.SlotId,
+                        StationId = slot.StationId,
+                        BatteryId = slot.BatteryId,
+                        CordinateX = slot.CordinateX,
+                        CordinateY = slot.CordinateY,
+                        Status = slot.Status,
+                        StartDate = slot.StartDate,
+                        UpdateDate = slot.UpdateDate
                     }
                 };
 
@@ -460,6 +521,7 @@ namespace Services.Services.BatteryService
                 existingBattery.Status = BatteryStatusEnums.Decommissioned.ToString();
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var deletedBattery = await _batteryRepo.UpdateBattery(existingBattery);
+                var slot = await _slotRepo.GetByBatteryId(deletedBattery.BatteryId);
                 //record lại lịch sử pin
                 var batteryHistory = new BatteryHistory
                 {
@@ -514,6 +576,17 @@ namespace Services.Services.BatteryService
                         Status = batteryHistory.Status,
                         StartDate = batteryHistory.StartDate,
                         UpdateDate = batteryHistory.UpdateDate
+                    },
+                    Slot = slot == null ? null : new
+                    {
+                        SlotId = slot.SlotId,
+                        StationId = slot.StationId,
+                        BatteryId = slot.BatteryId,
+                        CordinateX = slot.CordinateX,
+                        CordinateY = slot.CordinateY,
+                        Status = slot.Status,
+                        StartDate = slot.StartDate,
+                        UpdateDate = slot.UpdateDate
                     }
                 };
                 return new ResultModel
@@ -564,6 +637,7 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+
                 if (existingBattery.Status == BatteryStatusEnums.Decommissioned.ToString() || existingBattery.Status == BatteryStatusEnums.InUse.ToString())
                 {
                     return new ResultModel
@@ -589,6 +663,66 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
+
+                Slot? slot = null;
+
+                if (!string.IsNullOrEmpty(addBatteryInStationRequest.SlotId))
+                {
+                    slot = await _slotRepo.GetSlotById(addBatteryInStationRequest.SlotId);
+                    if (slot == null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                            Message = ResponseMessageConstantsStation.SLOT_NOT_FOUND,
+                            StatusCode = StatusCodes.Status404NotFound
+                        };
+                    }
+
+                    if (slot.StationId != addBatteryInStationRequest.StationId)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsStation.SLOT_NOT_BELONG_TO_STATION,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
+                    if (slot.Status != null && slot.Status != SlotStatusEnum.Empty.ToString())
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsStation.SLOT_NOT_EMPTY,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+                }
+                else
+                {
+                    slot = await _slotRepo.GetFirstAvailableSlot(addBatteryInStationRequest.StationId);
+                    if (slot == null)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsStation.STATION_NO_EMPTY_SLOT,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+                }
+
+                slot.BatteryId = existingBattery.BatteryId;
+                slot.Status = SlotStatusEnum.Occupied.ToString();
+                slot.UpdateDate = TimeHepler.SystemTimeNow;
+
+                await _slotRepo.UpdateSlot(slot);
+
                 stationResult.BatteryNumber = batteryInStation.Count;
                 await _stationRepo.UpdateStation(stationResult);
 
@@ -599,7 +733,7 @@ namespace Services.Services.BatteryService
                 {
                     BatteryHistoryId = _accountHelper.GenerateShortGuid(),
                     BatteryId = batteryDetail.BatteryId,
-                    Notes = HistoryActionConstants.BATTERY_ADDED_TO_STATION.ToString()+" "+ batteryDetail.Station.StationName,
+                    Notes = HistoryActionConstants.BATTERY_ADDED_TO_STATION.ToString() + " " + batteryDetail.Station.StationName,
                     ActionType = BatteryHistoryActionTypeEnums.Moved.ToString(),
                     StationId = batteryDetail.StationId,
                     EnergyLevel = batteryDetail.Capacity.ToString(),
@@ -633,7 +767,6 @@ namespace Services.Services.BatteryService
                         StartDate = batteryDetail.Station.StartDate,
                         UpdateDate = batteryDetail.Station.UpdateDate,
                         Image = batteryDetail.Station.Image,
-                        // KHÔNG có trường Batteries ở đây!
                     },
                     BatteryHistory = batteryHistory == null ? null : new
                     {
@@ -649,6 +782,17 @@ namespace Services.Services.BatteryService
                         Status = batteryHistory.Status,
                         StartDate = batteryHistory.StartDate,
                         UpdateDate = batteryHistory.UpdateDate
+                    },
+                    Slot = slot == null ? null : new
+                    {
+                        SlotId = slot.SlotId,
+                        StationId = slot.StationId,
+                        BatteryId = slot.BatteryId,
+                        CordinateX = slot.CordinateX,
+                        CordinateY = slot.CordinateY,
+                        Status = slot.Status,
+                        StartDate = slot.StartDate,
+                        UpdateDate = slot.UpdateDate
                     }
                 };
 
@@ -717,7 +861,17 @@ namespace Services.Services.BatteryService
                 var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
 
                 var batteryDetail = await _batteryRepo.GetBatteryById(updatedBattery.BatteryId);
-
+                if (batteryDetail == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                var slot = await _slotRepo.GetByBatteryId(batteryDetail.BatteryId);
                 var response = new
                 {
                     BatteryId = batteryDetail.BatteryId,
@@ -741,6 +895,17 @@ namespace Services.Services.BatteryService
                         StartDate = batteryDetail.Station.StartDate,
                         UpdateDate = batteryDetail.Station.UpdateDate,
                         Image = batteryDetail.Station.Image,
+                    },
+                    Slot = slot == null ? null : new
+                    {
+                        SlotId = slot.SlotId,
+                        StationId = slot.StationId,
+                        BatteryId = slot.BatteryId,
+                        CordinateX = slot.CordinateX,
+                        CordinateY = slot.CordinateY,
+                        Status = slot.Status,
+                        StartDate = slot.StartDate,
+                        UpdateDate = slot.UpdateDate
                     }
                 };
 
@@ -845,7 +1010,7 @@ namespace Services.Services.BatteryService
                 }
                 var battery = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
                 var batteries = await _batteryRepo.GetBatteriesByStationIdAndSpecification(getAllBatterySuitVehicle.StationId, battery.Specification, battery.BatteryType);
-                if (batteries == null || batteries.Count==0)
+                if (batteries == null || batteries.Count == 0)
                 {
                     return new ResultModel
                     {
@@ -873,6 +1038,7 @@ namespace Services.Services.BatteryService
 
                 foreach (var b in batteries)
                 {
+                    var slot = await _slotRepo.GetByBatteryId(b.BatteryId);
                     response.Add(new
                     {
                         BatteryId = b.BatteryId,
@@ -897,6 +1063,17 @@ namespace Services.Services.BatteryService
                             UpdateDate = b.Station.UpdateDate,
                             Image = b.Station.Image,
                         },
+                        Slot = slot == null ? null : new
+                        {
+                            SlotId = slot.SlotId,
+                            StationId = slot.StationId,
+                            BatteryId = slot.BatteryId,
+                            CordinateX = slot.CordinateX,
+                            CordinateY = slot.CordinateY,
+                            Status = slot.Status,
+                            StartDate = slot.StartDate,
+                            UpdateDate = slot.UpdateDate
+                        }
 
                     });
                 }
@@ -1170,6 +1347,8 @@ namespace Services.Services.BatteryService
 
                 };
                 await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
+
+                var slot = await _slotRepo.GetByBatteryId(battery.BatteryId);
                 var response = new
                 {
                     BatteryId = battery.BatteryId,
@@ -1209,6 +1388,17 @@ namespace Services.Services.BatteryService
                         Status = batteryHistory.Status,
                         StartDate = batteryHistory.StartDate,
                         UpdateDate = batteryHistory.UpdateDate
+                    },
+                    Slot = slot == null ? null : new
+                    {
+                        SlotId = slot.SlotId,
+                        StationId = slot.StationId,
+                        BatteryId = slot.BatteryId,
+                        CordinateX = slot.CordinateX,
+                        CordinateY = slot.CordinateY,
+                        Status = slot.Status,
+                        StartDate = slot.StartDate,
+                        UpdateDate = slot.UpdateDate
                     }
                 };
                 return new ResultModel
@@ -1249,7 +1439,7 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
-                if(existingBattery.StationId == null)
+                if (existingBattery.StationId == null)
                 {
                     return new ResultModel
                     {
@@ -1259,7 +1449,8 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
-                if (existingBattery.Status == BatteryStatusEnums.Booked.ToString()) {
+                if (existingBattery.Status == BatteryStatusEnums.Booked.ToString())
+                {
                     return new ResultModel
                     {
                         IsSuccess = false,
@@ -1278,7 +1469,7 @@ namespace Services.Services.BatteryService
                 {
                     BatteryHistoryId = _accountHelper.GenerateShortGuid(),
                     BatteryId = deletedBattery.BatteryId,
-                    Notes = "Pin đã được xóa khỏi trạm"+ stationName,
+                    Notes = "Pin đã được xóa khỏi trạm" + stationName,
                     ActionType = BatteryHistoryActionTypeEnums.Deleted.ToString(),
                     EnergyLevel = deletedBattery.Capacity.ToString(),
                     Status = BatteryHistoryStatusEnums.Active.ToString(),
@@ -1297,7 +1488,8 @@ namespace Services.Services.BatteryService
                     StatusCode = StatusCodes.Status200OK
                 };
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
 
                 return new ResultModel
                 {
