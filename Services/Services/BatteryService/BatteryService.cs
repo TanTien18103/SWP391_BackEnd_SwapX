@@ -300,17 +300,6 @@ namespace Services.Services.BatteryService
                     };
                 }
                 var vehicle = await _vehicleRepo.GetVehicleByBatteryId(b.BatteryId);
-                if (vehicle == null)
-                {
-                    return new ResultModel
-                    {
-                        IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
-                        Data = null,
-                        StatusCode = StatusCodes.Status404NotFound
-                    };
-                }
                 var slot = await _slotRepo.GetByBatteryId(b.BatteryId);
 
                 // Map sang object mới, station chỉ chứa thông tin cơ bản, không có batteries
