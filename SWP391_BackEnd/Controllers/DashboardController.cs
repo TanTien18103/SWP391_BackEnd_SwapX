@@ -22,6 +22,33 @@ namespace Controllers
             var summary = await _dashboardService.GetDashboardSummaryAsync();
             return Ok(summary);
         }
+        [HttpGet("total_exchange_battery")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetTotalExchangeBattery()
+        {
+            var summary = await _dashboardService.GetDashboardSummaryAsync();
+            return Ok(summary.TotalExchangeBatteries);
+        }
+        [HttpGet("total_user")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetTotalUser()
+        {
+            var summary = await _dashboardService.GetDashboardSummaryAsync();
+            return Ok(summary.TotalAccounts);
+        }
+        [HttpGet("total_revenue")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetTotalRevenue()
+        {
+            var summary = await _dashboardService.GetDashboardSummaryAsync();
+            return Ok(summary.TotalOrders);
+        }
+        [HttpGet("show_dashboard")]
+        public async Task<IActionResult> GetMonthlyRevenueGrowth()
+        {
+            var res = await _dashboardService.ShowDashboard();
+            return StatusCode(res.StatusCode, res);
+        }
     }
 }
 
