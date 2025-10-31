@@ -553,5 +553,9 @@ namespace BusinessObjects.Constants
         public const string PAID_IN_CASH_SUCCESS = "Thanh toán bằng tiền mặt thành công";
         public const string ORDER_ALREADY_EXISTS_FOR_EXCHANGE_BATTERY = "Đơn hàng đã tồn tại cho giao dịch đổi pin";
     }
+    public static class ResponseMessageConstantsDashboard
+    {
+        public const string DASHBOARD_LOADED_SUCCESS = "Dashboard loaded successfully";
+    }
 
 }

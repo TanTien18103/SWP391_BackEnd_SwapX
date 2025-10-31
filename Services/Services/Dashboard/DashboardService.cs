@@ -1,11 +1,13 @@
 ﻿using BusinessObjects.Constants;
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
+using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.BatteryRepo;
 using Repositories.Repositories.Dashboard;
+using Repositories.Repositories.ExchangeBatteryRepo;
 using Repositories.Repositories.OrderRepo;
 using Repositories.Repositories.StationRepo;
 using Services.ApiModels;
@@ -21,12 +23,14 @@ public class DashboardService : IDashboardService
     private readonly IAccountRepo _accountRepo;
     private readonly IBatteryRepo _batteryRepository;
     private readonly IStationRepo _stationRepository;
+    private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
     public DashboardService(
         IDashboardRepository dashboardRepository,
         IOrderRepository orderRepository,
         IAccountRepo accountRepo,
         IBatteryRepo batteryRepository,
-        IStationRepo stationRepository
+        IStationRepo stationRepository,
+        IExchangeBatteryRepo exchangeBatteryRepo
         )
     {
         _dashboardRepository = dashboardRepository;
@@ -34,6 +38,7 @@ public class DashboardService : IDashboardService
         _accountRepo = accountRepo;
         _batteryRepository = batteryRepository;
         _stationRepository = stationRepository;
+        _exchangeBatteryRepo = exchangeBatteryRepo;
     }
 
     public async Task<DashboardSummaryResponse> GetDashboardSummaryAsync()
@@ -56,250 +61,136 @@ public class DashboardService : IDashboardService
         };
     }
 
-    // ***************************************************************
-    // ⚠️ HÃY ĐỊNH NGHĨA CÁC MODELS NÀY TRONG NAMESPACE Services.ApiModels.Dashboard
-    // ***************************************************************
-
-    // public class MonthlyData { ... } 
-    // public class UserDistributionData { ... }
-    // public class DailySwapFrequencyData { ... }
-    // public class StationEfficiencyData { ... }
-    // public class HourSwapData { ... }
-    // public class ShowDashboardResponse { ... }
-
-    // public enum PaymentType { Package, PrePaid, UsePackage, PaidAtStation }
-
-    public async Task<ResultModel> ShowDashboard()
+    public async Task<ResultModel> ShowDashboard(DashboardFilterRequest filter)
     {
         try
         {
-            // 📥 Lấy dữ liệu
-            var orders = await _orderRepository.GetAllOrdersAsync();
+            var startDate = filter.StartDate ?? TimeHepler.SystemTimeNow.AddYears(-100);
+            var endDate = filter.EndDate ?? TimeHepler.SystemTimeNow;
+            var stationId = filter.StationId;
+
+            var stations = await _stationRepository.GetAllStations();
             var users = await _accountRepo.GetAll();
             var batteries = await _batteryRepository.GetAllBatteries();
-            var stations = await _stationRepository.GetAllStations();
+            var orders = await _orderRepository.GetAllOrdersAsync();
+            var exchanges = await _exchangeBatteryRepo.GetAll();
 
-            var now = DateTime.Now;
-            var currentYear = now.Year;
-            var currentMonth = now.Month;
-            var sevenDaysAgo = now.Date.AddDays(-6);
-
-            // --- HÀM HỖ TRỢ: Thử chuyển ServiceType (string) thành Enum ---
-            PaymentType? GetPaymentType(string serviceType)
-            {
-                if (string.IsNullOrEmpty(serviceType)) return null;
-                if (Enum.TryParse(serviceType, true, out PaymentType result))
-                {
-                    return result;
-                }
-                return null;
-            }
-
-            // --- HÀM HỖ TRỢ: Lấy StationId từ ExchangeBatteries ---
-            string GetStationId(Order order)
-            {
-                // GIẢ ĐỊNH: StationId được lưu trong bảng ExchangeBattery liên quan đến Order này
-                return order.ExchangeBatteries?.FirstOrDefault()?.StationId;
-            }
-
-            // -----------------------------------------------------------------------------------------------------
-            // 1️⃣ TÍNH TOÁN DOANH THU & SWAPS THEO THÁNG (Cho biểu đồ & Summary)
-            // -----------------------------------------------------------------------------------------------------
-
-            var monthlyData = orders
-                .Where(o => o.Date.HasValue && o.Total.HasValue
-                         && (GetPaymentType(o.ServiceType) == PaymentType.PaidAtStation
-                          || GetPaymentType(o.ServiceType) == PaymentType.PrePaid
-                          || GetPaymentType(o.ServiceType) == PaymentType.Package))
-                .GroupBy(o => new { Year = o.Date.Value.Year, Month = o.Date.Value.Month })
-                .Select(g => new MonthlyData
-                {
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    TotalRevenue = g.Sum(x => x.Total.Value),
-                    TotalSwaps = orders.Count(o => o.Date.HasValue
-                                                && o.Date.Value.Year == g.Key.Year
-                                                && o.Date.Value.Month == g.Key.Month)
-                })
-                .OrderBy(x => x.Year)
-                .ThenBy(x => x.Month)
+            var paidOrders = orders
+                .Where(o => o.Status == PaymentStatus.Paid.ToString())
                 .ToList();
 
-            // ... (Logic tính Summary giữ nguyên) ...
-            var currentMonthData = monthlyData.FirstOrDefault(d => d.Year == currentYear && d.Month == currentMonth);
-            var prevMonthData = monthlyData.Where(d => d.Year < currentYear || (d.Year == currentYear && d.Month < currentMonth))
-                                           .OrderByDescending(d => d.Year).ThenByDescending(d => d.Month).FirstOrDefault();
-
-            decimal currentMonthRevenue = currentMonthData?.TotalRevenue ?? 0;
-            decimal prevMonthRevenue = prevMonthData?.TotalRevenue ?? 0;
-            int currentMonthSwaps = currentMonthData?.TotalSwaps ?? 0;
-            int prevMonthSwaps = prevMonthData?.TotalSwaps ?? 0;
-
-            decimal revenueGrowthPercent = (prevMonthRevenue != 0)
-                                         ? Math.Round(((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100, 1) : 0;
-            decimal swapsGrowthPercent = (prevMonthSwaps != 0)
-                                        ? Math.Round(((decimal)(currentMonthSwaps - prevMonthSwaps) / prevMonthSwaps) * 100, 1) : 0;
-
-            // -----------------------------------------------------------------------------------------------------
-            // 2️⃣ TÍNH TOÁN PHÂN BỐ NGƯỜI DÙNG
-            // -----------------------------------------------------------------------------------------------------
-
-            var userCategories = orders
-                .Where(o => o.AccountId != null)
-                .GroupBy(o => o.AccountId)
-                .Select(g =>
-                {
-                    string userCategory;
-                    if (g.Any(o => GetPaymentType(o.ServiceType) == PaymentType.Package))
-                    {
-                        userCategory = "Người dùng thường xuyên (Package)";
-                    }
-                    else if (g.Any(o => GetPaymentType(o.ServiceType) == PaymentType.PaidAtStation))
-                    {
-                        userCategory = "Người dùng thỉnh thoảng (Pay-per-use)";
-                    }
-                    else if (g.Any(o => GetPaymentType(o.ServiceType) == PaymentType.PrePaid))
-                    {
-                        userCategory = "Người dùng trả trước (PrePaid)";
-                    }
-                    else
-                    {
-                        userCategory = "Khác/Giao dịch UsePackage";
-                    }
-                    return new { UserId = g.Key, UserCategory = userCategory };
-                })
-                .DistinctBy(x => x.UserId)
+            var completedExchange = exchanges
+                .Where(e => e.Status.Equals(ExchangeStatusEnums.Completed.ToString(), StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            var userDistributionGroups = userCategories
-                .GroupBy(x => x.UserCategory)
-                .Select(g => new UserDistributionData { UserType = g.Key, Count = g.Count() })
-                .ToList();
+            var completedOrders = (from o in paidOrders
+                                   join e in completedExchange on o.OrderId equals e.OrderId
+                                   select new
+                                   {
+                                       Order = o,
+                                       Exchange = e
+                                   }).ToList();
 
-            var activeUserIds = userCategories.Select(x => x.UserId).ToHashSet();
-            // SỬA: Dùng AccountId của Account để so sánh với Order.AccountId
-            var totalNewUsers = users.Count(u => !activeUserIds.Contains(u.AccountId));
 
-            if (totalNewUsers > 0)
+            if (!string.IsNullOrEmpty(stationId))
             {
-                userDistributionGroups.Add(new UserDistributionData { UserType = "Người dùng mới (Chưa đổi pin)", Count = totalNewUsers });
+                completedOrders = completedOrders
+                    .Where(x => x.Exchange.StationId == stationId)
+                    .ToList();
             }
 
-            var totalUsersCounted = userDistributionGroups.Sum(d => d.Count);
-            var userDistribution = userDistributionGroups;
-            userDistribution.ForEach(d =>
-            {
-                d.Percent = totalUsersCounted > 0 ? Math.Round((decimal)d.Count / totalUsersCounted * 100, 1) : 0;
-            });
+            completedOrders = completedOrders
+                .Where(x => x.Order.StartDate >= startDate && x.Order.StartDate <= endDate)
+                .ToList();
 
-            // -----------------------------------------------------------------------------------------------------
-            // 3️⃣ TÍNH TOÁN TẦN SUẤT ĐỔI PIN THEO NGÀY
-            // -----------------------------------------------------------------------------------------------------
+            var totalRevenue = completedOrders.Sum(x => x.Order.Total ?? 0);
+            var totalOrders = completedOrders.Count;
+            var totalUsers = users.Count;
+            var totalStations = stations.Count;
+            var totalBatteries = batteries.Count;
 
-            var dailySwapFrequency = orders
-                .Where(o => o.Date.HasValue && o.Date.Value.Date >= sevenDaysAgo)
-                .GroupBy(o => o.Date.Value.Date)
-                .Select(g => new DailySwapFrequencyData
+            var revenueOverTime = paidOrders
+                .GroupBy(x => x.StartDate.Value.Date)
+                .Select(g => new RevenueChartItem
                 {
                     Date = g.Key,
-                    TotalSwaps = g.Count(),
-                    // SỬA LỖI CS1061: Giả lập AvgTimeSpent vì Order không có TimeSpentSeconds
-                    AvgTimeSpent = 120
+                    Revenue = g.Sum(x => x.Total ?? 0)
                 })
-                .OrderBy(d => d.Date)
+                .OrderBy(x => x.Date)
                 .ToList();
 
-            // -----------------------------------------------------------------------------------------------------
-            // 4️⃣ TÍNH TOÁN HIỆU SUẤT TRẠM ĐỔI PIN (GIẢ LẬP)
-            // -----------------------------------------------------------------------------------------------------
-
-            var stationEfficiencies = orders
-                .Where(o => o.Date.HasValue && GetStationId(o) != null) // SỬA: Dùng GetStationId()
-                .GroupBy(o => GetStationId(o)) // SỬA: Dùng GetStationId()
-                .Select(g =>
+            var userGrowthChart = users
+                .GroupBy(x => x.StartDate.Value.Date)
+                .Select(g => new UserGrowthItem
                 {
-                    var station = stations.FirstOrDefault(s => s.StationId == g.Key);
-                    var totalSwaps = g.Count();
-
-                    return new StationEfficiencyData
-                    {
-                        StationName = station?.StationName ?? $"Trạm {g.Key}",
-                        TotalSwaps = totalSwaps,
-                        // Giả lập giá trị
-                        EfficiencyPercent = (g.Key.GetHashCode() % 6 + 70)
-                    };
+                    Date = g.Key,
+                    NewUsers = g.Count(),
+                    TotalUsers = users.Count(u => u.StartDate <= g.Key)
                 })
-                .OrderBy(s => s.StationName)
+                .OrderBy(x => x.Date)
                 .ToList();
 
-            // -----------------------------------------------------------------------------------------------------
-            // 5️⃣ TÍNH TOÁN PHÂN TÍCH GIỜ CAO ĐIỂM
-            // -----------------------------------------------------------------------------------------------------
-
-            var hourlySwapAnalysis = orders
-                .Where(o => o.Date.HasValue && o.Date.Value.Date >= sevenDaysAgo)
-                .GroupBy(o => o.Date.Value.Hour)
-                .Select(g => new HourSwapData
+            var topStations = completedOrders
+                .GroupBy(x => x.Exchange.StationId)
+                .Select(g => new TopStationItem
                 {
-                    Hour = g.Key,
-                    TotalSwaps = g.Count(),
-                    // SỬA: Dùng GetStationId()
-                    ActiveStations = g.Select(o => GetStationId(o)).Where(id => id != null).Distinct().Count()
+                    StationId = g.Key,
+                    StationName = stations.FirstOrDefault(s => s.StationId == g.Key)?.StationName ?? RoleEnums.Unknown.ToString(),
+                    Revenue = g.Sum(t => t.Order.Total ?? 0),
+                    Totalorders = g.Count()
                 })
-                .OrderBy(h => h.Hour)
+                .OrderByDescending(x => x.Revenue)
+                .Take(5)
                 .ToList();
 
-            for (int i = 0; i < 24; i++)
+            var revenueByServiceType = paidOrders
+                .GroupBy(x => x.ServiceType)
+                .Select(g => new RevenueByServiceTypeItem
+                {
+                    ServiceType = g.Key,
+                    Revenue = g.Sum(t => t.Total ?? 0),
+                    Orders = g.Count()
+                })
+                .ToList();
+
+            var batteryStatusSummary = new BatteryStatusSummary
             {
-                if (!hourlySwapAnalysis.Any(h => h.Hour == i))
+                Total = batteries.Count,
+                Charging = batteries.Count(b => b.Status == BatteryStatusEnums.Charging.ToString()),
+                InUse = batteries.Count(b => b.Status == BatteryStatusEnums.InUse.ToString()),
+                Available = batteries.Count(b => b.Status == BatteryStatusEnums.Available.ToString()),
+                Decommissioned = batteries.Count(b => b.Status == BatteryStatusEnums.Decommissioned.ToString()),
+                Booked = batteries.Count(b => b.Status == BatteryStatusEnums.Booked.ToString()),
+                Maintenance = batteries.Count(b => b.Status == BatteryStatusEnums.Maintenance.ToString())
+            };
+
+            var response = new ShowDashboardResponse
+            {
+                TotalStations = totalStations,
+                TotalUsers = totalUsers,
+                TotalBatteries = totalBatteries,
+                Totalorders = totalOrders,
+                TotalRevenue = totalRevenue,
+                RevenueOverTime = revenueOverTime,
+                UserGrowthChart = userGrowthChart,
+                TopStations = topStations,
+                RevenueByServiceType = revenueByServiceType,
+                BatteryStatusSummary = batteryStatusSummary,
+                FilterInfo = new DashboardFilterResponse
                 {
-                    hourlySwapAnalysis.Add(new HourSwapData { Hour = i, TotalSwaps = 0, ActiveStations = 0 });
+                    SelectedStationId = stationId,
+                    SelectedStationName = stations.FirstOrDefault(s => s.StationId == stationId)?.StationName,
+                    StartDate = startDate,
+                    EndDate = endDate
                 }
-            }
-            hourlySwapAnalysis = hourlySwapAnalysis.OrderBy(h => h.Hour).ToList();
-
-
-            // -----------------------------------------------------------------------------------------------------
-            // 6️⃣ GÓI DỮ LIỆU VÀ TRẢ VỀ
-            // -----------------------------------------------------------------------------------------------------
-
-            // Tính toán người dùng mới và hiệu suất pin
-            int prevMonthNewUsers = 100; // Giả lập
-                                         // SỬA: Dùng StartDate (thay vì CreatedAt)
-            int currentMonthNewUsers = users.Count(u => u.StartDate.HasValue && u.StartDate.Value.Year == currentYear && u.StartDate.Value.Month == currentMonth);
-            decimal newUsersGrowthPercent = (prevMonthNewUsers != 0) ? Math.Round(((decimal)(currentMonthNewUsers - prevMonthNewUsers) / prevMonthNewUsers) * 100, 1) : 0;
-
-            // SỬA LỖI CS1061: Giả định AverageEfficiency là 0.85
-            decimal averageEfficiency = batteries.Any()
-                                      ? 0.85M
-                                      : 0M;
-
-            var finalResult = new ShowDashboardResponse
-            {
-                // SUMMARY
-                CurrentMonthRevenue = currentMonthRevenue,
-                RevenueGrowthPercent = revenueGrowthPercent,
-                CurrentMonthSwaps = currentMonthSwaps,
-                SwapsGrowthPercent = swapsGrowthPercent,
-                TotalUsers = users.Count(),
-                NewUsersGrowthPercent = newUsersGrowthPercent,
-                AverageEfficiency = averageEfficiency * 100, // Hiển thị dưới dạng phần trăm (85.0)
-                EfficiencyGrowthPercent = 7.1M, // Giữ nguyên giả lập
-
-                // CHART DATA
-                MonthlyRevenuesAndSwaps = monthlyData,
-                UserDistribution = userDistribution,
-                DailySwapFrequency = dailySwapFrequency,
-                StationEfficiencies = stationEfficiencies,
-                HourlySwapAnalysis = hourlySwapAnalysis
             };
 
             return new ResultModel
             {
                 IsSuccess = true,
-                Data = finalResult,
                 ResponseCode = ResponseCodeConstants.SUCCESS,
-                StatusCode = StatusCodes.Status200OK
+                Message = ResponseMessageConstantsDashboard.DASHBOARD_LOADED_SUCCESS,
+                Data = response
             };
         }
         catch (Exception ex)
@@ -307,9 +198,8 @@ public class DashboardService : IDashboardService
             return new ResultModel
             {
                 IsSuccess = false,
-                Message = ex.Message,
-                ResponseCode = ResponseCodeConstants.INTERNAL_SERVER_ERROR,
-                StatusCode = StatusCodes.Status500InternalServerError
+                ResponseCode = ResponseCodeConstants.FAILED,
+                Message = ex.Message
             };
         }
     }
