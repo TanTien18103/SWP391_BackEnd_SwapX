@@ -21,6 +21,6 @@ namespace Services.Services.BatteryService
         Task<ResultModel> GetAllBatterySuitVehicle(GetAllBatterySuitVehicle getAllBatterySuitVehicle);
         Task<ResultModel> CreateBatteryByVehicleName(CreateBatteryByVehicleNameRequest createBatteryByVehicleNameRequest);
         Task<ResultModel> DeleteBatteryInStation(string batteryId);
-        
+        Task<ResultModel> AutoChargeAsync();
     }
 }
