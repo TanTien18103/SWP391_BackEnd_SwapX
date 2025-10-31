@@ -15,5 +15,7 @@ namespace Repositories.Repositories.BatteryRepo
         Task<List<Battery>> GetAllBatteries();
         Task<List<Battery>> GetBatteriesByStationId(string stationId);
         Task<List<Battery>> GetBatteriesByStationIdAndSpecification(string stationId, string specification, string batteryType);
+        Task<List<Battery>> GetChargingBatteriesAsync();
+        Task<List<Battery>> UpdateBatteries(List<Battery> batteries);
     }
 }

@@ -1,4 +1,5 @@
-﻿using BusinessObjects.Models;
+﻿using BusinessObjects.Enums;
+using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -71,5 +72,18 @@ namespace Repositories.Repositories.BatteryRepo
                 .ToListAsync();
         }
 
+        public async Task<List<Battery>> GetChargingBatteriesAsync()
+        {
+            return await _context.Batteries
+                .Where(b => b.Status == BatteryStatusEnums.Charging.ToString())
+                .ToListAsync();
+        }
+
+        public async Task<List<Battery>> UpdateBatteries(List<Battery> batteries)
+        {
+            _context.Batteries.UpdateRange(batteries);
+            await _context.SaveChangesAsync();
+            return batteries;
+        }
     }
 }
