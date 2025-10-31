@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.ApiModels;
 using Services.Services.Dashboard;
 using System.Threading.Tasks;
 
@@ -43,12 +44,13 @@ namespace Controllers
             var summary = await _dashboardService.GetDashboardSummaryAsync();
             return Ok(summary.TotalOrders);
         }
-        [HttpGet("show_dashboard")]
-        public async Task<IActionResult> GetMonthlyRevenueGrowth()
+        [HttpPost("show_dashboard")]
+        public async Task<IActionResult> ShowDashboard([FromForm] DashboardFilterRequest dashboardFilterRequest)
         {
-            var res = await _dashboardService.ShowDashboard();
+            var res = await _dashboardService.ShowDashboard(dashboardFilterRequest);
             return StatusCode(res.StatusCode, res);
         }
+
     }
 }
 
