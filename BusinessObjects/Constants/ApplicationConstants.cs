@@ -246,6 +246,10 @@ namespace BusinessObjects.Constants
         public const string DELETE_BATTERY_IN_STATION_SUCCESS = "Xóa pin khỏi trạm thành công";
         public const string BATTERY_BOOKED = "Pin đã được đặt không thể rời khỏi trạm";
         public const string BATTERY_QUALITY_LOWER_THAN_CURRENT_BATTERY = "Chất lượng pin mới phải cao hơn pin hiện tại";
+        public const string BATTERY_INUSE_BOOKED_DECOMMISSIONED_CANNOT_UPDATE = "Pin đang sử dụng, đã đặt hoặc đã ngừng hoạt động không thể cập nhật";
+        public const string CHARGE_BATTERY_FAIL = "Sạc pin thất bại";
+        public const string AUTO_CHARGE_SUCCESS = "Tự động sạc pin thành công";
+        public const string AUTO_CHARGE_FAILED = "Tự động sạc pin thất bại";
     }
     public static class EmailConstants
     {
@@ -548,6 +552,10 @@ namespace BusinessObjects.Constants
         public const string PAID_IN_CASH_FAILED = "Thanh toán bằng tiền mặt thất bại";
         public const string PAID_IN_CASH_SUCCESS = "Thanh toán bằng tiền mặt thành công";
         public const string ORDER_ALREADY_EXISTS_FOR_EXCHANGE_BATTERY = "Đơn hàng đã tồn tại cho giao dịch đổi pin";
+    }
+    public static class ResponseMessageConstantsDashboard
+    {
+        public const string DASHBOARD_LOADED_SUCCESS = "Dashboard loaded successfully";
     }
 
 }

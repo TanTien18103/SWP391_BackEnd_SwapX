@@ -7,6 +7,6 @@ namespace Services.Services.Dashboard;
 public interface IDashboardService
 {
     Task<DashboardSummaryResponse> GetDashboardSummaryAsync();
-    Task<ResultModel> ShowDashboard();
+    Task<ResultModel> ShowDashboard(DashboardFilterRequest dashboardFilterRequest);
 }
 

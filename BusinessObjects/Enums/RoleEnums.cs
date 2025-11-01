@@ -11,5 +11,6 @@ namespace BusinessObjects.Enums
         Admin = 0,
         EvDriver = 1,
         Bsstaff = 2,
+        Unknown = 3,
     }
 }

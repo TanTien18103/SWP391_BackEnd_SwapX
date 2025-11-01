@@ -7,72 +7,80 @@ using System.Threading.Tasks;
 namespace Services.ApiModels.Dashboard
 {
     // KHẮC PHỤC LỖI CS0246: MonthlyData
-    public class MonthlyData
-    {
-        public int Year { get; set; }
-        public int Month { get; set; }
-        public decimal TotalRevenue { get; set; }
-        public int TotalSwaps { get; set; }
-    }
-
-    // NEW: Model cho Phân tích giờ cao điểm
-    public class HourSwapData
-    {
-        public int Hour { get; set; } // Giờ trong ngày (0 đến 23)
-        public int TotalSwaps { get; set; } // Số lượt đổi pin trong giờ đó
-        public int ActiveStations { get; set; } // Số trạm hoạt động trong giờ đó (Giả định đơn giản)
-    }
-
     public class ShowDashboardResponse
     {
-        // 1️⃣ Các số liệu tổng quan (Dashboard Summary)
-        // ... (Giữ nguyên các thuộc tính Summary)
-        public decimal CurrentMonthRevenue { get; set; }
-        public decimal RevenueGrowthPercent { get; set; }
-        public int CurrentMonthSwaps { get; set; }
-        public decimal SwapsGrowthPercent { get; set; }
-        public int TotalUsers { get; set; }
-        public decimal NewUsersGrowthPercent { get; set; }
-        public decimal AverageEfficiency { get; set; }
-        public decimal EfficiencyGrowthPercent { get; set; }
+        // Tổng quan hệ thống
+        public int TotalStations { get; set; }              // Tổng số trạm
+        public int TotalUsers { get; set; }                 // Tổng số người dùng
+        public int TotalBatteries { get; set; }             // Tổng số pin
+        public int TotalTransactions { get; set; }          // Tổng số giao dịch
+        public decimal TotalRevenue { get; set; }           // Tổng doanh thu
+        public int Totalorders { get; set; }
 
-        // 2️⃣ Dữ liệu cho biểu đồ Doanh thu & Lượt đổi pin theo tháng
-        public List<MonthlyData> MonthlyRevenuesAndSwaps { get; set; }
+        // Dữ liệu thống kê theo thời gian
+        public List<RevenueChartItem> RevenueOverTime { get; set; } = new();  // Doanh thu theo ngày/tháng
+        public List<UserGrowthItem> UserGrowthChart { get; set; } = new();    // Tăng trưởng người dùng
 
-        // 3️⃣ Dữ liệu cho biểu đồ Phân bố loại người dùng
-        public List<UserDistributionData> UserDistribution { get; set; }
+        // Top 5 trạm có doanh thu cao nhất
+        public List<TopStationItem> TopStations { get; set; } = new();
 
-        // 4️⃣ Dữ liệu cho biểu đồ Tần suất đổi pin
-        public List<DailySwapFrequencyData> DailySwapFrequency { get; set; }
+        // Doanh thu theo loại dịch vụ
+        public List<RevenueByServiceTypeItem> RevenueByServiceType { get; set; } = new();
 
-        // 5️⃣ Dữ liệu cho biểu đồ Hiệu suất trạm đổi pin
-        public List<StationEfficiencyData> StationEfficiencies { get; set; }
+        // Thống kê trạng thái pin
+        public BatteryStatusSummary BatteryStatusSummary { get; set; } = new();
 
-        // 6️⃣ NEW: Dữ liệu cho biểu đồ Phân tích giờ cao điểm
-        public List<HourSwapData> HourlySwapAnalysis { get; set; }
+        // Bộ lọc
+        public DashboardFilterResponse FilterInfo { get; set; } = new();
     }
-
-    // Model cho Phân bố người dùng
-    public class UserDistributionData
-    {
-        public string UserType { get; set; }
-        public int Count { get; set; }
-        public decimal Percent { get; set; }
-    }
-
-    // Model cho Tần suất đổi pin theo ngày
-    public class DailySwapFrequencyData
+    public class RevenueChartItem
     {
         public DateTime Date { get; set; }
-        public int TotalSwaps { get; set; }
-        public decimal AvgTimeSpent { get; set; }
+        public decimal Revenue { get; set; }
     }
 
-    // Model cho Hiệu suất trạm đổi pin
-    public class StationEfficiencyData
+    public class UserGrowthItem
     {
-        public string StationName { get; set; }
-        public decimal EfficiencyPercent { get; set; }
-        public int TotalSwaps { get; set; }
+        public DateTime Date { get; set; }
+        public int NewUsers { get; set; }
+        public int TotalUsers { get; set; }
     }
+
+    public class TopStationItem
+    {
+        public string StationId { get; set; }
+        public string StationName { get; set; }
+        public decimal Revenue { get; set; }
+        public int TotalTransactions { get; set; }
+        public int Totalorders { get; set; }
+    }
+
+    public class RevenueByServiceTypeItem
+    {
+        public int Orders { get; set; }
+        public string ServiceType { get; set; }   // e.g. "Exchange", "Rent", "Recharge"
+        public decimal Revenue { get; set; }
+        public int Transactions { get; set; }
+    }
+
+    public class BatteryStatusSummary
+    {
+        public int Total { get; set; }
+        public int Charging { get; set; }
+        public int InUse { get; set; }
+        public int Available { get; set; }
+        public int Decommissioned { get; set; }
+        public int Booked { get; set; }
+        public int Maintenance { get; set; }
+
+    }
+
+    public class DashboardFilterResponse
+    {
+        public string SelectedStationId { get; set; }
+        public string SelectedStationName { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+    }
+
 }

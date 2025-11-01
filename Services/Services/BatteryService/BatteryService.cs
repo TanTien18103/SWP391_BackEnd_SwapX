@@ -390,6 +390,19 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+                if (existingBattery.Status == BatteryStatusEnums.InUse.ToString() ||
+                    existingBattery.Status == BatteryStatusEnums.Decommissioned.ToString() ||
+                    existingBattery.Status == BatteryStatusEnums.Booked.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_INUSE_BOOKED_DECOMMISSIONED_CANNOT_UPDATE,
+                        Data = null,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
 
                 // Only update if a new value is provided
                 if (updateBatteryRequest.Capacity.HasValue)
@@ -1495,6 +1508,67 @@ namespace Services.Services.BatteryService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsBattery.DELETE_BATTERY_IN_STATION_FAIL,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+
+        public async Task<ResultModel> AutoChargeAsync()
+        {
+            try
+            {
+                var chargingBatteries = await _batteryRepo.GetChargingBatteriesAsync();
+
+                if (chargingBatteries == null || !chargingBatteries.Any())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = true,
+                        ResponseCode = ResponseCodeConstants.SUCCESS,
+                        Message = ResponseMessageConstantsBattery.CHARGE_BATTERY_FAIL,
+                        StatusCode = StatusCodes.Status200OK
+                    };
+                }
+
+                foreach (var battery in chargingBatteries)
+                {
+                    battery.Capacity ??= 0;
+                    battery.Capacity += 2;
+
+                    if (battery.Capacity >= 100)
+                    {
+                        battery.Capacity = 100;
+                        battery.Status = BatteryStatusEnums.Available.ToString();
+                    }
+
+                    battery.UpdateDate = DateTime.UtcNow;
+                }
+
+                await _batteryRepo.UpdateBatteries(chargingBatteries);
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBattery.AUTO_CHARGE_SUCCESS,
+                    Data = chargingBatteries.Select(b => new
+                    {
+                        b.BatteryId,
+                        b.Capacity,
+                        b.Status
+                    }).ToList(),
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsBattery.AUTO_CHARGE_FAILED,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
