@@ -858,6 +858,58 @@ namespace Services.Services.BatteryService
                     };
                 }
 
+                if (existingBattery.Status == BatteryStatusEnums.InUse.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_INUSE_CANNOT_UPDATE_STATUS,
+                        Data = null
+                    };
+                }
+
+                if (existingBattery.Status == BatteryStatusEnums.Booked.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_BOOKED_CANNOT_UPDATE_STATUS,
+                        Data = null
+                    };
+                }
+
+                if (updateBatteryStatusRequest.Status == BatteryStatusEnums.InUse)
+                {
+                    var vehicleUsingBattery = await _vehicleRepo.GetVehicleByBatteryId(existingBattery.BatteryId);
+                    if (vehicleUsingBattery == null)
+                    {
+                        return new ResultModel
+                        {
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsBattery.BATTERY_CANNOT_SET_INUSE_NO_VEHICLE_USING,
+                            Data = null
+                        };
+                    }
+                }
+
+                if (updateBatteryStatusRequest.Status == BatteryStatusEnums.Booked)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_CANNOT_SET_BOOKED_NO_VEHICLE_USING,
+                        Data = null
+                    };
+                }
+
                 existingBattery.Status = updateBatteryStatusRequest.Status.ToString();
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
