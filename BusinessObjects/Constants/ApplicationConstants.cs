@@ -250,6 +250,8 @@ namespace BusinessObjects.Constants
         public const string CHARGE_BATTERY_FAIL = "Sạc pin thất bại";
         public const string AUTO_CHARGE_SUCCESS = "Tự động sạc pin thành công";
         public const string AUTO_CHARGE_FAILED = "Tự động sạc pin thất bại";
+        public const string BATTERY_INUSE_CANNOT_UPDATE_STATUS = "Pin đang sử dụng không thể cập nhật trạng thái";
+        public const string BATTERY_BOOKED_CANNOT_UPDATE_STATUS = "Pin đang sử dụng hoặc đã được đặt không thể cập nhật trạng thái";
     }
     public static class EmailConstants
     {
