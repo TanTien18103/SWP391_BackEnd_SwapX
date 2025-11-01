@@ -368,6 +368,7 @@ namespace BusinessObjects.Constants
         public const string VEHICLE_NOT_OWNED = "Xe không thuộc sở hữu của khách hàng";
         public const string NO_VEHICLE_FOR_USER = "Người dùng không có xe được liên kết";
         public const string VEHICLE_NOT_BELONG_TO_ACCOUNT = "Xe không thuộc sở hữu của tài khoản";
+        public const string VEHICLE_IN_PACKAGE_CANNOT_UNLINK = "gói của xe đang còn thời hạn bạn không thể xóa xe được";
     }
     //for StationSchedule (0-0-1)
     public static class ResponseMessageConstantsStationSchedule

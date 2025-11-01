@@ -993,6 +993,17 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
+                if(vehicle.PackageId != null && vehicle.PackageExpiredate<TimeHepler.SystemTimeNow)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_IN_PACKAGE_CANNOT_UNLINK,
+                        Data = null
+                    };
+                }
 
                 // Unlink logic here (for example, set CustomerId to null)
                 vehicle.Status = VehicleStatusEnums.Unlinked.ToString();
