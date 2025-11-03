@@ -45,6 +45,7 @@ namespace Controllers
             return Ok(summary.TotalOrders);
         }
         [HttpPost("show_dashboard")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ShowDashboard([FromForm] DashboardFilterRequest dashboardFilterRequest)
         {
             var res = await _dashboardService.ShowDashboard(dashboardFilterRequest);
