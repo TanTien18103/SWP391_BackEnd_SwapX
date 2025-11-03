@@ -653,11 +653,12 @@ namespace Services.Services.StationService
 
                     var schedules = await _stationScheduleRepository.GetStationSchedulesByStationId(existingStation.StationId);
 
-                    // Chỉ chặn nếu đã có lịch trong tương lai (bao gồm cả hôm nay)
+                    // Chỉ chặn nếu đã có lịch trong tương lai và check thêm nếu đang có schedule đang pending
                     bool hasFutureSchedule = schedules.Any(s =>
-                        s.Date.HasValue &&
+                        (s.Date.HasValue &&
                         s.Date.Value.Date >= today &&
-                        !string.Equals(s.Status, ScheduleStatusEnums.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase)
+                        !string.Equals(s.Status, ScheduleStatusEnums.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase)) ||
+                        s.Status == ScheduleStatusEnums.Pending.ToString()
                     );
 
                     if (hasFutureSchedule)

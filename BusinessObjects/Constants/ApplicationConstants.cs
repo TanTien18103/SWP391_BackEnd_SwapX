@@ -193,7 +193,7 @@ namespace BusinessObjects.Constants
         public const string INVALID_STATION_STATUS = "Trạng thái trạm không thay đổi";
         public const string UPDATE_STATION_STATUS_SUCCESS = "Trạng thái trạm không thay đổi";
         public const string UPDATE_STATION_STATUS_FAILED = "Trạng thái trạm không thay đổi";
-        public const string STATION_HAS_FUTURE_SCHEDULES = "Trạm có lịch trình trong tương lai, không thể ngừng hoạt động";
+        public const string STATION_HAS_FUTURE_SCHEDULES = "Trạm có lịch trình trong tương lai hoặc đang có lịch, không thể ngừng hoạt động";
         public const string STATION_INACTIVE_OR_MAINTENANCE = "Trạm đang ngừng hoạt động hoặc bảo trì";
         public const string DefaultBatterySuffix = "STATION_EXCHANGE";
         public const string STATION_NOT_EXIST = "Trạm không tồn tại";
@@ -253,7 +253,7 @@ namespace BusinessObjects.Constants
         public const string BATTERY_INUSE_CANNOT_UPDATE_STATUS = "Pin đang sử dụng không thể cập nhật trạng thái";
         public const string BATTERY_BOOKED_CANNOT_UPDATE_STATUS = "Pin đang sử dụng hoặc đã được đặt không thể cập nhật trạng thái";
         public const string BATTERY_CANNOT_SET_INUSE_NO_VEHICLE_USING = "Không thể đặt pin ở trạng thái Đang sử dụng khi không có xe nào đang sử dụng pin này.";
-        public const string BATTERY_CANNOT_SET_BOOKED_NO_VEHICLE_USING = "Không thể đặt pin ở trạng thái Đã đặt khi không có xe nào đang sử dụng pin này.";
+        public const string BATTERY_CANNOT_SET_TO_BOOKED = "Không thể đặt pin ở trạng thái Đã đặt.";
     }
     public static class EmailConstants
     {

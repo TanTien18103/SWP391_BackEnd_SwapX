@@ -905,7 +905,7 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status400BadRequest,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsBattery.BATTERY_CANNOT_SET_BOOKED_NO_VEHICLE_USING,
+                        Message = ResponseMessageConstantsBattery.BATTERY_CANNOT_SET_TO_BOOKED,
                         Data = null
                     };
                 }
