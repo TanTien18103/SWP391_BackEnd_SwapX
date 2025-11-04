@@ -276,6 +276,23 @@ namespace Services.Services.AccountService
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
+                var existingEmailUsers = await _accountRepository.GetAccountsByEmail(updateStaffRequest.Email);
+                if (existingEmailUsers != null)
+                {
+                    foreach (var user in existingEmailUsers)
+                    {
+                        if (user.AccountId != existingUser.AccountId && user.Status == AccountStatusEnums.Active.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.EXISTED,
+                                Message = ResponseMessageIdentity.EMAIL_IN_USE,
+                                StatusCode = StatusCodes.Status400BadRequest
+                            };
+                        }
+                    }
+                }
                 // Only update if the field is not null
                 if (updateStaffRequest.Name != null)
                     existingUser.Name = updateStaffRequest.Name;
@@ -886,6 +903,25 @@ namespace Services.Services.AccountService
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
+
+                var existingEmailUsers = await _accountRepository.GetAccountsByEmail(updateCustomerRequest.Email);
+                if (existingEmailUsers != null)
+                {
+                    foreach (var user in existingEmailUsers)
+                    {
+                        if (user.AccountId != existingUser.AccountId && user.Status == AccountStatusEnums.Active.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.EXISTED,
+                                Message = ResponseMessageIdentity.EMAIL_IN_USE,
+                                StatusCode = StatusCodes.Status400BadRequest
+                            };
+                        }
+                    }
+                }
+
                 // Only update if the field is not null
                 if (updateCustomerRequest.Name != null)
                     existingUser.Name = updateCustomerRequest.Name;
@@ -962,6 +998,23 @@ namespace Services.Services.AccountService
                         Message = ResponseMessageIdentity.ACCOUNT_NOT_FOUND,
                         StatusCode = StatusCodes.Status404NotFound
                     };
+                }
+                var existingEmailUsers = await _accountRepository.GetAccountsByEmail(updateProfileRequest.Email);
+                if (existingEmailUsers != null)
+                {
+                    foreach (var user in existingEmailUsers)
+                    {
+                        if (user.AccountId != existingAccount.AccountId && user.Status == AccountStatusEnums.Active.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.EXISTED,
+                                Message = ResponseMessageIdentity.EMAIL_IN_USE,
+                                StatusCode = StatusCodes.Status400BadRequest
+                            };
+                        }
+                    }
                 }
                 // Only update if the field is not null
                 if (updateProfileRequest.Name != null)
