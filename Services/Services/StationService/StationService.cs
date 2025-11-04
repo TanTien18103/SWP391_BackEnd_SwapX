@@ -6,6 +6,7 @@ using BusinessObjects.TimeCoreHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.AccountRepo;
+using Repositories.Repositories.BatteryRepo;
 using Repositories.Repositories.BssStaffRepo;
 using Repositories.Repositories.EvDriverRepo;
 using Repositories.Repositories.SlotRepo;
@@ -37,6 +38,7 @@ namespace Services.Services.StationService
         private readonly IEvDriverRepo _evDriverRepo;
         private readonly IVehicleRepo _vehicleRepo;
         private readonly ISlotRepo _slotRepo;
+        private readonly IBatteryRepo _batteryRepo;
 
         public StationService(
             IStationRepo stationRepository,
@@ -48,7 +50,8 @@ namespace Services.Services.StationService
             IStationScheduleRepo stationScheduleRepo,
             IEvDriverRepo evDriverRepo,
             IVehicleRepo vehicleRepo,
-            ISlotRepo slotRepo
+            ISlotRepo slotRepo,
+            IBatteryRepo batteryRepo
             )
         {
             _stationRepository = stationRepository;
@@ -61,6 +64,7 @@ namespace Services.Services.StationService
             _evDriverRepo = evDriverRepo;
             _vehicleRepo = vehicleRepo;
             _slotRepo = slotRepo;
+            _batteryRepo = batteryRepo;
         }
 
         public async Task<ResultModel> AddStation(AddStationRequest addStationRequest)
@@ -144,42 +148,49 @@ namespace Services.Services.StationService
                 }
 
                 // Map sang object mới, ẩn trường station trong từng battery
-                var response = stations.Select(station => new
+                var response = new List<object>();
+
+                foreach (var station in stations)
                 {
-                    StationId = station.StationId,
-                    StationName = station.StationName,
-                    Location = station.Location,
-                    Status = station.Status,
-                    Rating = station.Rating,
-                    BatteryNumber = station.BatteryNumber,
-                    StartDate = station.StartDate,
-                    UpdateDate = station.UpdateDate,
-                    BssStaffs = station.BssStaffs.Select(s => new
+                    var batteries = await _batteryRepo.GetBatteriesByStationId(station.StationId);
+                    var batteryCount = batteries.Count;
+
+                    var stationObj = new
                     {
-                        StaffId = s.StaffId,
-                    }).ToList(),
-                    Slots = station.Slots.Select(sl => new
-                    {
-                        SlotId = sl.SlotId,
-                        Status = sl.Status,
-                        Battery = sl.Battery == null ? null : new
+                        StationId = station.StationId,
+                        StationName = station.StationName,
+                        Location = station.Location,
+                        Status = station.Status,
+                        Rating = station.Rating,
+                        BatteryNumber = batteryCount,
+                        StartDate = station.StartDate,
+                        UpdateDate = station.UpdateDate,
+                        BssStaffs = station.BssStaffs.Select(s => new { s.StaffId }).ToList(),
+                        Slots = station.Slots.Select(sl => new
                         {
-                            BatteryId = sl.Battery.BatteryId,
-                            BatteryName = sl.Battery.BatteryName,
-                            Status = sl.Battery.Status,
-                            Capacity = sl.Battery.Capacity,
-                            BatteryType = sl.Battery.BatteryType,
-                            Specification = sl.Battery.Specification,
-                            BatteryQuality = sl.Battery.BatteryQuality,
-                            StartDate = sl.Battery.StartDate,
-                            UpdateDate = sl.Battery.UpdateDate
-                        },
-                        CordinateX = sl.CordinateX,
-                        CordinateY = sl.CordinateY,
-                        StartDate = sl.StartDate,
-                        UpdateDate = sl.UpdateDate
-                    }).ToList(),
-                }).ToList();
+                            sl.SlotId,
+                            sl.Status,
+                            sl.CordinateX,
+                            sl.CordinateY,
+                            sl.StartDate,
+                            sl.UpdateDate,
+                            Battery = sl.Battery == null ? null : new
+                            {
+                                sl.Battery.BatteryId,
+                                sl.Battery.BatteryName,
+                                sl.Battery.Status,
+                                sl.Battery.Capacity,
+                                sl.Battery.BatteryType,
+                                sl.Battery.Specification,
+                                sl.Battery.BatteryQuality,
+                                sl.Battery.StartDate,
+                                sl.Battery.UpdateDate
+                            }
+                        }).ToList()
+                    };
+
+                    response.Add(stationObj);
+                }
 
                 return new ResultModel
                 {
