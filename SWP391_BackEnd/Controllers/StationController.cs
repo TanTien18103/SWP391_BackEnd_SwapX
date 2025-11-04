@@ -25,7 +25,7 @@ public class StationController : ControllerBase
     }
 
     [HttpGet("get_all_stations")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> GetAllStations()
     {
         var res = await _stationService.GetAllStations();
