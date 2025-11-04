@@ -69,11 +69,11 @@ namespace Repositories.Repositories.SlotRepo
             return await _context.Slots.Where(s => s.StationId == stationId).ToListAsync();
         }
 
-        public Task<Slot> UpdateSlot(Slot slot)
+        public async Task<Slot> UpdateSlot(Slot slot)
         {
             _context.Slots.Update(slot);
-            _context.SaveChangesAsync();
-            return Task.FromResult(slot);
+            await _context.SaveChangesAsync();
+            return slot;
         }
     }
 }
