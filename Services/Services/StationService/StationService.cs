@@ -158,23 +158,22 @@ namespace Services.Services.StationService
                     {
                         StaffId = s.StaffId,
                     }).ToList(),
-                    Batteries = station.Batteries.Select(b => new
-                    {
-                        BatteryId = b.BatteryId,
-                        BatteryName = b.BatteryName,
-                        Status = b.Status,
-                        Capacity = b.Capacity,
-                        BatteryType = b.BatteryType,
-                        Specification = b.Specification,
-                        BatteryQuality = b.BatteryQuality,
-                        StartDate = b.StartDate,
-                        UpdateDate = b.UpdateDate
-                        // KHÔNG có trường station ở đây!
-                    }).ToList(),
                     Slots = station.Slots.Select(sl => new
                     {
                         SlotId = sl.SlotId,
                         Status = sl.Status,
+                        Battery = sl.Battery == null ? null : new
+                        {
+                            BatteryId = sl.Battery.BatteryId,
+                            BatteryName = sl.Battery.BatteryName,
+                            Status = sl.Battery.Status,
+                            Capacity = sl.Battery.Capacity,
+                            BatteryType = sl.Battery.BatteryType,
+                            Specification = sl.Battery.Specification,
+                            BatteryQuality = sl.Battery.BatteryQuality,
+                            StartDate = sl.Battery.StartDate,
+                            UpdateDate = sl.Battery.UpdateDate
+                        },
                         CordinateX = sl.CordinateX,
                         CordinateY = sl.CordinateY,
                         StartDate = sl.StartDate,
