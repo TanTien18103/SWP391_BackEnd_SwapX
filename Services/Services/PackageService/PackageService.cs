@@ -109,15 +109,25 @@ namespace Services.Services.PackageService
                 var vehicles = await _vehicleRepo.GetVehiclesByPackageId(package.PackageId);
                 if (vehicles != null)
                 {
-                    return new ResultModel
+                    var vehiclesExpiredPackage = vehicles.Where(v => v.PackageExpiredate < TimeHepler.SystemTimeNow);
+                    if (vehiclesExpiredPackage!=null) {
+                        foreach (var vehicle in vehiclesExpiredPackage) {
+                            vehicle.PackageId = null;
+                            vehicle.PackageExpiredate = null;
+                            await _vehicleRepo.UpdateVehicle(vehicle);
+                        }
+                    }
+                    else
                     {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsPackage.PACKAGE_IN_USE_CANNOT_INACTIVE,
-                        Data = null
-                    };
-                }
+                        return new ResultModel { 
+                         StatusCode= StatusCodes.Status400BadRequest,
+                         IsSuccess = false,
+                         ResponseCode = ResponseCodeConstants.FAILED,
+                         Message = ResponseMessageConstantsPackage.PACKAGE_IN_USE_CANNOT_INACTIVE,
+                         Data= null
+                        };
+                    }
+                } 
 
                 package.Status = PackageStatusEnums.Inactive.ToString();
                 package.UpdateDate = TimeHepler.SystemTimeNow;
@@ -230,7 +240,7 @@ namespace Services.Services.PackageService
                         Data = null
                     };
                 }
-                if(package.Status == PackageStatusEnums.Active.ToString())
+                if (package.Status == PackageStatusEnums.Active.ToString())
                 {
                     return new ResultModel
                     {
