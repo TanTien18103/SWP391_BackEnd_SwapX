@@ -21,6 +21,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Repositories.Repositories.ExchangeBatteryRepo;
 using Repositories.Repositories.OrderRepo;
+using Services.Services.EmailService;
+using Repositories.Repositories.AccountRepo;
 
 namespace Services.Services.FormService
 {
@@ -37,6 +39,8 @@ namespace Services.Services.FormService
         private readonly IBatteryRepo _batteryRepo;
         private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
         private readonly IOrderRepository _orderRepository;
+        private readonly IEmailService _emailService;
+        private readonly IAccountRepo _accountRepo;
 
         public FormService(
             IFormRepo formRepo,
@@ -49,7 +53,9 @@ namespace Services.Services.FormService
             IEvDriverRepo evDriverRepo,
             IBatteryRepo batteryRepo,
             IExchangeBatteryRepo exchangeBatteryRepo,
-            IOrderRepository orderRepository
+            IOrderRepository orderRepository,
+            IEmailService emailService,
+            IAccountRepo accountRepo
             )
         {
             _formRepo = formRepo;
@@ -63,6 +69,8 @@ namespace Services.Services.FormService
             _batteryRepo = batteryRepo;
             _exchangeBatteryRepo = exchangeBatteryRepo;
             _orderRepository = orderRepository;
+            _emailService = emailService;
+            _accountRepo = accountRepo;
         }
         public async Task<ResultModel> AddForm(AddFormRequest addFormRequest)
         {
@@ -793,6 +801,36 @@ namespace Services.Services.FormService
                 existingForm.Status = updateFormStatusStaffRequest.Status.ToString();
                 existingForm.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedForm = await _formRepo.Update(existingForm);
+
+                var customerAccount = await _accountRepo.GetAccountById(existingForm.AccountId);
+                if (customerAccount != null && !string.IsNullOrEmpty(customerAccount.Email) && updatedForm != null)
+                {
+                    string subject;
+                    string body;
+
+                    if (updateFormStatusStaffRequest.Status == StaffUpdateFormEnums.Approved)
+                    {
+                        subject = EmailConstants.APPROVE_FORM_SUBJECT;
+                        body = string.Format(
+                            EmailConstants.APPROVE_FORM_BODY,
+                            customerAccount.Username,
+                            existingForm.Date?.ToString("dd/MM/yyyy"),
+                            station.StationName
+                        );
+                    }
+                    else // Rejected
+                    {
+                        subject = EmailConstants.REJECT_FORM_SUBJECT;
+                        body = string.Format(
+                            EmailConstants.REJECT_FORM_BODY,
+                            customerAccount.Username,
+                            existingForm.Date?.ToString("dd/MM/yyyy"),
+                            station.StationName
+                        );
+                    }
+
+                    await _emailService.SendEmail(customerAccount.Email, subject, body);
+                }
                 return new ResultModel
                 {
                     IsSuccess = true,

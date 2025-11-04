@@ -128,6 +128,24 @@ namespace Services.Services.AccountService
 
             await _accountRepository.AddAccount(newUser);
 
+            if (!string.IsNullOrEmpty(newUser.Email))
+            {
+                var subject = EmailConstants.REGISTER_SUCCESS_SUBJECT;
+                var body = string.Format(
+                    EmailConstants.REGISTER_SUCCESS_BODY,
+                    newUser.Name,
+                    newUser.Email
+                );
+
+                await _emailService.SendEmail(newUser.Email, subject, body);
+            }
+            else
+            {
+                throw new AppException(ResponseCodeConstants.BAD_REQUEST,
+                    ResponseMessageIdentity.EMAIL_REQUIRED,
+                    StatusCodes.Status400BadRequest);
+            }
+
             string accessToken = _accountHelper.CreateToken(newUser);
             string refreshToken = _accountHelper.GenerateRefreshToken();
 
@@ -193,6 +211,25 @@ namespace Services.Services.AccountService
                 await _accountRepository.AddAccount(newUser);
                 var createdUser =
                 await _accountRepository.GetAccountById(newUser.AccountId);
+
+                if (!string.IsNullOrEmpty(newUser.Email))
+                {
+                    var subject = EmailConstants.STAFF_REGISTER_SUCCESS_SUBJECT;
+                    var body = string.Format(
+                        EmailConstants.STAFF_REGISTER_SUCCESS_BODY,
+                        newUser.Name,
+                        newUser.Username
+                    );
+
+                    await _emailService.SendEmail(newUser.Email, subject, body);
+                }
+                else
+                {
+                    throw new AppException(ResponseCodeConstants.BAD_REQUEST,
+                        ResponseMessageIdentity.EMAIL_REQUIRED,
+                        StatusCodes.Status400BadRequest);
+                }
+
                 return new ResultModel
                 {
                     IsSuccess = true,

@@ -19,6 +19,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Repositories.Repositories.BatteryHistoryRepo;
+using Services.Services.EmailService;
 
 
 
@@ -36,8 +37,19 @@ namespace Services.Services.VehicleService
         private readonly IEvDriverRepo _evDriverRepo;
         private readonly IAccountRepo _accountRepo;
         private readonly IBatteryHistoryRepo _batteryHistoryRepo;
+        private readonly IEmailService _emailService;
 
-        public VehicleService(IVehicleRepo vehicleRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IBatteryRepo batteryRepo, IPackageRepo packageRepo, IEvDriverRepo evDriverRepo, IAccountRepo accountRepo, IBatteryHistoryRepo batteryHistoryRepo)
+        public VehicleService(
+            IVehicleRepo vehicleRepo, 
+            IConfiguration configuration, 
+            IHttpContextAccessor httpContextAccessor, 
+            IBatteryRepo batteryRepo, 
+            IPackageRepo packageRepo, 
+            IEvDriverRepo evDriverRepo, 
+            IAccountRepo accountRepo, 
+            IBatteryHistoryRepo batteryHistoryRepo,
+            IEmailService emailService
+            )
         {
             _vehicleRepo = vehicleRepo;
             _configuration = configuration;
@@ -48,6 +60,7 @@ namespace Services.Services.VehicleService
             _evDriverRepo = evDriverRepo;
             _accountRepo = accountRepo;
             _batteryHistoryRepo = batteryHistoryRepo;
+            _emailService = emailService;
         }
         public async Task<ResultModel> AddVehicle(AddVehicleRequest addVehicleRequest)
         {
@@ -361,6 +374,19 @@ namespace Services.Services.VehicleService
         {
             try
             {
+                var Vin = await _vehicleRepo.GetVehicleById(linkVehicleRequest.VIN);
+                if (Vin != null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_ALREADY_EXISTS,
+                        Data = null
+                    };
+                }
+
                 // Lấy accountId từ claims của người dùng đang đăng nhập
                 if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
                  || string.IsNullOrEmpty(authHeader)
@@ -673,6 +699,31 @@ namespace Services.Services.VehicleService
                     vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                 }
                 await _vehicleRepo.AddVehicle(vehicle);
+
+                if (!string.IsNullOrEmpty(account.Email))
+                {
+                    var subject = EmailConstants.VEHICLE_LINK_SUCCESS_SUBJECT;
+                    var body = string.Format(
+                        EmailConstants.VEHICLE_LINK_SUCCESS_BODY,
+                        account.Name,
+                        vehicle.VehicleName,
+                        vehicle.Vin
+                    );
+
+                    await _emailService.SendEmail(account.Email, subject, body);
+                }
+                else
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status200OK,
+                        IsSuccess = true,
+                        ResponseCode = ResponseCodeConstants.SUCCESS,
+                        Message = ResponseMessageConstantsVehicle.LINK_VEHICLE_SUCCESS_BUT_NO_EMAIL,
+                        Data = vehicle
+                    };
+                }
+
                 //record lại lịch sử pin
                 var batteryHistory = new BatteryHistory
                 {
@@ -1009,6 +1060,20 @@ namespace Services.Services.VehicleService
                 vehicle.Status = VehicleStatusEnums.Unlinked.ToString();
                 vehicle.UpdateDate = TimeHepler.SystemTimeNow;
                 await _vehicleRepo.UpdateVehicle(vehicle);
+
+                var account = await _accountRepo.GetAccountById(accountId);
+                if (account != null)
+                {
+                    var subject = EmailConstants.VEHICLE_UNLINK_SUCCESS_SUBJECT;
+                    var body = string.Format(
+                        EmailConstants.VEHICLE_UNLINK_SUCCESS_BODY,
+                        account.Name,
+                        vehicle.Vin + " - " + vehicle.VehicleName
+                    );
+
+                    await _emailService.SendEmail(account.Email, subject, body);
+                }
+
 
                 return new ResultModel
                 {
