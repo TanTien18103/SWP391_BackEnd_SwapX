@@ -146,6 +146,7 @@ namespace BusinessObjects.Constants
         public const string STATUS_NOT_CHANGED = "Trạng thái người dùng không thay đổi";
         public const string CANNOT_CHANGE_ADMIN_STATUS = "Không thể thay đổi trạng thái của quản trị viên";
         public const string EVDRIVER_NOT_FOUND = "Không tìm thấy tài xế";
+        public const string USER_EMAIL_NOT_FOUND = "Không tìm thấy email của người dùng";
     }
     public class ResponseMessageImage
     {
@@ -261,306 +262,402 @@ namespace BusinessObjects.Constants
         public const string OtpBodyTemplate = "Otp xác nhận đổi mật khẩu mới của bạn là: <b>{0}</b>. Hãy nhập otp để nhận mật khẩu mới ngay.";
         public const string NewPasswordSubject = "Mật khẩu mới của bạn";
         public const string NewPasswordBodyTemplate = "Mật khẩu mới của bạn là: <b>{0}</b>. Hãy đăng nhập và đổi mật khẩu ngay.";
-    }
-    public static class HistoryActionConstants
-    {
-        public const string BATTERY_CREATED = "Pin đã được tạo theo xe";
-        public const string BATTERY_CREATED_BY_ADMIN = "Pin đã được thêm bởi admin";
-        public const string BATTERY_UPDATED = "Pin đã được cập nhật";
-        public const string BATTERY_DELETED = "Pin đã bị xóa bởi admin";
-        public const string BATTERY_ADDED_TO_STATION = "Pin đã được thêm vào trạm";
-        public const string BATTERY_CREATED_BY_USER = "Pin đã được tạo bởi người dùng tích hợp xe";
-        public const string BATTERY_RETURNED_TO_STATION_AFTER_EXCHANGE = "Battery returned to station {0} after exchange.";
-        public const string BATTERY_ASSIGNED_TO_VEHICLE_AFTER_EXCHANGE = "Battery assigned to vehicle VIN: {0}, Model: {1} after exchange.";
-    }
-    public static class ResponseMessageConstantsForm
-    {
-        public const string FORM_NOT_FOUND = "Không tìm thấy biểu mẫu";
-        public const string FORM_EXISTED = "Biểu mẫu đã tồn tại";
-        public const string ADD_FORM_SUCCESS = "Thêm biểu mẫu thành công";
-        public const string UPDATE_FORM_SUCCESS = "Cập nhật biểu mẫu thành công";
-        public const string DELETE_FORM_SUCCESS = "Xóa biểu mẫu thành công";
-        public const string FORM_INACTIVE = "Biểu mẫu đã bị ngừng hoạt động";
-        public const string GET_FORM_LIST_SUCCESS = "Lấy danh sách biểu mẫu thành công";
-        public const string GET_FORM_DETAIL_SUCCESS = "Lấy chi tiết biểu mẫu thành công";
-        public const string ADD_FORM_FAIL = "Thêm biểu mẫu thất bại";
-        public const string GET_ALL_FORM_FAIL = "Lấy danh sách biểu mẫu thất bại";
-        public const string FORM_LIST_EMPTY = "Lấy danh sách biểu mẫu thất bại";
-        public const string GET_ALL_FORM_SUCCESS = "Lấy danh sách biểu mẫu thành công";
-        public const string UPDATE_FORM_FAILED = "Cập nhật biểu mẫu thất bại";
-        public const string GET_FORM_FAIL = "Lấy biểu mẫu thất bại";
-        public const string GET_FORM_SUCCESS = "Lấy biểu mẫu thành công";
-        public const string DELETE_FORM_FAILED = "Xóa biểu mẫu thất bại";
-        public const string INVALID_FORM_DATE = "Ngày biểu mẫu không hợp lệ";
-        public const string INVALID_FORM_TIME = "Thời gian không nằm trong giờ hành chính (7h30–12h, 13h30–17h).";
-        public const string INVALID_FORM_STATUS_VALUE = "Trạng thái biểu mẫu không hợp lệ";
-        public const string INVALID_FORM_STATUS_UPDATE = "Không thể cập nhật trạng thái biểu mẫu";
-        public const string UPDATE_FORM_STATUS_SUCCESS = " Cập nhật trạng thái biểu mẫu thành công";
-        public const string UPDATE_FORM_STATUS_FAILED = " Cập nhật trạng thái biểu mẫu thất bại";
-        public const string BATTERY_ALREADY_BOOKED = "Pin đã được đặt";
-        public const string VEHICLE_ALREADY_HAS_PENDING_FORM = "Xe đã có biểu mẫu đang chờ xử lý";
-        public const string CREATE_STATION_SCHEDULE_FAILED = "Tạo lịch trạm thất bại";
-        public const string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
-        public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
-    }
-    // For Package (0-0-1)
-    public static class ResponseMessageConstantsPackage
-    {
-        public const string PACKAGE_NOT_FOUND = "Không tìm thấy gói";
-        public const string PACKAGE_EXISTED = "Gói đã tồn tại";
-        public const string ADD_PACKAGE_SUCCESS = "Thêm gói thành công";
-        public const string UPDATE_PACKAGE_SUCCESS = "Cập nhật gói thành công";
-        public const string DELETE_PACKAGE_SUCCESS = "Xóa gói thành công";
-        public const string PACKAGE_INACTIVE = "Gói đã bị ngừng hoạt động";
-        public const string GET_PACKAGE_LIST_SUCCESS = "Lấy danh sách gói thành công";
-        public const string GET_PACKAGE_DETAIL_SUCCESS = "Lấy chi tiết gói thành công";
-        public const string ADD_PACKAGE_FAIL = "Thêm gói thất bại";
-        public const string GET_ALL_PACKAGE_FAIL = "Lấy danh sách gói thất bại";
-        public const string PACKAGE_LIST_EMPTY = "Lấy danh sách gói thất bại";
-        public const string GET_ALL_PACKAGE_SUCCESS = "Lấy danh sách gói thành công";
-        public const string UPDATE_PACKAGE_FAILED = "Cập nhật gói thất bại";
-        public const string GET_PACKAGE_FAIL = "Lấy gói thất bại";
-        public const string GET_PACKAGE_SUCCESS = "Lấy gói thành công";
-        public const string DELETE_PACKAGE_FAILED = "Xóa gói thất bại";
-        public const string GET_PACKAGE_BY_BATTERY_TYPE_FAIL = " Lấy gói theo loại pin thất bại";
-        public const string GET_PACKAGE_BY_BATTERY_TYPE_SUCCESS = "Lấy gói theo loại pin thành công";
-        public const string PACKAGE_STATUS_SAME = "Trạng thái gói không thay đổi";
-        public const string UPDATE_PACKAGE_STATUS_SUCCESS = "Cập nhật trạng thái gói thành công";
-        public const string PACKAGE_IN_USE_CANNOT_INACTIVE = "Gói đang được sử dụng, không thể ngừng hoạt động";
-        public const string UPDATE_PACKAGE_STATUS_FAILED = "Cập nhật trạng thái gói thất bại";
-        public const string PACKAGE_INACTIVE_CANNOT_UPDATE = "Gói đã ngừng hoạt động, không thể cập nhật";
-        public const string PACKAGE_ACTIVE_CANNOT_UPDATE = "Gói đang hoạt động, không thể cập nhật";
-        public const string PACKAGE_ALREADY_INACTIVE = "Gói đang hoạt động, không thể cập nhật";
-        public const string PACKAGE_EXPIRED = "Gói đã hết hạn sử dụng";
-        public const string PACKAGE_NOT_FOUND_FOR_VEHICLE = "Xe không có gói nào được liên kết";
-        public const string PACKAGE_EXPIRED_OR_NOT_EXISTS_IN_VEHICLE = "Gói đã hết hạn sử dụng hoặc không tồn tại trong xe";
-        public const string VEHICLE_ALREADY_HAS_PACKAGE = "Xe đã có gói được liên kết";
-    }
-    //for Vehicle (0-0-1)
-    public static class ResponseMessageConstantsVehicle
-    {
-        public const string VEHICLE_NOT_FOUND = "Không tìm thấy xe";
-        public const string VEHICLE_EXISTED = "Xe đã tồn tại";
-        public const string ADD_VEHICLE_SUCCESS = "Thêm xe thành công";
-        public const string UPDATE_VEHICLE_SUCCESS = "Cập nhật xe thành công";
-        public const string DELETE_VEHICLE_SUCCESS = "Xóa xe thành công";
-        public const string VEHICLE_INACTIVE = "Xe đã bị ngừng hoạt động";
-        public const string GET_VEHICLE_LIST_SUCCESS = "Lấy danh sách xe thành công";
-        public const string GET_VEHICLE_DETAIL_SUCCESS = "Lấy chi tiết xe thành công";
-        public const string ADD_VEHICLE_FAIL = "Thêm xe thất bại";
-        public const string GET_ALL_VEHICLE_FAIL = "Lấy danh sách xe thất bại";
-        public const string VEHICLE_LIST_EMPTY = "Lấy danh sách xe thất bại";
-        public const string GET_ALL_VEHICLE_SUCCESS = "Lấy danh sách xe thành công";
-        public const string UPDATE_VEHICLE_FAILED = "Cập nhật xe thất bại";
-        public const string GET_VEHICLE_FAIL = "Lấy xe thất bại";
-        public const string GET_VEHICLE_SUCCESS = "Lấy xe thành công";
-        public const string DELETE_VEHICLE_FAILED = "Xóa xe thất bại";
-        public const string GET_VEHICLES_BY_PACKAGE_ID_FAILED = "Lấy xe theo gói thất bại";
-        public const string GET_VEHICLES_BY_PACKAGE_ID_SUCCESS = "Lấy xe theo gói thành công";
-        public const string LINK_VEHICLE_FAILED = "Liên kết xe thất bại";
-        public const string LINK_VEHICLE_SUCCESS = "Liên kết xe thành công";
-        public const string ADD_VEHICLE_IN_PACKAGE_SUCCESS = "Thêm xe vào gói thành công";
-        public const string ADD_VEHICLE_IN_PACKAGE_FAILED = "Thêm xe vào gói thất bại";
-        public const string DELETE_VEHICLE_IN_PACKAGE_FAILED = "Hủy xe khỏi gói thất bại";
-        public const string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
-        public const string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống hoặc sai tên xe vui lòng liên hệ với người bán cho bạn xe cũ để được biết thêm thông tin của xe";
-        public const string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
-        public const string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";
-        public const string VEHICLE_ALREADY_IN_PACKAGE = "Xe đã có gói";
-        public const string GET_PACKAGE_BY_VEHICLE_ID_SUCCESS = " Lấy gói theo xe thành công";
-        public const string GET_PACKAGE_BY_VEHICLE_ID_FAILED = "Lấy gói theo xe thất bại";
-        public const string VEHICLE_NOT_OWNED = "Xe không thuộc sở hữu của khách hàng";
-        public const string NO_VEHICLE_FOR_USER = "Người dùng không có xe được liên kết";
-        public const string VEHICLE_NOT_BELONG_TO_ACCOUNT = "Xe không thuộc sở hữu của tài khoản";
-        public const string VEHICLE_IN_PACKAGE_CANNOT_UNLINK = "gói của xe đang còn thời hạn bạn không thể xóa xe được";
-    }
-    //for StationSchedule (0-0-1)
-    public static class ResponseMessageConstantsStationSchedule
-    {
-        public const string STATION_SCHEDULE_NOT_FOUND = "Không tìm thấy lịch trạm";
-        public const string STATION_SCHEDULE_EXISTED = "Lịch trạm đã tồn tại";
-        public const string ADD_STATION_SCHEDULE_SUCCESS = "Thêm lịch trạm thành công";
-        public const string UPDATE_STATION_SCHEDULE_SUCCESS = "Cập nhật lịch trạm thành công";
-        public const string DELETE_STATION_SCHEDULE_SUCCESS = "Xóa lịch trạm thành công";
-        public const string STATION_SCHEDULE_INACTIVE = "Lịch trạm đã bị ngừng hoạt động";
-        public const string GET_STATION_SCHEDULE_LIST_SUCCESS = "Lấy danh sách lịch trạm thành công";
-        public const string GET_STATION_SCHEDULE_DETAIL_SUCCESS = "Lấy chi tiết lịch trạm thành công";
-        public const string ADD_STATION_SCHEDULE_FAIL = "Thêm lịch trạm thất bại";
-        public const string GET_ALL_STATION_SCHEDULE_FAIL = "Lấy danh sách lịch trạm thất bại";
-        public const string STATION_SCHEDULE_LIST_EMPTY = "Lấy danh sách lịch trạm thất bại";
-        public const string GET_ALL_STATION_SCHEDULE_SUCCESS = "Lấy danh sách lịch trạm thành công";
-        public const string UPDATE_STATION_SCHEDULE_FAILED = "Cập nhật lịch trạm thất bại";
-        public const string GET_STATION_SCHEDULE_FAIL = "Lấy lịch trạm thất bại";
-        public const string GET_STATION_SCHEDULE_SUCCESS = "Lấy lịch trạm thành công";
-        public const string DELETE_STATION_SCHEDULE_FAILED = "Xóa lịch trạm thất bại";
-        public const string INVALID_TIME_RANGE = "Khoảng thời gian không hợp lệ";
-        public const string GET_STATION_SCHEDULE_BY_STATION_ID_SUCCESS = "Lấy lịch trạm theo ID trạm thành công";
-        public const string GET_STATION_SCHEDULE_BY_STATION_ID_FAILED = "Lấy lịch trạm theo ID trạm thất bại";
-        public const string UPDATE_STATUS_STATION_SCHEDULE_SUCCESS = "Cập nhật trạng thái lịch trạm thành công";
-        public const string FORM_NOT_APPROVED = "Biểu mẫu chưa được phê duyệt, không thể Cập nhật trạng thái lịch trạm";
-        public const string UPDATE_STATUS_STATION_SCHEDULE_FAILED = "Cập nhật trạng thái lịch trạm thất bại";
-        public const string CANNOT_COMPLETE_BEFORE_DATE = "Không thể hoàn thành lịch trạm trước ngày hiện tại";
-        public const string STATION_SCHEDULE_ALREADY_COMPLETED = "Lịch trạm đã được hoàn thành";
-        public const string CANNOT_UPDATE_STATUS_FROM_INACTIVE = "Không thể cập nhật trạng thái từ ngừng hoạt động";
-        public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_SUCCESS = "Lấy lịch trạm theo ID tài khoản thành công";
-        public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_FAILED = "Lấy lịch trạm theo ID tài khoản thất bại";
-    }
-    //for Rating (0-0-1)
-    public static class ResponseMessageConstantsRating
-    {
-        public const string RATING_NOT_FOUND = "Không tìm thấy đánh giá";
-        public const string RATING_EXISTED = "Đánh giá đã tồn tại";
-        public const string ADD_RATING_SUCCESS = "Thêm đánh giá thành công";
-        public const string UPDATE_RATING_SUCCESS = "Cập nhật đánh giá thành công";
-        public const string DELETE_RATING_SUCCESS = "Xóa đánh giá thành công";
-        public const string RATING_INACTIVE = "Đánh giá đã bị ngừng hoạt động";
-        public const string GET_RATING_LIST_SUCCESS = "Lấy danh sách đánh giá thành công";
-        public const string GET_RATING_DETAIL_SUCCESS = "Lấy chi tiết đánh giá thành công";
-        public const string ADD_RATING_FAIL = "Thêm đánh giá thất bại";
-        public const string GET_ALL_RATING_FAIL = "Lấy danh sách đánh giá thất bại";
-        public const string RATING_LIST_EMPTY = "Lấy danh sách đánh giá thất bại";
-        public const string GET_ALL_RATING_SUCCESS = "Lấy danh sách đánh giá thành công";
-        public const string UPDATE_RATING_FAILED = "Cập nhật đánh giá thất bại";
-        public const string GET_RATING_FAIL = "Lấy đánh giá thất bại";
-        public const string GET_RATING_SUCCESS = "Lấy đánh giá thành công";
-        public const string DELETE_RATING_FAILED = "Xóa đánh giá thất bại";
-        public const string ADD_RATING_ONE_TIME = "Bạn chỉ có thể đánh giá một lần cho mỗi trạm nếu bạn muốn đánh giá lần nữa bạn có thể chỉnh sửa";
-        public const string DELETE_RATING_FORBIDDEN = "Bạn không có quyền xóa đánh giá này";
-        public const string UPDATE_RATING_FORBIDDEN = "Bạn không có quyền cập nhật đánh giá này";
-    }
-    //for Report (0-0-1)
-    public static class ResponseMessageConstantsReport
-    {
-        public const string REPORT_NOT_FOUND = "Không tìm thấy báo cáo";
-        public const string REPORT_EXISTED = "Báo cáo đã tồn tại";
-        public const string ADD_REPORT_SUCCESS = "Thêm báo cáo thành công";
-        public const string UPDATE_REPORT_SUCCESS = "Cập nhật báo cáo thành công";
-        public const string DELETE_REPORT_SUCCESS = "Xóa báo cáo thành công";
-        public const string REPORT_INACTIVE = "Báo cáo đã bị ngừng hoạt động";
-        public const string GET_REPORT_LIST_SUCCESS = "Lấy danh sách báo cáo thành công";
-        public const string GET_REPORT_DETAIL_SUCCESS = "Lấy chi tiết báo cáo thành công";
-        public const string ADD_REPORT_FAIL = "Thêm báo cáo thất bại";
-        public const string GET_ALL_REPORT_FAIL = "Lấy danh sách báo cáo thất bại";
-        public const string REPORT_LIST_EMPTY = "Lấy danh sách báo cáo thất bại";
-        public const string GET_ALL_REPORT_SUCCESS = "Lấy danh sách báo cáo thành công";
-        public const string UPDATE_REPORT_FAILED = "Cập nhật báo cáo thất bại";
-        public const string GET_REPORT_FAIL = "Lấy báo cáo thất bại";
-        public const string GET_REPORT_SUCCESS = "Lấy báo cáo thành công";
-        public const string DELETE_REPORT_FAILED = "Xóa báo cáo thất bại";
-        public const string UPDATE_REPORT_STATUS_SUCCESS = "Cập nhật trạng thái báo cáo thành công";
-        public const string REPORT_ALREADY_COMPLETED = "Báo cáo đã được hoàn thành";
-        public const string REPORT_STATUS_SAME = "Báo cáo đã ở trạng thái này";
-        public const string UPDATE_REPORT_STATUS_FAILED = "Cập nhật trạng thái báo cáo thất bại";
-        public const string GET_REPORTS_BY_STATION_FAIL = "Lấy báo cáo theo trạm thất bại";
-        public const string GET_REPORTS_BY_STATION_SUCCESS = "Lấy báo cáo theo trạm thành công";
-    }
-    //for BatteryReport (0-0-1)
-    public static class ResponseMessageConstantsBatteryReport
-    {
-        public const string BATTERY_REPORT_NOT_FOUND = "Không tìm thấy báo cáo pin";
-        public const string BATTERY_REPORT_EXISTED = "Báo cáo pin đã tồn tại";
-        public const string ADD_BATTERY_REPORT_SUCCESS = "Thêm báo cáo pin thành công";
-        public const string UPDATE_BATTERY_REPORT_SUCCESS = "Cập nhật báo cáo pin thành công";
-        public const string DELETE_BATTERY_REPORT_SUCCESS = "Xóa báo cáo pin thành công";
-        public const string BATTERY_REPORT_INACTIVE = "Báo cáo pin đã bị ngừng hoạt động";
-        public const string GET_BATTERY_REPORT_LIST_SUCCESS = "Lấy danh sách báo cáo pin thành công";
-        public const string GET_BATTERY_REPORT_DETAIL_SUCCESS = "Lấy chi tiết báo cáo pin thành công";
-        public const string ADD_BATTERY_REPORT_FAIL = "Thêm báo cáo pin thất bại";
-        public const string GET_ALL_BATTERY_REPORT_FAIL = "Lấy danh sách báo cáo pin thất bại";
-        public const string BATTERY_REPORT_LIST_EMPTY = "Lấy danh sách báo cáo pin thất bại";
-        public const string GET_ALL_BATTERY_REPORT_SUCCESS = "Lấy danh sách báo cáo pin thành công";
-        public const string UPDATE_BATTERY_REPORT_FAILED = "Cập nhật báo cáo pin thất bại";
-        public const string GET_BATTERY_REPORT_FAIL = "Lấy báo cáo pin thất bại";
-        public const string GET_BATTERY_REPORT_SUCCESS = "Lấy báo cáo pin thành công";
-        public const string DELETE_BATTERY_REPORT_FAILED = "Xóa báo cáo pin thất bại";
-        public const string BATTERY_REPORT_NOT_COMPLETED = "Báo cáo pin chưa hoàn thành";
-        public const string BATTERY_MISMATCH_WITH_EXCHANGE = "Pin trong báo cáo không khớp với pin trong giao dịch đổi pin";
-    }
 
-    public static class ExchangeMessages
-    {
-        public const string CreateSuccess = "Tạo giao dịch đổi pin thành công.";
-        public const string CreateFailed = "Không thể tạo giao dịch đổi pin.";
-        public const string NotFound = "Không tìm thấy thông tin giao dịch đổi pin.";
-        public const string ListEmpty = "Không có bản ghi giao dịch đổi pin nào.";
-        public const string InvalidStation = "Mã trạm không hợp lệ.";
-        public const string InvalidOrder = "Mã đơn hàng không hợp lệ.";
-        public const string InvalidBattery = "Thông tin pin không hợp lệ.";
-        public const string UpdateSuccess = "Cập nhật giao dịch đổi pin thành công.";
-        public const string UpdateFailed = "Cập nhật giao dịch đổi pin thất bại.";
-        public const string DeleteSuccess = "Xóa giao dịch đổi pin thành công.";
-        public const string DeleteFailed = "Xóa giao dịch đổi pin thất bại.";
-        public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
-        public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
-    }
-    public static class PayOSMessages
-    {
-        public const string InvalidOrderId = "OrderId không hợp lệ.";
-        public const string OrderNotFound = "Không tìm thấy đơn hàng.";
-        public const string PaymentLinkCreated = "Tạo link thanh toán thành công.";
-    }
-    public static class ExchangeBatteryMessages
-    {
-        public const string CreateSuccess = "Tạo giao dịch đổi pin thành công.";
-        public const string CreateFailed = "Không thể tạo giao dịch đổi pin.";
-        public const string NotFound = "Không tìm thấy thông tin giao dịch đổi pin.";
-        public const string ListEmpty = "Không có bản ghi giao dịch đổi pin nào.";
-        public const string InvalidStation = "Mã trạm không hợp lệ.";
-        public const string InvalidOrder = "Mã đơn hàng không hợp lệ.";
-        public const string InvalidBattery = "Thông tin pin không hợp lệ.";
-        public const string UpdateSuccess = "Cập nhật giao dịch đổi pin thành công.";
-        public const string UpdateFailed = "Cập nhật giao dịch đổi pin thất bại.";
-        public const string DeleteSuccess = "Xóa giao dịch đổi pin thành công.";
-        public const string DeleteFailed = "Xóa giao dịch đổi pin thất bại.";
-        public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
-        public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
-        public const string EXCHANGE_BATTERY_NOT_FOUND = "Không tìm thấy giao dịch đổi pin";
-        public const string UPDATE_EXCHANGE_STATUS_SUCCESS = "Cập nhật trạng thái giao dịch đổi pin thành công";
-        public const string UPDATE_EXCHANGE_STATUS_FAILED = " Cập nhật trạng thái giao dịch đổi pin thất bại";
-        public const string INVALID_STATUS_UPDATE = "Trạng thái cập nhật không hợp lệ";
-        public const string EXCHANGE_BATTERY_ALREADY_FINALIZED = "Giao dịch đổi pin đã được hoàn tất";
-        public const string INVALID_STATUS_TYPE = "Loại trạng thái không hợp lệ";
-        public const string CreatePackageSuccess = "Thanh toán gói thành công.";
-        public const string CreatePackageFailed = "Thanh toán gói thất bại.";
-        public const string NEW_BATTERY_ID_NOT_MATCHED_WITH_FORM_BATTERY_ID = "ID pin mới không khớp với ID pin trong biểu mẫu.";
-        public const string NEW_BATTERY_NOT_IN_BOOKED_STATUS = "Pin mới không ở trạng thái đã đặt.";
-        public const string NEW_BATTERY_NOT_IN_STATION = "Pin mới không có trong trạm.";
-        public const string EXCHANGE_BATTERY_UPDATE_FAILED = "Cập nhật giao dịch đổi pin thất bại.";
-        public const string FORM_NOT_BELONG_TO_EXCHANGE_BATTERY = "Biểu mẫu không thuộc về giao dịch đổi pin.";
-        public const string SLOT_WITH_NEW_BATTERY_NOT_FOUND = "Không tìm thấy vị trí chứa pin mới trong trạm.";
-        public const string NO_EMPTY_SLOT_FOR_OLD_BATTERY = "Không có vị trí trống trong trạm để đặt pin cũ.";
-    }
-    public static class ResponseMessageBatteryHistory
-    {
-        public const string BATTERY_HISTORY_NOT_FOUND = "Không tìm thấy lịch sử pin";
-        public const string BATTERY_HISTORY_LIST_EMPTY = "Lịch sử pin trống";
-        public const string GET_BATTERY_HISTORY_SUCCESS = "Lấy lịch sử pin thành công";
-        public const string GET_BATTERY_HISTORY_FAIL = "Lấy lịch sử pin thất bại";
-    }
-    public static class ResponseMessageOrder
-    {
-        public const string ORDER_NOT_FOUND = "Không tìm thấy đơn hàng";
-        public const string ORDER_LIST_EMPTY = "Danh sách đơn hàng trống";
-        public const string GET_ORDER_SUCCESS = "Lấy đơn hàng thành công";
-        public const string GET_ORDER_FAIL = "Lấy đơn hàng thất bại";
-        public const string CREATE_ORDER_SUCCESS = "Tạo đơn hàng thành công";
-        public const string CREATE_ORDER_FAIL = "Tạo đơn hàng thất bại";
-        public const string UPDATE_ORDER_SUCCESS = "Cập nhật đơn hàng thành công";
-        public const string UPDATE_ORDER_FAIL = "Cập nhật đơn hàng thất bại";
-        public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
-        public const string ORDER_CREATED_PENDING_PAYMENT = "Đơn hàng đã được tạo và đang chờ thanh toán";
-        public const string ORDER_CREATED_AND_PAID = "Đơn hàng đã được tạo và thanh toán thành công";
-        public const string ORDER_WILL_BE_CREATED_AT_STATION = "Đơn hàng sẽ được tạo tại trạm";
-        public const string INVALID_PAYMENT_METHOD = "Phương thức thanh toán không hợp lệ";
-        public const string ORDER_CREATE_FAILED = "Tạo đơn hàng thất bại";
-        public const string ORDER_ALREADY_PENDING = "Đã có đơn hàng đã ở trạng thái đang chờ xử lý";
-        public const string PAID_IN_CASH_FAILED = "Thanh toán bằng tiền mặt thất bại";
-        public const string PAID_IN_CASH_SUCCESS = "Thanh toán bằng tiền mặt thành công";
-        public const string ORDER_ALREADY_EXISTS_FOR_EXCHANGE_BATTERY = "Đơn hàng đã tồn tại cho giao dịch đổi pin";
-    }
-    public static class ResponseMessageConstantsDashboard
-    {
-        public const string DASHBOARD_LOADED_SUCCESS = "Dashboard loaded successfully";
-    }
+        public const string APPROVE_FORM_SUBJECT = "Your battery exchange request has been approved";
+        public const string REJECT_FORM_SUBJECT = "Your battery exchange request has been rejected";
 
+        public const string APPROVE_FORM_BODY = @"
+            <p>Dear {0},</p>
+            <p>Your battery exchange request submitted on <b>{1}</b> has been <b>approved</b>.</p>
+            <p>Please visit the station <b>{2}</b> for further processing.</p>
+            <p>Thank you for using our service!</p>
+            <br/>
+            <p><i>This is an automated message. Please do not reply.</i></p>";
+
+        public const string REJECT_FORM_BODY = @"
+            <p>Dear {0},</p>
+            <p>We regret to inform you that your battery exchange request submitted on 
+            <b>{1}</b> has been <b>rejected</b>.</p>
+            <p>If you need further details, please contact the station <b>{2}</b>.</p>
+            <br/>
+            <p><i>This is an automated message. Please do not reply.</i></p>";
+
+        public const string EXCHANGE_COMPLETED_SUBJECT = "Your battery exchange has been completed";
+        public const string EXCHANGE_CANCELLED_SUBJECT = "Your battery exchange has been cancelled";
+
+        public const string EXCHANGE_COMPLETED_BODY = @"
+            <p>Dear {0},</p>
+            <p>Your battery exchange at station <b>{1}</b> has been successfully <b>completed</b> on <b>{2}</b>.</p>
+            <p>New battery ID: <b>{3}</b></p>
+            <p>Thank you for trusting and using our service!</p>
+            <br/>
+            <p><i>This is an automated email, please do not reply.</i></p>";
+
+        public const string EXCHANGE_CANCELLED_BODY = @"
+            <p>Dear {0},</p>
+            <p>We regret to inform you that your battery exchange at station <b>{1}</b> has been <b>cancelled</b> on <b>{2}</b>.</p>
+            <p>Reason/Note: {3}</p>
+            <p>If you have any questions, please contact the station staff for support.</p>
+            <br/>
+            <p><i>This is an automated email, please do not reply.</i></p>";
+
+        public const string REGISTER_SUCCESS_SUBJECT = "Welcome to SwapX!";
+        public const string REGISTER_SUCCESS_BODY = @"
+        <p>Dear {0},</p>
+        <p>Welcome to our SwapX! 🎉</p>
+        <p>Your account has been successfully created and is now active.</p>
+        <p>We’re excited to have you on board.</p>
+        <br/>
+        <p><i>This is an automated email, please do not reply.</i></p>";
+
+        public const string STAFF_REGISTER_SUCCESS_SUBJECT = "Welcome to SwapX Team!";
+
+        public const string STAFF_REGISTER_SUCCESS_BODY = @"
+            <p>Dear {0},</p>
+            <p>Welcome aboard! 🎉</p>
+            <p>Your staff account at <b>SwapX</b> has been successfully created.</p>
+            <p>Username: <b>{1}</b></p>
+            <p>Please log in using your credentials to get started.</p>
+            <br/>
+            <p>We’re thrilled to have you as part of the team!</p>
+            <p><i>This is an automated email, please do not reply.</i></p>";
+
+        public const string VEHICLE_LINK_SUCCESS_SUBJECT = "🚗 Vehicle Linked Successfully";
+        public const string VEHICLE_LINK_SUCCESS_BODY = @"
+            <p>Dear {0},</p>
+            <p>Your vehicle <b>{1}</b> (VIN: {2}) has been successfully linked to your account.</p>
+            <p>A new battery has been assigned and initialized for your vehicle.</p>
+            <p>Thank you for using our SwapX service!</p>
+            <br/>
+            <p><i>This is an automated notification. Please do not reply.</i></p>";
+
+        // 📢 Report - Notification templates
+        public const string REPORT_STATUS_UPDATE_SUBJECT = "🛠 Report Status Updated";
+
+        public const string REPORT_STATUS_UPDATE_BODY = @"
+            <p>Dear {0},</p>
+            <p>Your report (<b>{1}</b>) submitted to station <b>{2}</b> has been updated.</p>
+            <p><b>Status:</b> {3}</p>
+            <p><b>Description:</b> {4}</p>
+            <p>Thank you for helping us improve our service!</p>
+            <br/>
+            <p><i>This is an automated message. Please do not reply.</i></p>";
+
+        // 📤 Vehicle Unlinked Notification
+        public const string VEHICLE_UNLINK_SUCCESS_SUBJECT = "🚗 Vehicle Unlinked Successfully";
+
+        public const string VEHICLE_UNLINK_SUCCESS_BODY = @"
+            <p>Dear {0},</p>
+            <p>Your vehicle (<b>{1}</b>) has been successfully unlinked from your account.</p>
+            <p>If this action was not performed by you, please contact our support team immediately.</p>
+            <p>Thank you for using our SwapX service!</p>
+            <br/>
+            <p><i>This is an automated notification. Please do not reply.</i></p>";
+
+
+    }
 }
+public static class HistoryActionConstants
+{
+    public const string BATTERY_CREATED = "Pin đã được tạo theo xe";
+    public const string BATTERY_CREATED_BY_ADMIN = "Pin đã được thêm bởi admin";
+    public const string BATTERY_UPDATED = "Pin đã được cập nhật";
+    public const string BATTERY_DELETED = "Pin đã bị xóa bởi admin";
+    public const string BATTERY_ADDED_TO_STATION = "Pin đã được thêm vào trạm";
+    public const string BATTERY_CREATED_BY_USER = "Pin đã được tạo bởi người dùng tích hợp xe";
+    public const string BATTERY_RETURNED_TO_STATION_AFTER_EXCHANGE = "Battery returned to station {0} after exchange.";
+    public const string BATTERY_ASSIGNED_TO_VEHICLE_AFTER_EXCHANGE = "Battery assigned to vehicle VIN: {0}, Model: {1} after exchange.";
+}
+public static class ResponseMessageConstantsForm
+{
+    public const string FORM_NOT_FOUND = "Không tìm thấy biểu mẫu";
+    public const string FORM_EXISTED = "Biểu mẫu đã tồn tại";
+    public const string ADD_FORM_SUCCESS = "Thêm biểu mẫu thành công";
+    public const string UPDATE_FORM_SUCCESS = "Cập nhật biểu mẫu thành công";
+    public const string DELETE_FORM_SUCCESS = "Xóa biểu mẫu thành công";
+    public const string FORM_INACTIVE = "Biểu mẫu đã bị ngừng hoạt động";
+    public const string GET_FORM_LIST_SUCCESS = "Lấy danh sách biểu mẫu thành công";
+    public const string GET_FORM_DETAIL_SUCCESS = "Lấy chi tiết biểu mẫu thành công";
+    public const string ADD_FORM_FAIL = "Thêm biểu mẫu thất bại";
+    public const string GET_ALL_FORM_FAIL = "Lấy danh sách biểu mẫu thất bại";
+    public const string FORM_LIST_EMPTY = "Lấy danh sách biểu mẫu thất bại";
+    public const string GET_ALL_FORM_SUCCESS = "Lấy danh sách biểu mẫu thành công";
+    public const string UPDATE_FORM_FAILED = "Cập nhật biểu mẫu thất bại";
+    public const string GET_FORM_FAIL = "Lấy biểu mẫu thất bại";
+    public const string GET_FORM_SUCCESS = "Lấy biểu mẫu thành công";
+    public const string DELETE_FORM_FAILED = "Xóa biểu mẫu thất bại";
+    public const string INVALID_FORM_DATE = "Ngày biểu mẫu không hợp lệ";
+    public const string INVALID_FORM_TIME = "Thời gian không nằm trong giờ hành chính (7h30–12h, 13h30–17h).";
+    public const string INVALID_FORM_STATUS_VALUE = "Trạng thái biểu mẫu không hợp lệ";
+    public const string INVALID_FORM_STATUS_UPDATE = "Không thể cập nhật trạng thái biểu mẫu";
+    public const string UPDATE_FORM_STATUS_SUCCESS = " Cập nhật trạng thái biểu mẫu thành công";
+    public const string UPDATE_FORM_STATUS_FAILED = " Cập nhật trạng thái biểu mẫu thất bại";
+    public const string BATTERY_ALREADY_BOOKED = "Pin đã được đặt";
+    public const string VEHICLE_ALREADY_HAS_PENDING_FORM = "Xe đã có biểu mẫu đang chờ xử lý";
+    public const string CREATE_STATION_SCHEDULE_FAILED = "Tạo lịch trạm thất bại";
+    public const string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
+    public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
+}
+// For Package (0-0-1)
+public static class ResponseMessageConstantsPackage
+{
+    public const string PACKAGE_NOT_FOUND = "Không tìm thấy gói";
+    public const string PACKAGE_EXISTED = "Gói đã tồn tại";
+    public const string ADD_PACKAGE_SUCCESS = "Thêm gói thành công";
+    public const string UPDATE_PACKAGE_SUCCESS = "Cập nhật gói thành công";
+    public const string DELETE_PACKAGE_SUCCESS = "Xóa gói thành công";
+    public const string PACKAGE_INACTIVE = "Gói đã bị ngừng hoạt động";
+    public const string GET_PACKAGE_LIST_SUCCESS = "Lấy danh sách gói thành công";
+    public const string GET_PACKAGE_DETAIL_SUCCESS = "Lấy chi tiết gói thành công";
+    public const string ADD_PACKAGE_FAIL = "Thêm gói thất bại";
+    public const string GET_ALL_PACKAGE_FAIL = "Lấy danh sách gói thất bại";
+    public const string PACKAGE_LIST_EMPTY = "Lấy danh sách gói thất bại";
+    public const string GET_ALL_PACKAGE_SUCCESS = "Lấy danh sách gói thành công";
+    public const string UPDATE_PACKAGE_FAILED = "Cập nhật gói thất bại";
+    public const string GET_PACKAGE_FAIL = "Lấy gói thất bại";
+    public const string GET_PACKAGE_SUCCESS = "Lấy gói thành công";
+    public const string DELETE_PACKAGE_FAILED = "Xóa gói thất bại";
+    public const string GET_PACKAGE_BY_BATTERY_TYPE_FAIL = " Lấy gói theo loại pin thất bại";
+    public const string GET_PACKAGE_BY_BATTERY_TYPE_SUCCESS = "Lấy gói theo loại pin thành công";
+    public const string PACKAGE_STATUS_SAME = "Trạng thái gói không thay đổi";
+    public const string UPDATE_PACKAGE_STATUS_SUCCESS = "Cập nhật trạng thái gói thành công";
+    public const string PACKAGE_IN_USE_CANNOT_INACTIVE = "Gói đang được sử dụng, không thể ngừng hoạt động";
+    public const string UPDATE_PACKAGE_STATUS_FAILED = "Cập nhật trạng thái gói thất bại";
+    public const string PACKAGE_INACTIVE_CANNOT_UPDATE = "Gói đã ngừng hoạt động, không thể cập nhật";
+    public const string PACKAGE_ACTIVE_CANNOT_UPDATE = "Gói đang hoạt động, không thể cập nhật";
+    public const string PACKAGE_ALREADY_INACTIVE = "Gói đang hoạt động, không thể cập nhật";
+    public const string PACKAGE_EXPIRED = "Gói đã hết hạn sử dụng";
+    public const string PACKAGE_NOT_FOUND_FOR_VEHICLE = "Xe không có gói nào được liên kết";
+    public const string PACKAGE_EXPIRED_OR_NOT_EXISTS_IN_VEHICLE = "Gói đã hết hạn sử dụng hoặc không tồn tại trong xe";
+    public const string VEHICLE_ALREADY_HAS_PACKAGE = "Xe đã có gói được liên kết";
+}
+//for Vehicle (0-0-1)
+public static class ResponseMessageConstantsVehicle
+{
+    public const string VEHICLE_NOT_FOUND = "Không tìm thấy xe";
+    public const string VEHICLE_EXISTED = "Xe đã tồn tại";
+    public const string ADD_VEHICLE_SUCCESS = "Thêm xe thành công";
+    public const string UPDATE_VEHICLE_SUCCESS = "Cập nhật xe thành công";
+    public const string DELETE_VEHICLE_SUCCESS = "Xóa xe thành công";
+    public const string VEHICLE_INACTIVE = "Xe đã bị ngừng hoạt động";
+    public const string GET_VEHICLE_LIST_SUCCESS = "Lấy danh sách xe thành công";
+    public const string GET_VEHICLE_DETAIL_SUCCESS = "Lấy chi tiết xe thành công";
+    public const string ADD_VEHICLE_FAIL = "Thêm xe thất bại";
+    public const string GET_ALL_VEHICLE_FAIL = "Lấy danh sách xe thất bại";
+    public const string VEHICLE_LIST_EMPTY = "Lấy danh sách xe thất bại";
+    public const string GET_ALL_VEHICLE_SUCCESS = "Lấy danh sách xe thành công";
+    public const string UPDATE_VEHICLE_FAILED = "Cập nhật xe thất bại";
+    public const string GET_VEHICLE_FAIL = "Lấy xe thất bại";
+    public const string GET_VEHICLE_SUCCESS = "Lấy xe thành công";
+    public const string DELETE_VEHICLE_FAILED = "Xóa xe thất bại";
+    public const string GET_VEHICLES_BY_PACKAGE_ID_FAILED = "Lấy xe theo gói thất bại";
+    public const string GET_VEHICLES_BY_PACKAGE_ID_SUCCESS = "Lấy xe theo gói thành công";
+    public const string LINK_VEHICLE_FAILED = "Liên kết xe thất bại";
+    public const string LINK_VEHICLE_SUCCESS = "Liên kết xe thành công";
+    public const string ADD_VEHICLE_IN_PACKAGE_SUCCESS = "Thêm xe vào gói thành công";
+    public const string ADD_VEHICLE_IN_PACKAGE_FAILED = "Thêm xe vào gói thất bại";
+    public const string DELETE_VEHICLE_IN_PACKAGE_FAILED = "Hủy xe khỏi gói thất bại";
+    public const string DELETE_VEHICLE_IN_PACKAGE_SUCCESS = "Hủy xe khỏi gói thành công";
+    public const string VEHICLE_ALREADY_EXISTS = "Xe đã tồn tại trong hệ thống hoặc sai tên xe vui lòng liên hệ với người bán cho bạn xe cũ để được biết thêm thông tin của xe";
+    public const string UNLINK_VEHICLE_SUCCESS = "Hủy liên kết xe thành công";
+    public const string UNLINK_VEHICLE_FAILED = "Hủy liên kết xe thất bại";
+    public const string VEHICLE_ALREADY_IN_PACKAGE = "Xe đã có gói";
+    public const string GET_PACKAGE_BY_VEHICLE_ID_SUCCESS = " Lấy gói theo xe thành công";
+    public const string GET_PACKAGE_BY_VEHICLE_ID_FAILED = "Lấy gói theo xe thất bại";
+    public const string VEHICLE_NOT_OWNED = "Xe không thuộc sở hữu của khách hàng";
+    public const string NO_VEHICLE_FOR_USER = "Người dùng không có xe được liên kết";
+    public const string VEHICLE_NOT_BELONG_TO_ACCOUNT = "Xe không thuộc sở hữu của tài khoản";
+    public const string VEHICLE_IN_PACKAGE_CANNOT_UNLINK = "gói của xe đang còn thời hạn bạn không thể xóa xe được";
+    public const string LINK_VEHICLE_SUCCESS_BUT_NO_EMAIL = "Liên kết xe thành công nhưng không thể gửi email thông báo do tài khoản người dùng không có email";
+}
+//for StationSchedule (0-0-1)
+public static class ResponseMessageConstantsStationSchedule
+{
+    public const string STATION_SCHEDULE_NOT_FOUND = "Không tìm thấy lịch trạm";
+    public const string STATION_SCHEDULE_EXISTED = "Lịch trạm đã tồn tại";
+    public const string ADD_STATION_SCHEDULE_SUCCESS = "Thêm lịch trạm thành công";
+    public const string UPDATE_STATION_SCHEDULE_SUCCESS = "Cập nhật lịch trạm thành công";
+    public const string DELETE_STATION_SCHEDULE_SUCCESS = "Xóa lịch trạm thành công";
+    public const string STATION_SCHEDULE_INACTIVE = "Lịch trạm đã bị ngừng hoạt động";
+    public const string GET_STATION_SCHEDULE_LIST_SUCCESS = "Lấy danh sách lịch trạm thành công";
+    public const string GET_STATION_SCHEDULE_DETAIL_SUCCESS = "Lấy chi tiết lịch trạm thành công";
+    public const string ADD_STATION_SCHEDULE_FAIL = "Thêm lịch trạm thất bại";
+    public const string GET_ALL_STATION_SCHEDULE_FAIL = "Lấy danh sách lịch trạm thất bại";
+    public const string STATION_SCHEDULE_LIST_EMPTY = "Lấy danh sách lịch trạm thất bại";
+    public const string GET_ALL_STATION_SCHEDULE_SUCCESS = "Lấy danh sách lịch trạm thành công";
+    public const string UPDATE_STATION_SCHEDULE_FAILED = "Cập nhật lịch trạm thất bại";
+    public const string GET_STATION_SCHEDULE_FAIL = "Lấy lịch trạm thất bại";
+    public const string GET_STATION_SCHEDULE_SUCCESS = "Lấy lịch trạm thành công";
+    public const string DELETE_STATION_SCHEDULE_FAILED = "Xóa lịch trạm thất bại";
+    public const string INVALID_TIME_RANGE = "Khoảng thời gian không hợp lệ";
+    public const string GET_STATION_SCHEDULE_BY_STATION_ID_SUCCESS = "Lấy lịch trạm theo ID trạm thành công";
+    public const string GET_STATION_SCHEDULE_BY_STATION_ID_FAILED = "Lấy lịch trạm theo ID trạm thất bại";
+    public const string UPDATE_STATUS_STATION_SCHEDULE_SUCCESS = "Cập nhật trạng thái lịch trạm thành công";
+    public const string FORM_NOT_APPROVED = "Biểu mẫu chưa được phê duyệt, không thể Cập nhật trạng thái lịch trạm";
+    public const string UPDATE_STATUS_STATION_SCHEDULE_FAILED = "Cập nhật trạng thái lịch trạm thất bại";
+    public const string CANNOT_COMPLETE_BEFORE_DATE = "Không thể hoàn thành lịch trạm trước ngày hiện tại";
+    public const string STATION_SCHEDULE_ALREADY_COMPLETED = "Lịch trạm đã được hoàn thành";
+    public const string CANNOT_UPDATE_STATUS_FROM_INACTIVE = "Không thể cập nhật trạng thái từ ngừng hoạt động";
+    public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_SUCCESS = "Lấy lịch trạm theo ID tài khoản thành công";
+    public const string GET_STATION_SCHEDULE_BY_ACCOUNT_ID_FAILED = "Lấy lịch trạm theo ID tài khoản thất bại";
+}
+//for Rating (0-0-1)
+public static class ResponseMessageConstantsRating
+{
+    public const string RATING_NOT_FOUND = "Không tìm thấy đánh giá";
+    public const string RATING_EXISTED = "Đánh giá đã tồn tại";
+    public const string ADD_RATING_SUCCESS = "Thêm đánh giá thành công";
+    public const string UPDATE_RATING_SUCCESS = "Cập nhật đánh giá thành công";
+    public const string DELETE_RATING_SUCCESS = "Xóa đánh giá thành công";
+    public const string RATING_INACTIVE = "Đánh giá đã bị ngừng hoạt động";
+    public const string GET_RATING_LIST_SUCCESS = "Lấy danh sách đánh giá thành công";
+    public const string GET_RATING_DETAIL_SUCCESS = "Lấy chi tiết đánh giá thành công";
+    public const string ADD_RATING_FAIL = "Thêm đánh giá thất bại";
+    public const string GET_ALL_RATING_FAIL = "Lấy danh sách đánh giá thất bại";
+    public const string RATING_LIST_EMPTY = "Lấy danh sách đánh giá thất bại";
+    public const string GET_ALL_RATING_SUCCESS = "Lấy danh sách đánh giá thành công";
+    public const string UPDATE_RATING_FAILED = "Cập nhật đánh giá thất bại";
+    public const string GET_RATING_FAIL = "Lấy đánh giá thất bại";
+    public const string GET_RATING_SUCCESS = "Lấy đánh giá thành công";
+    public const string DELETE_RATING_FAILED = "Xóa đánh giá thất bại";
+    public const string ADD_RATING_ONE_TIME = "Bạn chỉ có thể đánh giá một lần cho mỗi trạm nếu bạn muốn đánh giá lần nữa bạn có thể chỉnh sửa";
+    public const string DELETE_RATING_FORBIDDEN = "Bạn không có quyền xóa đánh giá này";
+    public const string UPDATE_RATING_FORBIDDEN = "Bạn không có quyền cập nhật đánh giá này";
+}
+//for Report (0-0-1)
+public static class ResponseMessageConstantsReport
+{
+    public const string REPORT_NOT_FOUND = "Không tìm thấy báo cáo";
+    public const string REPORT_EXISTED = "Báo cáo đã tồn tại";
+    public const string ADD_REPORT_SUCCESS = "Thêm báo cáo thành công";
+    public const string UPDATE_REPORT_SUCCESS = "Cập nhật báo cáo thành công";
+    public const string DELETE_REPORT_SUCCESS = "Xóa báo cáo thành công";
+    public const string REPORT_INACTIVE = "Báo cáo đã bị ngừng hoạt động";
+    public const string GET_REPORT_LIST_SUCCESS = "Lấy danh sách báo cáo thành công";
+    public const string GET_REPORT_DETAIL_SUCCESS = "Lấy chi tiết báo cáo thành công";
+    public const string ADD_REPORT_FAIL = "Thêm báo cáo thất bại";
+    public const string GET_ALL_REPORT_FAIL = "Lấy danh sách báo cáo thất bại";
+    public const string REPORT_LIST_EMPTY = "Lấy danh sách báo cáo thất bại";
+    public const string GET_ALL_REPORT_SUCCESS = "Lấy danh sách báo cáo thành công";
+    public const string UPDATE_REPORT_FAILED = "Cập nhật báo cáo thất bại";
+    public const string GET_REPORT_FAIL = "Lấy báo cáo thất bại";
+    public const string GET_REPORT_SUCCESS = "Lấy báo cáo thành công";
+    public const string DELETE_REPORT_FAILED = "Xóa báo cáo thất bại";
+    public const string UPDATE_REPORT_STATUS_SUCCESS = "Cập nhật trạng thái báo cáo thành công";
+    public const string REPORT_ALREADY_COMPLETED = "Báo cáo đã được hoàn thành";
+    public const string REPORT_STATUS_SAME = "Báo cáo đã ở trạng thái này";
+    public const string UPDATE_REPORT_STATUS_FAILED = "Cập nhật trạng thái báo cáo thất bại";
+    public const string GET_REPORTS_BY_STATION_FAIL = "Lấy báo cáo theo trạm thất bại";
+    public const string GET_REPORTS_BY_STATION_SUCCESS = "Lấy báo cáo theo trạm thành công";
+    public const string REPORT_INVALID_UPDATE_STATUS = "Trạng thái báo cáo không hợp lệ";
+    public const string ACCOUNT_EMAIL_NOT_FOUND = "Không tìm thấy email của tài khoản";
+}
+//for BatteryReport (0-0-1)
+public static class ResponseMessageConstantsBatteryReport
+{
+    public const string BATTERY_REPORT_NOT_FOUND = "Không tìm thấy báo cáo pin";
+    public const string BATTERY_REPORT_EXISTED = "Báo cáo pin đã tồn tại";
+    public const string ADD_BATTERY_REPORT_SUCCESS = "Thêm báo cáo pin thành công";
+    public const string UPDATE_BATTERY_REPORT_SUCCESS = "Cập nhật báo cáo pin thành công";
+    public const string DELETE_BATTERY_REPORT_SUCCESS = "Xóa báo cáo pin thành công";
+    public const string BATTERY_REPORT_INACTIVE = "Báo cáo pin đã bị ngừng hoạt động";
+    public const string GET_BATTERY_REPORT_LIST_SUCCESS = "Lấy danh sách báo cáo pin thành công";
+    public const string GET_BATTERY_REPORT_DETAIL_SUCCESS = "Lấy chi tiết báo cáo pin thành công";
+    public const string ADD_BATTERY_REPORT_FAIL = "Thêm báo cáo pin thất bại";
+    public const string GET_ALL_BATTERY_REPORT_FAIL = "Lấy danh sách báo cáo pin thất bại";
+    public const string BATTERY_REPORT_LIST_EMPTY = "Lấy danh sách báo cáo pin thất bại";
+    public const string GET_ALL_BATTERY_REPORT_SUCCESS = "Lấy danh sách báo cáo pin thành công";
+    public const string UPDATE_BATTERY_REPORT_FAILED = "Cập nhật báo cáo pin thất bại";
+    public const string GET_BATTERY_REPORT_FAIL = "Lấy báo cáo pin thất bại";
+    public const string GET_BATTERY_REPORT_SUCCESS = "Lấy báo cáo pin thành công";
+    public const string DELETE_BATTERY_REPORT_FAILED = "Xóa báo cáo pin thất bại";
+    public const string BATTERY_REPORT_NOT_COMPLETED = "Báo cáo pin chưa hoàn thành";
+    public const string BATTERY_MISMATCH_WITH_EXCHANGE = "Pin trong báo cáo không khớp với pin trong giao dịch đổi pin";
+}
+
+public static class ExchangeMessages
+{
+    public const string CreateSuccess = "Tạo giao dịch đổi pin thành công.";
+    public const string CreateFailed = "Không thể tạo giao dịch đổi pin.";
+    public const string NotFound = "Không tìm thấy thông tin giao dịch đổi pin.";
+    public const string ListEmpty = "Không có bản ghi giao dịch đổi pin nào.";
+    public const string InvalidStation = "Mã trạm không hợp lệ.";
+    public const string InvalidOrder = "Mã đơn hàng không hợp lệ.";
+    public const string InvalidBattery = "Thông tin pin không hợp lệ.";
+    public const string UpdateSuccess = "Cập nhật giao dịch đổi pin thành công.";
+    public const string UpdateFailed = "Cập nhật giao dịch đổi pin thất bại.";
+    public const string DeleteSuccess = "Xóa giao dịch đổi pin thành công.";
+    public const string DeleteFailed = "Xóa giao dịch đổi pin thất bại.";
+    public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
+    public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
+}
+public static class PayOSMessages
+{
+    public const string InvalidOrderId = "OrderId không hợp lệ.";
+    public const string OrderNotFound = "Không tìm thấy đơn hàng.";
+    public const string PaymentLinkCreated = "Tạo link thanh toán thành công.";
+}
+public static class ExchangeBatteryMessages
+{
+    public const string CreateSuccess = "Tạo giao dịch đổi pin thành công.";
+    public const string CreateFailed = "Không thể tạo giao dịch đổi pin.";
+    public const string NotFound = "Không tìm thấy thông tin giao dịch đổi pin.";
+    public const string ListEmpty = "Không có bản ghi giao dịch đổi pin nào.";
+    public const string InvalidStation = "Mã trạm không hợp lệ.";
+    public const string InvalidOrder = "Mã đơn hàng không hợp lệ.";
+    public const string InvalidBattery = "Thông tin pin không hợp lệ.";
+    public const string UpdateSuccess = "Cập nhật giao dịch đổi pin thành công.";
+    public const string UpdateFailed = "Cập nhật giao dịch đổi pin thất bại.";
+    public const string DeleteSuccess = "Xóa giao dịch đổi pin thành công.";
+    public const string DeleteFailed = "Xóa giao dịch đổi pin thất bại.";
+    public const string PermissionDenied = "Bạn không có quyền thực hiện hành động này.";
+    public const string UnexpectedError = "Đã xảy ra lỗi không mong muốn trong quá trình xử lý giao dịch đổi pin.";
+    public const string EXCHANGE_BATTERY_NOT_FOUND = "Không tìm thấy giao dịch đổi pin";
+    public const string UPDATE_EXCHANGE_STATUS_SUCCESS = "Cập nhật trạng thái giao dịch đổi pin thành công";
+    public const string UPDATE_EXCHANGE_STATUS_FAILED = " Cập nhật trạng thái giao dịch đổi pin thất bại";
+    public const string INVALID_STATUS_UPDATE = "Trạng thái cập nhật không hợp lệ";
+    public const string EXCHANGE_BATTERY_ALREADY_FINALIZED = "Giao dịch đổi pin đã được hoàn tất";
+    public const string INVALID_STATUS_TYPE = "Loại trạng thái không hợp lệ";
+    public const string CreatePackageSuccess = "Thanh toán gói thành công.";
+    public const string CreatePackageFailed = "Thanh toán gói thất bại.";
+    public const string NEW_BATTERY_ID_NOT_MATCHED_WITH_FORM_BATTERY_ID = "ID pin mới không khớp với ID pin trong biểu mẫu.";
+    public const string NEW_BATTERY_NOT_IN_BOOKED_STATUS = "Pin mới không ở trạng thái đã đặt.";
+    public const string NEW_BATTERY_NOT_IN_STATION = "Pin mới không có trong trạm.";
+    public const string EXCHANGE_BATTERY_UPDATE_FAILED = "Cập nhật giao dịch đổi pin thất bại.";
+    public const string FORM_NOT_BELONG_TO_EXCHANGE_BATTERY = "Biểu mẫu không thuộc về giao dịch đổi pin.";
+    public const string SLOT_WITH_NEW_BATTERY_NOT_FOUND = "Không tìm thấy vị trí chứa pin mới trong trạm.";
+    public const string NO_EMPTY_SLOT_FOR_OLD_BATTERY = "Không có vị trí trống trong trạm để đặt pin cũ.";
+}
+public static class ResponseMessageBatteryHistory
+{
+    public const string BATTERY_HISTORY_NOT_FOUND = "Không tìm thấy lịch sử pin";
+    public const string BATTERY_HISTORY_LIST_EMPTY = "Lịch sử pin trống";
+    public const string GET_BATTERY_HISTORY_SUCCESS = "Lấy lịch sử pin thành công";
+    public const string GET_BATTERY_HISTORY_FAIL = "Lấy lịch sử pin thất bại";
+}
+public static class ResponseMessageOrder
+{
+    public const string ORDER_NOT_FOUND = "Không tìm thấy đơn hàng";
+    public const string ORDER_LIST_EMPTY = "Danh sách đơn hàng trống";
+    public const string GET_ORDER_SUCCESS = "Lấy đơn hàng thành công";
+    public const string GET_ORDER_FAIL = "Lấy đơn hàng thất bại";
+    public const string CREATE_ORDER_SUCCESS = "Tạo đơn hàng thành công";
+    public const string CREATE_ORDER_FAIL = "Tạo đơn hàng thất bại";
+    public const string UPDATE_ORDER_SUCCESS = "Cập nhật đơn hàng thành công";
+    public const string UPDATE_ORDER_FAIL = "Cập nhật đơn hàng thất bại";
+    public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
+    public const string ORDER_CREATED_PENDING_PAYMENT = "Đơn hàng đã được tạo và đang chờ thanh toán";
+    public const string ORDER_CREATED_AND_PAID = "Đơn hàng đã được tạo và thanh toán thành công";
+    public const string ORDER_WILL_BE_CREATED_AT_STATION = "Đơn hàng sẽ được tạo tại trạm";
+    public const string INVALID_PAYMENT_METHOD = "Phương thức thanh toán không hợp lệ";
+    public const string ORDER_CREATE_FAILED = "Tạo đơn hàng thất bại";
+    public const string ORDER_ALREADY_PENDING = "Đã có đơn hàng đã ở trạng thái đang chờ xử lý";
+    public const string PAID_IN_CASH_FAILED = "Thanh toán bằng tiền mặt thất bại";
+    public const string PAID_IN_CASH_SUCCESS = "Thanh toán bằng tiền mặt thành công";
+    public const string ORDER_ALREADY_EXISTS_FOR_EXCHANGE_BATTERY = "Đơn hàng đã tồn tại cho giao dịch đổi pin";
+}
+public static class ResponseMessageConstantsDashboard
+{
+    public const string DASHBOARD_LOADED_SUCCESS = "Dashboard loaded successfully";
+}
+

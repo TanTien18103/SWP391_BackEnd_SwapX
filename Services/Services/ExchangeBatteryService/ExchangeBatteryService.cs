@@ -20,6 +20,7 @@ using Services.ApiModels.StationSchedule;
 using Repositories.Repositories.FormRepo;
 using Repositories.Repositories.AccountRepo;
 using Repositories.Repositories.SlotRepo;
+using Services.Services.EmailService;
 
 namespace Services.Services.ExchangeBatteryService;
 
@@ -37,6 +38,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
     private readonly IAccountRepo _accountRepo;
     private readonly BatteryHelper _batteryHelper;
     private readonly ISlotRepo _slotRepo;
+    private readonly IEmailService _emailService;
 
     public ExchangeBatteryService(
         IExchangeBatteryRepo exchangeRepo,
@@ -50,7 +52,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
         IFormRepo formRepo,
         IAccountRepo accountRepo,
         BatteryHelper batteryHelper,
-        ISlotRepo slotRepo
+        ISlotRepo slotRepo,
+        IEmailService emailService
         )
     {
         _exchangeRepo = exchangeRepo;
@@ -65,6 +68,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
         _accountRepo = accountRepo;
         _batteryHelper = batteryHelper;
         _slotRepo = slotRepo;
+        _emailService = emailService;
     }
 
     private ExchangeBatteryResponse MapToResponse(ExchangeBattery entity)
@@ -577,6 +581,24 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     await _batteryHistoryRepo.AddBatteryHistory(newbatteryhistory);
                     await _slotRepo.UpdateSlot(emptySlot);
 
+                    var Completedform = await _formRepo.GetById(formInSchdeule.FormId);
+                    if (Completedform != null)
+                    {
+                        var account = await _accountRepo.GetAccountById(Completedform.AccountId);
+                        if (account != null && !string.IsNullOrEmpty(account.Email))
+                        {
+                            var subject = EmailConstants.EXCHANGE_COMPLETED_SUBJECT;
+                            var body = string.Format(
+                                EmailConstants.EXCHANGE_COMPLETED_BODY,
+                                account.Username,
+                                station.StationName,
+                                TimeHepler.SystemTimeNow.ToString("dd/MM/yyyy HH:mm"),
+                                newBattery.BatteryId
+                            );
+                            await _emailService.SendEmail(account.Email, subject, body);
+                        }
+                    }
+
                     break;
 
                 case ExchangeStatusEnums.Cancelled:
@@ -601,6 +623,25 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     await _batteryRepo.UpdateBattery(newBattery);
                     await _stationScheduleRepo.UpdateStationSchedule(schedule);
                     await _exchangeRepo.Update(exchange);
+
+                    var Cancelform = await _formRepo.GetById(formInSchdeule.FormId);
+                    if (Cancelform != null)
+                    {
+                        var account = await _accountRepo.GetAccountById(Cancelform.AccountId);
+                        if (account != null && !string.IsNullOrEmpty(account.Email))
+                        {
+                            var subject = EmailConstants.EXCHANGE_CANCELLED_SUBJECT;
+                            var body = string.Format(
+                                EmailConstants.EXCHANGE_CANCELLED_BODY,
+                                account.Username,
+                                station.StationName,
+                                TimeHepler.SystemTimeNow.ToString("dd/MM/yyyy HH:mm"),
+                                request.Note ?? "(No additional notes)"
+                            );
+                            await _emailService.SendEmail(account.Email, subject, body);
+                        }
+                    }
+
                     break;
 
                 case ExchangeStatusEnums.Pending:
@@ -621,6 +662,8 @@ public class ExchangeBatteryService : IExchangeBatteryService
                         StatusCode = StatusCodes.Status400BadRequest
                     };
             }
+
+
 
             return new ResultModel
             {

@@ -14,6 +14,8 @@ using Repositories.Repositories.ReportRepo;
 using BusinessObjects.Enums;
 using BusinessObjects.Constants;
 using BusinessObjects.TimeCoreHelper;
+using BusinessObjects.Models;
+using Services.Services.EmailService;
 
 namespace Services.Services.ReportService
 {
@@ -25,7 +27,16 @@ namespace Services.Services.ReportService
         private readonly AccountHelper _accountHelper;
         private readonly IAccountRepo _accountRepo;
         private readonly IStationRepo _stationRepo;
-        public ReportService(IReportRepo reportRepo, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IAccountRepo accountRepo, IStationRepo stationRepo)
+        private readonly IEmailService _emailService;
+        public ReportService(
+            IReportRepo reportRepo,
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor,
+            AccountHelper accountHelper,
+            IAccountRepo accountRepo,
+            IStationRepo stationRepo,
+            IEmailService emailService
+            )
         {
             _reportReport = reportRepo;
             _configuration = configuration;
@@ -33,6 +44,7 @@ namespace Services.Services.ReportService
             _accountHelper = accountHelper;
             _accountRepo = accountRepo;
             _stationRepo = stationRepo;
+            _emailService = emailService;
         }
 
         public async Task<ResultModel> AddReport(AddReportRequest addReportRequest)
@@ -320,6 +332,19 @@ namespace Services.Services.ReportService
                         Data = null
                     };
                 }
+                var station = await _stationRepo.GetStationById(report.StationId);
+                if (station == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null
+                    };
+                }
+
                 if (report.Status == updateReportStatusRequest.Status.ToString())
                 {
                     return new ResultModel
@@ -331,6 +356,20 @@ namespace Services.Services.ReportService
                         Data = null
                     };
                 }
+
+                if (updateReportStatusRequest.Status != ReportStatusEnums.Completed &&
+                    updateReportStatusRequest.Status != ReportStatusEnums.Cancelled)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsReport.REPORT_INVALID_UPDATE_STATUS,
+                        Data = null
+                    };
+                }
+
                 if (report.Status == ReportStatusEnums.Completed.ToString())
                 {
                     return new ResultModel
@@ -342,9 +381,37 @@ namespace Services.Services.ReportService
                         Data = null
                     };
                 }
+
                 report.Status = updateReportStatusRequest.Status.ToString();
                 report.UpdateDate = TimeHepler.SystemTimeNow;
                 await _reportReport.UpdateReport(report);
+
+                var account = await _accountRepo.GetAccountById(report.AccountId);
+                if (!string.IsNullOrEmpty(account.Email))
+                {
+                    // Gửi mail khi cập nhật trạng thái báo cáo
+                    var subject = EmailConstants.REPORT_STATUS_UPDATE_SUBJECT;
+                    var body = string.Format(
+                        EmailConstants.REPORT_STATUS_UPDATE_BODY,
+                        account.Name,
+                        report.Name,
+                        station.StationName,
+                        report.Status,
+                        report.Description
+                    );
+                    await _emailService.SendEmail(account.Email, subject, body);
+                }else
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsReport.ACCOUNT_EMAIL_NOT_FOUND,
+                        Data = null
+                    };
+                }
+
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
