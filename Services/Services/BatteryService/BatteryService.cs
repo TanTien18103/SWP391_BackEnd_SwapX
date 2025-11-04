@@ -640,7 +640,8 @@ namespace Services.Services.BatteryService
                     };
                 }
 
-                if (existingBattery.Status == BatteryStatusEnums.Decommissioned.ToString() || existingBattery.Status == BatteryStatusEnums.InUse.ToString())
+                if (existingBattery.Status == BatteryStatusEnums.Decommissioned.ToString() || 
+                    existingBattery.Status == BatteryStatusEnums.InUse.ToString())
                 {
                     return new ResultModel
                     {
