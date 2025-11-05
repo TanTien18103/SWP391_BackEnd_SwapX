@@ -470,6 +470,7 @@ public static class ResponseMessageConstantsVehicle
     public const string VEHICLE_IN_PACKAGE_CANNOT_UNLINK = "gói của xe đang còn thời hạn bạn không thể xóa xe được";
     public const string LINK_VEHICLE_SUCCESS_BUT_NO_EMAIL = "Liên kết xe thành công nhưng không thể gửi email thông báo do tài khoản người dùng không có email";
     public const string VEHICLE_ALREADY_LINKED ="Xe đã được liên kết với tài khoản này";
+    public const string VEHICLE_NAME_REQUIRED="Tên xe không được để trống";
 }
 //for StationSchedule (0-0-1)
 public static class ResponseMessageConstantsStationSchedule
