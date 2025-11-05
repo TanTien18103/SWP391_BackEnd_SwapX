@@ -467,7 +467,7 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
-                if (vehicle.VehicleName == null)
+                if (linkVehicleRequest.VehicleName == null)
                 {
                     return new ResultModel
                     {
