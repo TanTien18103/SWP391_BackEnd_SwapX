@@ -375,18 +375,6 @@ namespace Services.Services.VehicleService
             try
             {
                 var Vin = await _vehicleRepo.GetVehicleById(linkVehicleRequest.VIN);
-                if (Vin != null)
-                {
-                    return new ResultModel
-                    {
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
-                        Message = ResponseMessageConstantsVehicle.VEHICLE_ALREADY_EXISTS,
-                        Data = null
-                    };
-                }
-
                 // Lấy accountId từ claims của người dùng đang đăng nhập
                 if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
                  || string.IsNullOrEmpty(authHeader)
