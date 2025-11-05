@@ -427,6 +427,17 @@ namespace Services.Services.VehicleService
                 var Vin = await _vehicleRepo.GetVehicleById(linkVehicleRequest.VIN);
                 if (Vin != null)
                 {
+                    if (Vin.Status == VehicleStatusEnums.linked.ToString() && Vin.CustomerId == evDriver.CustomerId)
+                    {
+                        return new ResultModel
+                        {
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                            Message = ResponseMessageConstantsVehicle.VEHICLE_ALREADY_LINKED,
+                            Data = null
+                        };
+                    }
                     // Nếu xe tồn tại nhưng đang unlinked (đã bán trước đó)
                     //Nếu người dùng bị xóa tài khoản thì có thể dùng tài khoản mới để link xe ở bên tài khoản cũ
                     var user_own_old_car = await _accountRepo.GetAccountByCustomerId(Vin.CustomerId);
@@ -447,17 +458,7 @@ namespace Services.Services.VehicleService
                             Data = Vin
                         };
                     }
-                    if(Vin.Status == VehicleStatusEnums.linked.ToString()&& Vin.CustomerId == evDriver.CustomerId)
-                    {
-                        return new ResultModel
-                        {
-                            StatusCode = StatusCodes.Status400BadRequest,
-                            IsSuccess = false,
-                            ResponseCode = ResponseCodeConstants.BAD_REQUEST,
-                            Message = ResponseMessageConstantsVehicle.VEHICLE_ALREADY_LINKED,
-                            Data = null
-                        };
-                    }
+                  
                     // Nếu xe tồn tại và vẫn đang active, nghĩa là người khác đang dùng
                     return new ResultModel
                     {
