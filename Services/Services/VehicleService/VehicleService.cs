@@ -438,11 +438,9 @@ namespace Services.Services.VehicleService
                             Data = null
                         };
                     }
-                    // Nếu xe tồn tại nhưng đang unlinked (đã bán trước đó)
-                    //Nếu người dùng bị xóa tài khoản thì có thể dùng tài khoản mới để link xe ở bên tài khoản cũ
-                    var user_own_old_car = await _accountRepo.GetAccountByCustomerId(Vin.CustomerId);
-                    if ((Vin.Status == VehicleStatusEnums.Unlinked.ToString() && Vin.VehicleName == linkVehicleRequest.VehicleName.ToString()) ||
-                        (user_own_old_car.Status == AccountStatusEnums.Inactive.ToString() && Vin.VehicleName == linkVehicleRequest.VehicleName.ToString()))
+                    var user_of_vehicle = await _accountRepo.GetAccountByCustomerId(Vin.CustomerId);
+                    if (Vin.Status == VehicleStatusEnums.Unlinked.ToString()||
+                        user_of_vehicle.Status == AccountStatusEnums.Inactive.ToString())
                     {
                         Vin.Status = VehicleStatusEnums.linked.ToString();
                         Vin.CustomerId = evDriver.CustomerId;
@@ -466,6 +464,17 @@ namespace Services.Services.VehicleService
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.BAD_REQUEST,
                         Message = ResponseMessageConstantsVehicle.VEHICLE_ALREADY_EXISTS,
+                        Data = null
+                    };
+                }
+                if (vehicle.VehicleName == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NAME_REQUIRED,
                         Data = null
                     };
                 }
