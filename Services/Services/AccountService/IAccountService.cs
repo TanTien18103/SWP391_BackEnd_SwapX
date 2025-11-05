@@ -10,6 +10,7 @@ namespace Services.Services.AccountService
 {
     public interface IAccountService
     {
+        Task<string> RegisterGoogleUser(string name, string email, string avatar);
         Task<(string accessToken, string refreshToken)> Login(string username, string password);
         Task<ResultModel> Logout();
         Task<ResultModel> ForgotPassword(string email);

@@ -1329,6 +1329,40 @@ namespace Services.Services.AccountService
                 };
             }
         }
+
+        public async Task<string> RegisterGoogleUser(string name, string email, string avatar)
+        {
+            var existingUser = await _accountRepository.GetAccountByEmail(email);
+            if (existingUser == null)
+            {
+                var newUser = new Account
+                {
+                    AccountId = _accountHelper.GenerateShortGuid(),
+                    Username = name,
+                    Email = email,
+                    Role = RoleEnums.EvDriver.ToString(),
+                    Status = AccountStatusEnums.Active.ToString(),
+                    Name = name,
+                    Avatar = avatar,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
+                };
+
+                await _accountRepository.AddAccount(newUser);
+                existingUser = newUser;
+
+                var evdriver = new Evdriver
+                {
+                    CustomerId = _accountHelper.GenerateShortGuid(),
+                    AccountId = newUser.AccountId,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow,
+                    Status = AccountStatusEnums.Active.ToString()
+                };
+                await _evDriverRepository.AddDriver(evdriver);
+            }
+            return _accountHelper.CreateToken(existingUser);
+        }
     }
 }
 

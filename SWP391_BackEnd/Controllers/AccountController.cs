@@ -1,4 +1,6 @@
 ﻿using BusinessObjects.Constants;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +33,47 @@ namespace Services.Controllers
             {
                 return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
             }
+        }
+
+        [HttpGet("google-response")]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            if (!result.Succeeded || result.Principal == null)
+            {
+                return BadRequest("Google authentication failed.");
+            }
+
+            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            if (claims == null)
+            {
+                return BadRequest("No claims found.");
+            }
+
+            string email = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+            string name = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
+
+            string avatar = claims.FirstOrDefault(c => c.Type == "picture")?.Value
+             ?? claims.FirstOrDefault(c => c.Type == "urn:google:picture")?.Value
+             ?? claims.FirstOrDefault(c => c.Type == "urn:google:avatar")?.Value;
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(name))
+            {
+                return BadRequest("Email or name not found in claims.");
+            }
+
+            var accessToken = await _accountService.RegisterGoogleUser(name, email, avatar);
+
+            return Ok(new { accessToken });
+        }
+
+        [HttpGet("login-google")]
+        public IActionResult LoginWithGoogle()
+        {
+            var redirectUrl = Url.Action(nameof(GoogleResponse), "Account", null, Request.Scheme);
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
         [HttpPost("logout")]

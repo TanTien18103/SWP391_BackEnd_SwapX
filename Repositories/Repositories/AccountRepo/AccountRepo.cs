@@ -131,5 +131,13 @@ namespace Repositories.Repositories.AccountRepo
             return null;
 
         }
+
+        public async Task<Account> GetAccountByEmail(string email)
+        {
+            return await _context.Accounts
+                 .Include(a => a.BssStaffs)
+                 .Include(a => a.Evdrivers)
+                 .FirstOrDefaultAsync(a => a.Email == email);
+        }
     }
 }

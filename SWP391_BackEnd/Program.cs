@@ -46,6 +46,10 @@ using Services.Payments;
 using Services.Services.BatteryHistoryService;
 using Services.Services.GeminiService;
 using Repositories.Repositories.SlotRepo;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 //*************** I KNEW YOU WERE HERE ***************//
 
@@ -209,7 +213,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = "Cookies";
 })
 .AddJwtBearer(options =>
 {
@@ -241,13 +246,18 @@ builder.Services.AddAuthentication(options =>
             return context.Response.WriteAsync(result);
         }
     };
-})
-.AddCookie("Cookies")
+}).AddCookie("Cookies")
 .AddGoogle(googleOptions =>
 {
     googleOptions.ClientId = builder.Configuration["Google:ClientId"];
     googleOptions.ClientSecret = builder.Configuration["Google:ClientSecret"];
     googleOptions.CallbackPath = "/signin-google";
+
+    // Map picture -> claim "picture" hoặc urn
+    googleOptions.ClaimActions.MapJsonKey("picture", "picture");
+    // Bạn có thể map thêm name / email nếu cần:
+    googleOptions.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+    googleOptions.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
 });
 
 var app = builder.Build();

@@ -22,6 +22,6 @@ namespace Repositories.Repositories.AccountRepo
         Task<List<Account>> GetAllCustomerHasPackage();
         Task<List<object>> GetCustomersStatus();
         Task<Account>GetAccountByCustomerId(string customerId);
-
+        Task<Account> GetAccountByEmail(string email);
     }
 }
