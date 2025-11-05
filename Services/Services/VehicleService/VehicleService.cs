@@ -374,7 +374,7 @@ namespace Services.Services.VehicleService
         {
             try
             {
-                var Vin = await _vehicleRepo.GetVehicleById(linkVehicleRequest.VIN);
+               
                 // Lấy accountId từ claims của người dùng đang đăng nhập
                 if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
                  || string.IsNullOrEmpty(authHeader)
@@ -424,7 +424,7 @@ namespace Services.Services.VehicleService
                     StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
                 };
-               
+                var Vin = await _vehicleRepo.GetVehicleById(linkVehicleRequest.VIN);
                 if (Vin != null)
                 {
                     // Nếu xe tồn tại nhưng đang unlinked (đã bán trước đó)
