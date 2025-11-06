@@ -100,8 +100,11 @@ namespace BusinessObjects.Constants
         public const string LOGOUT_SUCCESS = "Đăng xuất thành công.";
         public const string EMAIL_IN_USE = "Email đã được sử dụng bởi người dùng khác.";
         public const string DUPLICATED_EMAIL = "Email này đang được sử dụng bởi nhiều tài khoản Active.";
-        public const string ACCOUNT_INACTIVE = "Tài khoản của bạn hiện không hoạt động.";
+        public const string ACCOUNT_INACTIVE_OR_NOT_VERIFIED = " Tài khoản của bạn hiện không hoạt động hoặc chưa được xác thực.";
         public const string REGISTER_FAILED = "Đăng ký tài khoản thất bại. Vui lòng thử lại sau.";
+        public const string REGISTER_VERIFY_OTP_FAILED = "Xác thực OTP thất bại. Vui lòng kiểm tra lại mã OTP hoặc yêu cầu mã mới.";
+        public const string ACCOUNT_ALREADY_VERIFIED = " Tài khoản đã được xác thực.";
+        public const string RESEND_OTP_FAILED = " Gửi lại mã OTP thất bại. Vui lòng thử lại sau.";
     }
 
     //Auth-Account Controllers
@@ -119,6 +122,8 @@ namespace BusinessObjects.Constants
         public const string ADD_ROLE_SUCCESS = "Thêm role thành công!";
         public const string UPDATE_ROLE_SUCCESS = "Cập nhật role thành công!";
         public const string DELETE_ROLE_SUCCESS = "Xóa role thành công!";
+        public const string REGISTER_VERIFY_OTP_SUCCESS = "Xác thực OTP thành công! Tài khoản của bạn đã được kích hoạt.";
+        public const string RESEND_OTP_SUCCESS = "OTP đã được gửi lại thành công";
     }
 
     //For User (0-1-0)  
@@ -147,6 +152,7 @@ namespace BusinessObjects.Constants
         public const string CANNOT_CHANGE_ADMIN_STATUS = "Không thể thay đổi trạng thái của quản trị viên";
         public const string EVDRIVER_NOT_FOUND = "Không tìm thấy tài xế";
         public const string USER_EMAIL_NOT_FOUND = "Không tìm thấy email của người dùng";
+        public const string REGISTER_SUCCESS_NEED_VERIFY = "OTP đã được gửi đến email của bạn. Vui lòng xác thực để kích hoạt tài khoản.";
     }
     public class ResponseMessageImage
     {
@@ -331,7 +337,6 @@ namespace BusinessObjects.Constants
             <br/>
             <p><i>This is an automated notification. Please do not reply.</i></p>";
 
-        // 📢 Report - Notification templates
         public const string REPORT_STATUS_UPDATE_SUBJECT = "🛠 Report Status Updated";
 
         public const string REPORT_STATUS_UPDATE_BODY = @"
@@ -343,7 +348,6 @@ namespace BusinessObjects.Constants
             <br/>
             <p><i>This is an automated message. Please do not reply.</i></p>";
 
-        // 📤 Vehicle Unlinked Notification
         public const string VEHICLE_UNLINK_SUCCESS_SUBJECT = "🚗 Vehicle Unlinked Successfully";
 
         public const string VEHICLE_UNLINK_SUCCESS_BODY = @"
@@ -354,7 +358,15 @@ namespace BusinessObjects.Constants
             <br/>
             <p><i>This is an automated notification. Please do not reply.</i></p>";
 
+        public const string REGISTER_OTP_SUBJECT = "Verify your SwapX account";
 
+        public const string REGISTER_OTP_BODY = @"
+            <p>Hello {0},</p>
+            <p>Thank you for registering with <b>SwapX</b>!</p>
+            <p>Your verification code (OTP) is: <b>{1}</b></p>
+            <p>This code will expire in <b>30 minutes</b>. Please enter it in the app to activate your account.</p>
+            <br/>
+            <p><i>This is an automated message, please do not reply.</i></p>";
     }
 }
 public static class HistoryActionConstants
@@ -469,8 +481,8 @@ public static class ResponseMessageConstantsVehicle
     public const string VEHICLE_NOT_BELONG_TO_ACCOUNT = "Xe không thuộc sở hữu của tài khoản";
     public const string VEHICLE_IN_PACKAGE_CANNOT_UNLINK = "gói của xe đang còn thời hạn bạn không thể xóa xe được";
     public const string LINK_VEHICLE_SUCCESS_BUT_NO_EMAIL = "Liên kết xe thành công nhưng không thể gửi email thông báo do tài khoản người dùng không có email";
-    public const string VEHICLE_ALREADY_LINKED ="Xe đã được liên kết với tài khoản này";
-    public const string VEHICLE_NAME_REQUIRED="Tên xe không được để trống";
+    public const string VEHICLE_ALREADY_LINKED = "Xe đã được liên kết với tài khoản này";
+    public const string VEHICLE_NAME_REQUIRED = "Tên xe không được để trống";
 }
 //for StationSchedule (0-0-1)
 public static class ResponseMessageConstantsStationSchedule
