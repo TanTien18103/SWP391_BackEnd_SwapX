@@ -41,7 +41,7 @@ public class StationController : ControllerBase
     }
 
     [HttpGet("get_station_by_id_for_admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Bsstaff")]
     public async Task<IActionResult> GetStationByIdForAdmin([FromQuery] string? stationId)
     {
         var res = await _stationService.GetStationById(stationId);
