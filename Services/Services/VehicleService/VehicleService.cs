@@ -185,56 +185,6 @@ namespace Services.Services.VehicleService
                 };
             }
         }
-
-        public async Task<ResultModel> UpdateVehicle(UpdateVehicleRequest updateVehicleRequest)
-        {
-            try
-            {
-
-                var existingVehicle = await _vehicleRepo.GetVehicleById(updateVehicleRequest.Vin);
-                if (existingVehicle == null)
-                {
-                    return new ResultModel
-                    {
-                        StatusCode = StatusCodes.Status404NotFound,
-                        IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
-                        Data = null
-                    };
-                }
-
-                if (updateVehicleRequest.VehicleType != null)
-                {
-                    existingVehicle.VehicleType = updateVehicleRequest.VehicleType.ToString();
-                }
-                if (updateVehicleRequest.VehicleName != null)
-                {
-                    existingVehicle.VehicleName = updateVehicleRequest.VehicleName.ToString();
-                }
-                existingVehicle.UpdateDate = TimeHepler.SystemTimeNow;
-                await _vehicleRepo.UpdateVehicle(existingVehicle);
-                return new ResultModel
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    IsSuccess = true,
-                    ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsVehicle.UPDATE_VEHICLE_SUCCESS,
-                    Data = existingVehicle
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ResultModel
-                {
-                    IsSuccess = false,
-                    ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageConstantsVehicle.UPDATE_VEHICLE_FAILED,
-                    Data = ex.Message,
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
-            }
-        }
         public async Task<ResultModel> DeleteVehicle(string vehicleId)
         {
             try

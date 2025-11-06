@@ -34,13 +34,6 @@ namespace SWP391_BackEnd.Controllers
             var res = await _vehicleService.DeleteVehicle(vehicleId);
             return StatusCode(res.StatusCode, res);
         }
-        [HttpPut("update_vehicle")]
-        [Authorize(Roles = "EvDriver, Admin")]
-        public async Task<IActionResult> UpdateVehicle([FromForm] Services.ApiModels.Vehicle.UpdateVehicleRequest updateVehicleRequest)
-        {
-            var res = await _vehicleService.UpdateVehicle(updateVehicleRequest);
-            return StatusCode(res.StatusCode, res);
-        }
         [HttpGet("get_all_vehicles")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllVehicles()
