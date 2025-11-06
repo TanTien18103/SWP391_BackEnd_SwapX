@@ -158,6 +158,19 @@ namespace Services.Controllers
             }
         }
 
+        [HttpGet("register-verify-otp")]
+        public async Task<IActionResult> RegisterVerifyOtp([FromQuery] string email, [FromQuery] string otp)
+        {
+            var res = await _accountService.RegisterVerifyOtp(email, otp);
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpGet("resend-register-otp")]
+        public async Task<IActionResult> ResendRegisterOtp([FromQuery] string email)
+        {
+            var res = await _accountService.ResendRegisterOtp(email);
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpGet("get_all_account_for_admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllAccount()

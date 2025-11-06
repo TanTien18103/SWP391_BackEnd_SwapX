@@ -10,5 +10,6 @@ namespace BusinessObjects.Enums
     {
         Inactive,
         Active,
+        NotVerified,
     }
 }
