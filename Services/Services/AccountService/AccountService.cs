@@ -23,7 +23,14 @@ namespace Services.Services.AccountService
         private readonly IEmailService _emailService;
         private readonly AccountHelper _accountHelper;
 
-        public AccountService(IAccountRepo accountRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IEvDriverRepo evDriverRepo, AccountHelper accountHelper, IEmailService emailService)
+        public AccountService(
+            IAccountRepo accountRepository,
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor,
+            IEvDriverRepo evDriverRepo,
+            AccountHelper accountHelper,
+            IEmailService emailService
+            )
         {
             _accountRepository = accountRepository;
             _configuration = configuration;
@@ -56,7 +63,7 @@ namespace Services.Services.AccountService
             if (user == null)
             {
                 throw new AppException(ResponseCodeConstants.BAD_REQUEST,
-                    ResponseMessageIdentity.ACCOUNT_INACTIVE,
+                    ResponseMessageIdentity.ACCOUNT_INACTIVE_OR_NOT_VERIFIED,
                     StatusCodes.Status400BadRequest);
             }
 
@@ -99,6 +106,10 @@ namespace Services.Services.AccountService
             }
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
 
+            var random = new Random();
+            string otp = random.Next(100000, 999999).ToString();
+            DateTime otpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(30);
+
             var newUser = new Account
             {
                 AccountId = _accountHelper.GenerateShortGuid(),
@@ -109,10 +120,12 @@ namespace Services.Services.AccountService
                 Address = registerRequest.Address,
                 Email = registerRequest.Email,
                 Role = RoleEnums.EvDriver.ToString(),
-                Status = AccountStatusEnums.Active.ToString(),
+                Status = AccountStatusEnums.NotVerified.ToString(),
                 StartDate = TimeHepler.SystemTimeNow,
                 UpdateDate = TimeHepler.SystemTimeNow,
                 Avatar = registerRequest.Avatar,
+                OtpCode = otp,
+                OtpExpiredTime = otpExpiredTime
             };
 
             var driver = new Evdriver
@@ -130,32 +143,233 @@ namespace Services.Services.AccountService
 
             if (!string.IsNullOrEmpty(newUser.Email))
             {
-                var subject = EmailConstants.REGISTER_SUCCESS_SUBJECT;
+                var subject = EmailConstants.REGISTER_OTP_SUBJECT;
                 var body = string.Format(
-                    EmailConstants.REGISTER_SUCCESS_BODY,
+                    EmailConstants.REGISTER_OTP_BODY,
                     newUser.Name,
-                    newUser.Email
+                    otp
                 );
 
                 await _emailService.SendEmail(newUser.Email, subject, body);
             }
-            else
+
+            return ResponseMessageConstantsUser.REGISTER_SUCCESS_NEED_VERIFY;
+        }
+        public async Task<ResultModel> RegisterVerifyOtp(string email, string otp)
+        {
+            try
             {
-                throw new AppException(ResponseCodeConstants.BAD_REQUEST,
-                    ResponseMessageIdentity.EMAIL_REQUIRED,
-                    StatusCodes.Status400BadRequest);
+                var accounts = await _accountRepository.GetAccountsByEmail(email);
+
+                if (accounts == null || !accounts.Any())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageIdentity.INCORRECT_EMAIL,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                var activeUser = accounts.FirstOrDefault(a => a.Status == AccountStatusEnums.Active.ToString());
+                if (activeUser != null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.EMAIL_IN_USE,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                var user = accounts.FirstOrDefault(a =>
+                a.Status == AccountStatusEnums.NotVerified.ToString() &&
+                a.OtpCode != null &&
+                a.OtpExpiredTime != null);
+
+                if (user == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageIdentity.INCORRECT_EMAIL,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                if (user.OtpExpiredTime < TimeHepler.SystemTimeNow)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.OTP_EXPIRED,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                if (user.OtpCode != otp)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.OTP_INVALID,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                user.Status = AccountStatusEnums.Active.ToString();
+                user.OtpExpiredTime = null;
+                user.OtpCode = null;
+                user.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedUser = await _accountRepository.UpdateAccount(user);
+                var token = string.Empty;
+
+                if (updatedUser != null)
+                {
+                    if (!string.IsNullOrEmpty(user.Email))
+                    {
+                        var subject = EmailConstants.REGISTER_SUCCESS_SUBJECT;
+                        var body = string.Format(
+                            EmailConstants.REGISTER_SUCCESS_BODY,
+                            user.Name,
+                            user.Email
+                        );
+
+                        await _emailService.SendEmail(user.Email, subject, body);
+                    }
+
+                    token = _accountHelper.CreateToken(user);
+                }
+                else
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageIdentity.REGISTER_VERIFY_OTP_FAILED,
+                        StatusCode = StatusCodes.Status500InternalServerError
+                    };
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageIdentitySuccess.REGISTER_VERIFY_OTP_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = new
+                    {
+                        AccessToken = token
+                    }
+                };
             }
-
-            string accessToken = _accountHelper.CreateToken(newUser);
-            string refreshToken = _accountHelper.GenerateRefreshToken();
-
-            if (_httpContextAccessor.HttpContext?.Session != null)
+            catch (Exception ex)
             {
-                _httpContextAccessor.HttpContext.Session.SetString("RefreshToken", refreshToken);
-                _httpContextAccessor.HttpContext.Session.SetString("UserName", registerRequest.Username);
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
             }
+        }
+        public async Task<ResultModel> ResendRegisterOtp(string email)
+        {
+            try
+            {
+                var accounts = await _accountRepository.GetAccountsByEmail(email);
 
-            return accessToken;
+                if (accounts == null || !accounts.Any())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageIdentity.INCORRECT_EMAIL,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                var activeUser = accounts.FirstOrDefault(a => a.Status == AccountStatusEnums.Active.ToString());
+                if (activeUser != null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.EMAIL_IN_USE,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                var user = accounts.FirstOrDefault(a =>
+                a.Status == AccountStatusEnums.NotVerified.ToString() &&
+                a.OtpCode != null &&
+                a.OtpExpiredTime != null);
+
+                if (user == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.ACCOUNT_ALREADY_VERIFIED,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                var random = new Random();
+                string otp = random.Next(100000, 999999).ToString();
+                DateTime otpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(30);
+
+                user.OtpCode = otp;
+                user.OtpExpiredTime = otpExpiredTime;
+                user.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedUser = await _accountRepository.UpdateAccount(user);
+                if (updatedUser != null)
+                {
+                    var subject = EmailConstants.REGISTER_OTP_SUBJECT;
+                    var body = string.Format(
+                        EmailConstants.REGISTER_OTP_BODY,
+                        user.Name,
+                        otp
+                    );
+
+                    await _emailService.SendEmail(user.Email, subject, body);
+                }
+                else
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageIdentity.RESEND_OTP_FAILED,
+                        StatusCode = StatusCodes.Status500InternalServerError
+                    };
+                }
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageIdentitySuccess.RESEND_OTP_SUCCESS,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
         }
 
         public async Task<ResultModel> CreateStaff(RegisterRequest registerRequest)

@@ -17,6 +17,8 @@ namespace Services.Services.AccountService
         Task<ResultModel> ForgotPasswordVerifyOtp(string email, string otp);
         Task<ResultModel> ChangePassword(ChangePasswordRequest request);
         Task<string> Register(RegisterRequest registerRequest);
+        Task<ResultModel> RegisterVerifyOtp(string email, string otp);
+        Task<ResultModel> ResendRegisterOtp(string email);
         Task<ResultModel> CreateAdmin(RegisterRequest registerRequest);
         Task<ResultModel> CreateStaff(RegisterRequest registerRequest);
         Task<ResultModel> UpdateStaff(UpdateStaffRequest updateStaffRequest);
