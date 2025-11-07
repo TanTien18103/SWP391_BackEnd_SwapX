@@ -100,11 +100,12 @@ namespace BusinessObjects.Constants
         public const string LOGOUT_SUCCESS = "Đăng xuất thành công.";
         public const string EMAIL_IN_USE = "Email đã được sử dụng bởi người dùng khác.";
         public const string DUPLICATED_EMAIL = "Email này đang được sử dụng bởi nhiều tài khoản Active.";
-        public const string ACCOUNT_INACTIVE_OR_NOT_VERIFIED = " Tài khoản của bạn hiện không hoạt động hoặc chưa được xác thực.";
+        public const string ACCOUNT_INACTIVE_OR_NOT_VERIFIED = "Tài khoản của bạn hiện không hoạt động hoặc chưa được xác thực.";
         public const string REGISTER_FAILED = "Đăng ký tài khoản thất bại. Vui lòng thử lại sau.";
         public const string REGISTER_VERIFY_OTP_FAILED = "Xác thực OTP thất bại. Vui lòng kiểm tra lại mã OTP hoặc yêu cầu mã mới.";
-        public const string ACCOUNT_ALREADY_VERIFIED = " Tài khoản đã được xác thực.";
-        public const string RESEND_OTP_FAILED = " Gửi lại mã OTP thất bại. Vui lòng thử lại sau.";
+        public const string ACCOUNT_ALREADY_VERIFIED = "Tài khoản đã được xác thực.";
+        public const string RESEND_OTP_FAILED = "Gửi lại mã OTP thất bại. Vui lòng thử lại sau.";
+        public const string EMAIL_OTP_REQUIRED = "Vui lòng nhập mã OTP được gửi đến email của bạn để xác thực.";
     }
 
     //Auth-Account Controllers

@@ -106,8 +106,7 @@ namespace Services.Services.AccountService
             }
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
 
-            var random = new Random();
-            string otp = random.Next(100000, 999999).ToString();
+            string otp = _accountHelper.GenerateSecureOtp();
             DateTime otpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(30);
 
             var newUser = new Account
@@ -159,6 +158,17 @@ namespace Services.Services.AccountService
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(otp))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.EMAIL_OTP_REQUIRED,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
                 var accounts = await _accountRepository.GetAccountsByEmail(email);
 
                 if (accounts == null || !accounts.Any())
@@ -211,7 +221,7 @@ namespace Services.Services.AccountService
                     };
                 }
 
-                if (user.OtpCode != otp)
+                if (!_accountHelper.SecureStringCompare(user.OtpCode, otp))
                 {
                     return new ResultModel
                     {
@@ -282,6 +292,16 @@ namespace Services.Services.AccountService
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageIdentity.EMAIL_REQUIRED,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
                 var accounts = await _accountRepository.GetAccountsByEmail(email);
 
                 if (accounts == null || !accounts.Any())
@@ -314,17 +334,22 @@ namespace Services.Services.AccountService
 
                 if (user == null)
                 {
+                    var notVerifiedUser = accounts.FirstOrDefault(a => a.Status == AccountStatusEnums.NotVerified.ToString());
+
+                    var message = notVerifiedUser != null
+                                            ? ResponseMessageIdentity.REGISTER_VERIFY_OTP_FAILED
+                                            : ResponseMessageIdentity.ACCOUNT_ALREADY_VERIFIED;
+
                     return new ResultModel
                     {
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.BAD_REQUEST,
-                        Message = ResponseMessageIdentity.ACCOUNT_ALREADY_VERIFIED,
+                        Message = message,
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
 
-                var random = new Random();
-                string otp = random.Next(100000, 999999).ToString();
+                string otp = _accountHelper.GenerateSecureOtp();
                 DateTime otpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(30);
 
                 user.OtpCode = otp;
@@ -828,11 +853,11 @@ namespace Services.Services.AccountService
                     return res;
                 }
 
-                var random = new Random();
-                string otp = random.Next(100000, 999999).ToString();
+                string otp = _accountHelper.GenerateSecureOtp();
+                DateTime otpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(30);
 
                 activeUser.OtpCode = otp;
-                activeUser.OtpExpiredTime = TimeHepler.SystemTimeNow.AddMinutes(5);
+                activeUser.OtpExpiredTime = otpExpiredTime;
                 activeUser.UpdateDate = TimeHepler.SystemTimeNow;
                 await _accountRepository.UpdateAccount(activeUser);
 
@@ -862,6 +887,14 @@ namespace Services.Services.AccountService
             var res = new ResultModel();
             try
             {
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(otp))
+                {
+                    res.IsSuccess = false;
+                    res.ResponseCode = ResponseCodeConstants.BAD_REQUEST;
+                    res.Message = ResponseMessageIdentity.EMAIL_OTP_REQUIRED;
+                    res.StatusCode = StatusCodes.Status400BadRequest;
+                    return res;
+                }
                 var accounts = await _accountRepository.GetAccountsByEmail(email);
 
                 if (accounts == null || !accounts.Any())
@@ -904,7 +937,7 @@ namespace Services.Services.AccountService
                     return res;
                 }
 
-                if (user.OtpCode != otp)
+                if (!_accountHelper.SecureStringCompare(user.OtpCode, otp))
                 {
                     res.IsSuccess = false;
                     res.ResponseCode = ResponseCodeConstants.BAD_REQUEST;

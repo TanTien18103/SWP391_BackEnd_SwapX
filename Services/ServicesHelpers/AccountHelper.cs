@@ -68,5 +68,27 @@ namespace Services.ServicesHelpers
             string orderCodeString = datePart + randomNumber.ToString();
             return long.Parse(orderCodeString);
         }
+
+        public string GenerateSecureOtp()
+        {
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            var bytes = new byte[4];
+            rng.GetBytes(bytes);
+            var randomNumber = BitConverter.ToUInt32(bytes, 0);
+            return (randomNumber % 900000 + 100000).ToString();
+        }
+
+        public bool SecureStringCompare(string a, string b)
+        {
+            if (a == null || b == null || a.Length != b.Length)
+                return false;
+
+            int result = 0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                result |= a[i] ^ b[i];
+            }
+            return result == 0;
+        }
     }
 }
