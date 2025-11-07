@@ -159,9 +159,9 @@ namespace Services.Controllers
         }
 
         [HttpGet("register-verify-otp")]
-        public async Task<IActionResult> RegisterVerifyOtp([FromQuery] string email, [FromQuery] string otp)
+        public async Task<IActionResult> RegisterVerifyOtp([FromForm] VerifyOtpRequest verifyOtpRequest)
         {
-            var res = await _accountService.RegisterVerifyOtp(email, otp);
+            var res = await _accountService.RegisterVerifyOtp(verifyOtpRequest.Email, verifyOtpRequest.Otp);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("resend-register-otp")]
