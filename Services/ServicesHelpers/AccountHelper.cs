@@ -90,5 +90,15 @@ namespace Services.ServicesHelpers
             }
             return result == 0;
         }
+        public string BuildRedirectUrl(string baseUrl, string? error = null, string? token = null)
+        {
+            if (!string.IsNullOrEmpty(error))
+                return $"{baseUrl}?error={Uri.EscapeDataString(error)}";
+
+            if (!string.IsNullOrEmpty(token))
+                return $"{baseUrl}?token={Uri.EscapeDataString(token)}";
+
+            return baseUrl;
+        }
     }
 }

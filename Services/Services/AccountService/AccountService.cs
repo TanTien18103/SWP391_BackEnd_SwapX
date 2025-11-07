@@ -1616,48 +1616,44 @@ namespace Services.Services.AccountService
 
         public async Task<string> HandleGoogleResponse(HttpContext httpContext)
         {
-            var result = await httpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-            var feBaseUrl = _configuration["Frontend:SignInUrl"];
+            var feBaseUrl = _configuration[GoogleAuthConstants.FRONTEND_SIGNIN_URL]
+                            ?? "https://localhost:5173/signin";
 
+            var result = await httpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
             if (!result.Succeeded || result.Principal == null)
             {
-                return $"{feBaseUrl}?error=google_auth_failed";
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, GoogleAuthConstants.ERROR_GOOGLE_AUTH_FAILED);
             }
 
             var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
             if (claims == null)
             {
-                return $"{feBaseUrl}?error=no_claims_found";
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, GoogleAuthConstants.ERROR_NO_CLAIMS_FOUND);
             }
 
-            string email = claims.FirstOrDefault(c =>
-                c.Type == ClaimTypes.Email ||
-                c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+            string GetClaimValue(params string[] types) =>
+                claims.FirstOrDefault(c => types.Contains(c.Type))?.Value;
 
-            string name = claims.FirstOrDefault(c =>
-                c.Type == ClaimTypes.Name ||
-                c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
+            var email = GetClaimValue(GoogleAuthConstants.EMAIL_CLAIMS);
+            var name = GetClaimValue(GoogleAuthConstants.NAME_CLAIMS);
+            var avatar = GetClaimValue(GoogleAuthConstants.AVATAR_CLAIMS);
 
-            string avatar = claims.FirstOrDefault(c => c.Type == "picture")?.Value
-                ?? claims.FirstOrDefault(c => c.Type == "urn:google:picture")?.Value
-                ?? claims.FirstOrDefault(c => c.Type == "urn:google:avatar")?.Value;
-
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrWhiteSpace(email))
             {
-                return $"{feBaseUrl}?error=email_not_found";
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, GoogleAuthConstants.ERROR_EMAIL_NOT_FOUND);
             }
 
             try
             {
                 var accessToken = await RegisterGoogleUser(name, email, avatar);
-                return $"{feBaseUrl}?token={accessToken}";
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, null, accessToken);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[GoogleResponse] Error: {ex.Message}");
-                return $"{feBaseUrl}?error=internal_error";
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, GoogleAuthConstants.ERROR_INTERNAL);
             }
         }
+
     }
 }
 
