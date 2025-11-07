@@ -1,4 +1,5 @@
-﻿using Services.ApiModels;
+﻿using Microsoft.AspNetCore.Http;
+using Services.ApiModels;
 using Services.ApiModels.Account;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Services.Services.AccountService
     public interface IAccountService
     {
         Task<string> RegisterGoogleUser(string name, string email, string avatar);
+        Task<string> HandleGoogleResponse(HttpContext httpContext);
         Task<(string accessToken, string refreshToken)> Login(string username, string password);
         Task<ResultModel> Logout();
         Task<ResultModel> ForgotPassword(string email);

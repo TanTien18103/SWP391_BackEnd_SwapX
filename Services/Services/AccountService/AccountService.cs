@@ -3,6 +3,8 @@ using BusinessObjects.Enums;
 using BusinessObjects.Exceptions;
 using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.AccountRepo;
@@ -11,6 +13,7 @@ using Services.ApiModels;
 using Services.ApiModels.Account;
 using Services.Services.EmailService;
 using Services.ServicesHelpers;
+using System.Security.Claims;
 
 namespace Services.Services.AccountService
 {
@@ -1609,6 +1612,51 @@ namespace Services.Services.AccountService
                 await _evDriverRepository.AddDriver(evdriver);
             }
             return _accountHelper.CreateToken(existingUser);
+        }
+
+        public async Task<string> HandleGoogleResponse(HttpContext httpContext)
+        {
+            var result = await httpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+            var feBaseUrl = _configuration["Frontend:SignInUrl"];
+
+            if (!result.Succeeded || result.Principal == null)
+            {
+                return $"{feBaseUrl}?error=google_auth_failed";
+            }
+
+            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            if (claims == null)
+            {
+                return $"{feBaseUrl}?error=no_claims_found";
+            }
+
+            string email = claims.FirstOrDefault(c =>
+                c.Type == ClaimTypes.Email ||
+                c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+
+            string name = claims.FirstOrDefault(c =>
+                c.Type == ClaimTypes.Name ||
+                c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
+
+            string avatar = claims.FirstOrDefault(c => c.Type == "picture")?.Value
+                ?? claims.FirstOrDefault(c => c.Type == "urn:google:picture")?.Value
+                ?? claims.FirstOrDefault(c => c.Type == "urn:google:avatar")?.Value;
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return $"{feBaseUrl}?error=email_not_found";
+            }
+
+            try
+            {
+                var accessToken = await RegisterGoogleUser(name, email, avatar);
+                return $"{feBaseUrl}?token={accessToken}";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GoogleResponse] Error: {ex.Message}");
+                return $"{feBaseUrl}?error=internal_error";
+            }
         }
     }
 }
