@@ -38,29 +38,10 @@ namespace Services.Controllers
         [HttpGet("google-response")]
         public async Task<IActionResult> GoogleResponse()
         {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-
-            if (!result.Succeeded || result.Principal == null)
-            {
-                return Redirect("https://localhost:5173/signin?error=google_auth_failed");
-            }
-
-            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-
-            string email = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-            string name = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
-            string avatar = claims.FirstOrDefault(c => c.Type == "picture")?.Value
-                ?? claims.FirstOrDefault(c => c.Type == "urn:google:picture")?.Value
-                ?? claims.FirstOrDefault(c => c.Type == "urn:google:avatar")?.Value;
-
-            var accessToken = await _accountService.RegisterGoogleUser(name, email, avatar);
-
-            const string feBaseUrl = "https://localhost:5173/signin"; 
-
-            var redirectUrl = $"{feBaseUrl}?token={accessToken}";
-
+            var redirectUrl = await _accountService.HandleGoogleResponse(HttpContext);
             return Redirect(redirectUrl);
         }
+
         [HttpGet("login-google")]
         public IActionResult LoginWithGoogle()
         {
