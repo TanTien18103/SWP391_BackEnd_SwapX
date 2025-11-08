@@ -98,13 +98,13 @@ public class DashboardService : IDashboardService
                     .Where(x => x.Exchange.StationId == stationId)
                     .ToList();
             }
-
+            
             completedOrders = completedOrders
                 .Where(x => x.Order.StartDate >= startDate && x.Order.StartDate <= endDate)
                 .ToList();
 
-            var totalRevenue = completedOrders.Sum(x => x.Order.Total ?? 0);
-            var totalOrders = completedOrders.Count;
+            var totalRevenue = paidOrders.Sum(x => x.Total ?? 0);
+            var totalOrders = paidOrders.Count;
             var totalUsers = users.Count;
             var totalStations = stations.Count;
             var totalBatteries = batteries.Count;

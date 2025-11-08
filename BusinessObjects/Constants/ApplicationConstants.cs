@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace BusinessObjects.Constants
         public const string FAILED = "Failed!";
         public const string EXISTED = "Existed!";
         public const string DUPLICATE = "Duplicate!";
-        public const string INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
+        public const string INTERNAL_SERVER_ERROR = "Internal server error!";
         public const string INVALID_INPUT = "Invalid input!";
         public const string REQUIRED_INPUT = "Input required!";
         public const string UNAUTHORIZED = "Unauthorized!";
@@ -675,4 +676,34 @@ public static class ResponseMessageConstantsDashboard
 {
     public const string DASHBOARD_LOADED_SUCCESS = "Dashboard loaded successfully";
 }
+
+public static class GoogleAuthConstants
+{
+    public const string FRONTEND_SIGNIN_URL = "Frontend:SignInUrl";
+
+    public const string ERROR_GOOGLE_AUTH_FAILED = "google_auth_failed";
+    public const string ERROR_NO_CLAIMS_FOUND = "no_claims_found";
+    public const string ERROR_EMAIL_NOT_FOUND = "email_not_found";
+    public const string ERROR_INTERNAL = "internal_error";
+
+    public static readonly string[] EMAIL_CLAIMS =
+    {
+        ClaimTypes.Email,
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+    };
+
+    public static readonly string[] NAME_CLAIMS =
+    {
+        ClaimTypes.Name,
+        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+    };
+
+    public static readonly string[] AVATAR_CLAIMS =
+    {
+        "picture",
+        "urn:google:picture",
+        "urn:google:avatar"
+    };
+}
+
 

@@ -38,34 +38,8 @@ namespace Services.Controllers
         [HttpGet("google-response")]
         public async Task<IActionResult> GoogleResponse()
         {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-
-            if (!result.Succeeded || result.Principal == null)
-            {
-                return BadRequest("Google authentication failed.");
-            }
-
-            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-            if (claims == null)
-            {
-                return BadRequest("No claims found.");
-            }
-
-            string email = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-            string name = claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name")?.Value;
-
-            string avatar = claims.FirstOrDefault(c => c.Type == "picture")?.Value
-             ?? claims.FirstOrDefault(c => c.Type == "urn:google:picture")?.Value
-             ?? claims.FirstOrDefault(c => c.Type == "urn:google:avatar")?.Value;
-
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(name))
-            {
-                return BadRequest("Email or name not found in claims.");
-            }
-
-            var accessToken = await _accountService.RegisterGoogleUser(name, email, avatar);
-
-            return Ok(new { accessToken });
+            var redirectUrl = await _accountService.HandleGoogleResponse(HttpContext);
+            return Redirect(redirectUrl);
         }
 
         [HttpGet("login-google")]
@@ -158,13 +132,14 @@ namespace Services.Controllers
             }
         }
 
-        [HttpGet("register-verify-otp")]
+        [HttpPost("register-verify-otp")]
         public async Task<IActionResult> RegisterVerifyOtp([FromForm] VerifyOtpRequest verifyOtpRequest)
         {
             var res = await _accountService.RegisterVerifyOtp(verifyOtpRequest.Email, verifyOtpRequest.Otp);
             return StatusCode(res.StatusCode, res);
         }
-        [HttpGet("resend-register-otp")]
+
+        [HttpPost("resend-register-otp")]
         public async Task<IActionResult> ResendRegisterOtp([FromQuery] string email)
         {
             var res = await _accountService.ResendRegisterOtp(email);

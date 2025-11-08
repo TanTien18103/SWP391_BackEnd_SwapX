@@ -3,6 +3,8 @@ using BusinessObjects.Enums;
 using BusinessObjects.Exceptions;
 using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.AccountRepo;
@@ -11,6 +13,7 @@ using Services.ApiModels;
 using Services.ApiModels.Account;
 using Services.Services.EmailService;
 using Services.ServicesHelpers;
+using System.Security.Claims;
 
 namespace Services.Services.AccountService
 {
@@ -630,7 +633,6 @@ namespace Services.Services.AccountService
                 };
             }
         }
-
         public async Task<ResultModel> GetAllStaff()
         {
             var res = new ResultModel();
@@ -816,7 +818,6 @@ namespace Services.Services.AccountService
                 };
             }
         }
-
         public async Task<ResultModel> ForgotPassword(string email)
         {
             var res = new ResultModel();
@@ -1610,6 +1611,47 @@ namespace Services.Services.AccountService
             }
             return _accountHelper.CreateToken(existingUser);
         }
+
+        public async Task<string> HandleGoogleResponse(HttpContext httpContext)
+        {
+            var feBaseUrl = _configuration[GoogleAuthConstants.FRONTEND_SIGNIN_URL]
+                            ?? "https://localhost:5173/signin";
+
+            var result = await httpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+            if (!result.Succeeded || result.Principal == null)
+            {
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, GoogleAuthConstants.ERROR_GOOGLE_AUTH_FAILED);
+            }
+
+            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            if (claims == null)
+            {
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, GoogleAuthConstants.ERROR_NO_CLAIMS_FOUND);
+            }
+
+            string GetClaimValue(params string[] types) =>
+                claims.FirstOrDefault(c => types.Contains(c.Type))?.Value;
+
+            var email = GetClaimValue(GoogleAuthConstants.EMAIL_CLAIMS);
+            var name = GetClaimValue(GoogleAuthConstants.NAME_CLAIMS);
+            var avatar = GetClaimValue(GoogleAuthConstants.AVATAR_CLAIMS);
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, GoogleAuthConstants.ERROR_EMAIL_NOT_FOUND);
+            }
+
+            try
+            {
+                var accessToken = await RegisterGoogleUser(name, email, avatar);
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, null, accessToken);
+            }
+            catch (Exception ex)
+            {
+                return _accountHelper.BuildRedirectUrl(feBaseUrl, GoogleAuthConstants.ERROR_INTERNAL);
+            }
+        }
+
     }
 }
 
