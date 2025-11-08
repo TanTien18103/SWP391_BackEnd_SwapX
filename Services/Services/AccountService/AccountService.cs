@@ -633,7 +633,6 @@ namespace Services.Services.AccountService
                 };
             }
         }
-
         public async Task<ResultModel> GetAllStaff()
         {
             var res = new ResultModel();
@@ -819,7 +818,6 @@ namespace Services.Services.AccountService
                 };
             }
         }
-
         public async Task<ResultModel> ForgotPassword(string email)
         {
             var res = new ResultModel();
