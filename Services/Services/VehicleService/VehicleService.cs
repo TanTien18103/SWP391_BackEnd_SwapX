@@ -1011,7 +1011,7 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
-                if(vehicle.PackageId != null && vehicle.PackageExpiredate<TimeHepler.SystemTimeNow)
+                if(vehicle.PackageId != null && vehicle.PackageExpiredate>TimeHepler.SystemTimeNow)
                 {
                     return new ResultModel
                     {

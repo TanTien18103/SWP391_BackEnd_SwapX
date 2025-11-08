@@ -105,6 +105,16 @@ namespace Services.Services.RatingService
                     StationName = (await _stationRepo.GetStationById(createdRating.StationId))?.StationName,
                     Image = createdRating.Image
                 };
+                var ratingOfStation = await _ratingRepo.GetAllRatingByStationId(addRatingRequest.StationId);
+                decimal avg = 0m;
+                var station = await _stationRepo.GetStationById(addRatingRequest.StationId);
+                if (ratingOfStation.Count > 0)
+                {
+                    avg = ratingOfStation.Average(r => r.Rating1.Value);
+                }
+                station.Rating = avg;
+                station.UpdateDate = TimeHepler.SystemTimeNow;
+                await _stationRepo.UpdateStation(station);
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status201Created,
@@ -146,7 +156,16 @@ namespace Services.Services.RatingService
                 }
                 existingRating.Status = AccountStatusEnums.Inactive.ToString();
                 existingRating.UpdateDate = TimeHepler.SystemTimeNow;
-                var deletedRating = await _ratingRepo.UpdateRating(existingRating);
+                var ratingOfStation = await _ratingRepo.GetAllRatingByStationId(existingRating.StationId);
+                decimal avg = 0m;
+                var station = await _stationRepo.GetStationById(existingRating.StationId);
+                if (ratingOfStation.Count > 0)
+                {
+                    avg = ratingOfStation.Average(r => r.Rating1.Value);
+                }
+                station.Rating = avg;
+                station.UpdateDate = TimeHepler.SystemTimeNow;
+                await _stationRepo.UpdateStation(station);
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -333,6 +352,16 @@ namespace Services.Services.RatingService
                 }
                 existingRating.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedRating = await _ratingRepo.UpdateRating(existingRating);
+                var ratingOfStation = await _ratingRepo.GetAllRatingByStationId(existingRating.StationId);
+                decimal avg = 0m;
+                var station = await _stationRepo.GetStationById(existingRating.StationId);
+                if (ratingOfStation.Count > 0)
+                {
+                    avg = ratingOfStation.Average(r => r.Rating1.Value);
+                }
+                station.Rating = avg;
+                station.UpdateDate = TimeHepler.SystemTimeNow;
+                await _stationRepo.UpdateStation(station);
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
