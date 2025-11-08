@@ -132,13 +132,14 @@ namespace Services.Controllers
             }
         }
 
-        [HttpGet("register-verify-otp")]
+        [HttpPost("register-verify-otp")]
         public async Task<IActionResult> RegisterVerifyOtp([FromForm] VerifyOtpRequest verifyOtpRequest)
         {
             var res = await _accountService.RegisterVerifyOtp(verifyOtpRequest.Email, verifyOtpRequest.Otp);
             return StatusCode(res.StatusCode, res);
         }
-        [HttpGet("resend-register-otp")]
+
+        [HttpPost("resend-register-otp")]
         public async Task<IActionResult> ResendRegisterOtp([FromQuery] string email)
         {
             var res = await _accountService.ResendRegisterOtp(email);
