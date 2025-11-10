@@ -316,6 +316,21 @@ public class OrderService : IOrderService
                             StatusCode = StatusCodes.Status404NotFound
                         };
                     }
+                    //Kiểm tra đã có order cho ExchangeBattery chưa
+                    var orderExisting = await _orderRepository.GetOrderByIdAsync(exchangeBattery.OrderId);
+                    if (orderExisting != null && 
+                        orderExisting.ServiceType == PaymentType.PaidAtStation.ToString() && 
+                        orderExisting.Status == PaymentStatus.Paid.ToString())
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageOrder.ORDER_ALREADY_EXISTS_FOR_EXCHANGE_BATTERY,
+                            StatusCode = StatusCodes.Status400BadRequest
+                        };
+                    }
+
                     var PaidAtStationform = await _formRepo.GetByStationScheduleId(exchangeBattery.ScheduleId);
                     if (PaidAtStationform == null)
                     {
