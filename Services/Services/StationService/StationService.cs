@@ -361,6 +361,33 @@ namespace Services.Services.StationService
                     };
                 }
                 existingStation.Status = StationStatusEnum.Inactive.ToString();
+
+                if(existingStation.Status == StationStatusEnum.Inactive.ToString())
+                {
+                    var today = TimeHepler.SystemTimeNow.Date;
+
+                    var schedules = await _stationScheduleRepository.GetStationSchedulesByStationId(existingStation.StationId);
+
+                    // Chỉ chặn nếu đã có lịch trong tương lai và check thêm nếu đang có schedule đang pending
+                    bool hasFutureSchedule = schedules.Any(s =>
+                        (s.Date.HasValue &&
+                        s.Date.Value.Date >= today &&
+                        !string.Equals(s.Status, ScheduleStatusEnums.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase)) ||
+                        s.Status == ScheduleStatusEnums.Pending.ToString()
+                    );
+
+                    if (hasFutureSchedule)
+                    {
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.CONFLICT,
+                            Message = ResponseMessageConstantsStation.STATION_HAS_FUTURE_SCHEDULES,
+                            Data = null,
+                            StatusCode = StatusCodes.Status409Conflict
+                        };
+                    }
+                }
                 existingStation.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedStation = await _stationRepository.UpdateStation(existingStation);
                 return new ResultModel
