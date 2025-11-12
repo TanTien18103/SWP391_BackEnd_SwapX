@@ -60,13 +60,19 @@ namespace Services.ServicesHelpers
             return base64.Replace("/", "_").Replace("+", "-").Substring(0, 20);
         }
 
-        public long? GenerateOrderCode()
+        private static readonly Random _random = new Random();
+        public long GenerateOrderCode()
         {
-            Random random = new Random();
-            int randomNumber = random.Next(100000, 999999);
-            string datePart = DateTime.Now.ToString("yyyyMMddHHmmss");
-            string orderCodeString = datePart + randomNumber.ToString();
-            return long.Parse(orderCodeString);
+            lock (_random) 
+            {
+                int randomNumber = _random.Next(100, 999); 
+                string datePart = DateTime.Now.ToString("yyMMddHHmmssfff"); 
+                string orderCodeString = $"{datePart}{randomNumber}";
+
+                return long.TryParse(orderCodeString, out long result)
+                    ? result
+                    : DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            }
         }
 
         public string GenerateSecureOtp()
