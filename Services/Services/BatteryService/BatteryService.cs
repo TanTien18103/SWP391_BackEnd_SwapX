@@ -716,6 +716,50 @@ namespace Services.Services.BatteryService
                         };
                     }
                 }
+
+                // Kiểm tra pin có đang nằm trong slot nào không
+                var currentSlot = await _slotRepo.GetByBatteryId(existingBattery.BatteryId);
+                if (currentSlot != null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_ALREADY_IN_SLOT,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+
+                // Lấy danh sách tất cả slot trong trạm hiện tại
+                var slotsInStation = await _slotRepo.GetSlotsByStationId(addBatteryInStationRequest.StationId);
+
+                // Kiểm tra xem pin có đang nằm trong slot của trạm khác không
+                var existingSlotWithBattery = await _slotRepo.GetByBatteryId(addBatteryInStationRequest.BatteryId);
+
+                if (existingSlotWithBattery != null)
+                {
+                    // Nếu pin đang nằm trong slot của trạm khác
+                    if (existingSlotWithBattery.StationId != addBatteryInStationRequest.StationId)
+                    {
+                        // Gỡ pin khỏi slot của trạm cũ
+                        existingSlotWithBattery.BatteryId = null;
+                        existingSlotWithBattery.Status = SlotStatusEnum.Empty.ToString();
+                        existingSlotWithBattery.UpdateDate = TimeHepler.SystemTimeNow;
+                        await _slotRepo.UpdateSlot(existingSlotWithBattery);
+                    }
+                    else
+                    {
+                        // Nếu pin đã nằm trong slot của cùng trạm này => không cho add lại
+                        return new ResultModel
+                        {
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.CONFLICT,
+                            Message = ResponseMessageConstantsBattery.BATTERY_ALREADY_IN_STATION,
+                            StatusCode = StatusCodes.Status409Conflict
+                        };
+                    }
+                }
+
                 existingBattery.StationId = addBatteryInStationRequest.StationId;
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
@@ -1515,11 +1559,13 @@ namespace Services.Services.BatteryService
                 }
                 string stationName = existingBattery.Station.StationName;
                 string stationID = existingBattery.StationId;
+
+                var slot = await _slotRepo.GetByBatteryId(existingBattery.BatteryId);
+
                 existingBattery.StationId = null;
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var deletedBattery = await _batteryRepo.UpdateBattery(existingBattery);
 
-                var slot = await _slotRepo.GetByBatteryId(deletedBattery.BatteryId);
                 if (slot != null)
                 {
                     slot.BatteryId = null;
@@ -1527,6 +1573,7 @@ namespace Services.Services.BatteryService
                     slot.UpdateDate = TimeHepler.SystemTimeNow;
                     await _slotRepo.UpdateSlot(slot);
                 }
+
 
                 //record lại lịch sử pin
                 var batteryHistory = new BatteryHistory

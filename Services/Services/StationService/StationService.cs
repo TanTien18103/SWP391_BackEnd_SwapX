@@ -355,40 +355,52 @@ namespace Services.Services.StationService
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
-                        Data = null,
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
-                existingStation.Status = StationStatusEnum.Inactive.ToString();
 
-                if(existingStation.Status == StationStatusEnum.Inactive.ToString())
+                // Kiểm tra pin trong trạm
+                var slots = await _slotRepo.GetSlotsByStationId(existingStation.StationId);
+                bool hasBatteryInSlot = slots.Any(s => !string.IsNullOrEmpty(s.BatteryId));
+                if (hasBatteryInSlot)
                 {
-                    var today = TimeHepler.SystemTimeNow.Date;
-
-                    var schedules = await _stationScheduleRepository.GetStationSchedulesByStationId(existingStation.StationId);
-
-                    // Chỉ chặn nếu đã có lịch trong tương lai và check thêm nếu đang có schedule đang pending
-                    bool hasFutureSchedule = schedules.Any(s =>
-                        (s.Date.HasValue &&
-                        s.Date.Value.Date >= today &&
-                        !string.Equals(s.Status, ScheduleStatusEnums.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase)) ||
-                        s.Status == ScheduleStatusEnums.Pending.ToString()
-                    );
-
-                    if (hasFutureSchedule)
+                    return new ResultModel
                     {
-                        return new ResultModel
-                        {
-                            IsSuccess = false,
-                            ResponseCode = ResponseCodeConstants.CONFLICT,
-                            Message = ResponseMessageConstantsStation.STATION_HAS_FUTURE_SCHEDULES,
-                            Data = null,
-                            StatusCode = StatusCodes.Status409Conflict
-                        };
-                    }
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.CONFLICT,
+                        Message = ResponseMessageConstantsStation.STATION_HAS_EXISTING_BATTERIES,
+                        StatusCode = StatusCodes.Status409Conflict
+                    };
                 }
+
+                // Kiểm tra lịch đặt trong tương lai
+                var today = TimeHepler.SystemTimeNow.Date;
+                var schedules = await _stationScheduleRepository.GetStationSchedulesByStationId(existingStation.StationId);
+
+                bool hasFutureSchedule = schedules.Any(s =>
+                    (s.Date.HasValue &&
+                     s.Date.Value.Date >= today &&
+                     !string.Equals(s.Status, ScheduleStatusEnums.Cancelled.ToString(), StringComparison.OrdinalIgnoreCase)) ||
+                     s.Status == ScheduleStatusEnums.Pending.ToString()
+                );
+
+                if (hasFutureSchedule)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.CONFLICT,
+                        Message = ResponseMessageConstantsStation.STATION_HAS_FUTURE_SCHEDULES,
+                        StatusCode = StatusCodes.Status409Conflict
+                    };
+                }
+
+                // Nếu không còn pin và không có lịch => set Inactive
+                existingStation.Status = StationStatusEnum.Inactive.ToString();
                 existingStation.UpdateDate = TimeHepler.SystemTimeNow;
-                var updatedStation = await _stationRepository.UpdateStation(existingStation);
+
+                await _stationRepository.UpdateStation(existingStation);
+
                 return new ResultModel
                 {
                     IsSuccess = true,
@@ -396,7 +408,6 @@ namespace Services.Services.StationService
                     Message = ResponseMessageConstantsStation.DELETE_STATION_SUCCESS,
                     StatusCode = StatusCodes.Status200OK
                 };
-
             }
             catch (Exception ex)
             {

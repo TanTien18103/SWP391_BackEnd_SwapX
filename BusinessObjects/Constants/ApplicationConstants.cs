@@ -210,6 +210,7 @@ namespace BusinessObjects.Constants
         public const string SLOT_NOT_BELONG_TO_STATION = "Vị trí không thuộc về trạm này";
         public const string SLOT_NOT_FOUND = "Không tìm thấy vị trí";
         public const string SLOT_NOT_EMPTY = "Vị trí không trống";
+        public const string STATION_HAS_EXISTING_BATTERIES = "Trạm có pin tồn tại, không thể xóa trạm.";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -263,6 +264,9 @@ namespace BusinessObjects.Constants
         public const string BATTERY_BOOKED_CANNOT_UPDATE_STATUS = "Pin đang sử dụng hoặc đã được đặt không thể cập nhật trạng thái";
         public const string BATTERY_CANNOT_SET_INUSE_NO_VEHICLE_USING = "Không thể đặt pin ở trạng thái Đang sử dụng khi không có xe nào đang sử dụng pin này.";
         public const string BATTERY_CANNOT_SET_TO_BOOKED = "Không thể đặt pin ở trạng thái Đã đặt.";
+        public const string BATTERY_ALREADY_IN_SLOT = "Pin đã có trong vị trí.";
+        public const string BATTERY_ALREADY_IN_ANOTHER_STATION = "Pin đã có trong trạm khác";
+        public const string BATTERY_ALREADY_IN_STATION = "Pin đã có trong trạm";
     }
     public static class EmailConstants
     {
