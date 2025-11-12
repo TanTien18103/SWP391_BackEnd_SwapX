@@ -247,19 +247,6 @@ namespace Services.Services.StationService
                     {
                         StaffId = s.StaffId,
                     }).ToList(),
-                    Batteries = station.Batteries.Select(b => new
-                    {
-                        BatteryId = b.BatteryId,
-                        BatteryName = b.BatteryName,
-                        Status = b.Status,
-                        Capacity = b.Capacity,
-                        BatteryType = b.BatteryType,
-                        Specification = b.Specification,
-                        BatteryQuality = b.BatteryQuality,
-                        StartDate = b.StartDate,
-                        UpdateDate = b.UpdateDate
-                        // KHÔNG có trường station ở đây!
-                    }).ToList(),
                     Slots = station.Slots.Select(sl => new
                     {
                         SlotId = sl.SlotId,
@@ -267,8 +254,20 @@ namespace Services.Services.StationService
                         CordinateX = sl.CordinateX,
                         CordinateY = sl.CordinateY,
                         StartDate = sl.StartDate,
-                        UpdateDate = sl.UpdateDate
-                    }).ToList(),
+                        UpdateDate = sl.UpdateDate,
+                        Battery= sl.Battery == null ? null : new
+                        {
+                            sl.Battery.BatteryId,
+                            sl.Battery.BatteryName,
+                            sl.Battery.Status,
+                            sl.Battery.Capacity,
+                            sl.Battery.BatteryType,
+                            sl.Battery.Specification,
+                            sl.Battery.BatteryQuality,
+                            sl.Battery.StartDate,
+                            sl.Battery.UpdateDate
+                        }
+                    })  .ToList()
                 };
 
                 return new ResultModel
