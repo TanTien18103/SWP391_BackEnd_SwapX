@@ -48,6 +48,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
         public async Task<ExchangeBattery?> GetById(string exchangeId)
         {
             return await _context.ExchangeBatteries
+                .Include(sc => sc.Schedule)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.ExchangeBatteryId == exchangeId);
         }
