@@ -651,9 +651,6 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
-                existingBattery.StationId = addBatteryInStationRequest.StationId;
-                existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
-                var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
 
                 var batteryInStation = await _batteryRepo.GetBatteriesByStationId(addBatteryInStationRequest.StationId);
                 if (batteryInStation.Count > 30)
@@ -719,7 +716,9 @@ namespace Services.Services.BatteryService
                         };
                     }
                 }
-
+                existingBattery.StationId = addBatteryInStationRequest.StationId;
+                existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
+                var updatedBattery = await _batteryRepo.UpdateBattery(existingBattery);
                 slot.BatteryId = existingBattery.BatteryId;
                 slot.Status = SlotStatusEnum.Occupied.ToString();
                 slot.UpdateDate = TimeHepler.SystemTimeNow;
