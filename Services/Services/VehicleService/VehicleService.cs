@@ -442,7 +442,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Lithium.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -461,7 +461,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Accumulator.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -481,7 +481,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -501,7 +501,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Lithium.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V48_Ah12.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -520,7 +520,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Lithium.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V36_Ah10_4.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -539,7 +539,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Lithium.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V36_Ah7_8.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -559,7 +559,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.LFP.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V72_Ah30.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -578,7 +578,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.LFP.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V72_Ah50.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -597,7 +597,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V72_Ah38.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -622,7 +622,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V60_Ah22.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -643,7 +643,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V72_Ah22.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
@@ -667,7 +667,7 @@ namespace Services.Services.VehicleService
                             BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
                             BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
                             Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
-                            Image = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240",
+                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
                             StartDate = TimeHepler.SystemTimeNow,
                             UpdateDate = TimeHepler.SystemTimeNow
                         };
