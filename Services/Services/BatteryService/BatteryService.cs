@@ -424,6 +424,8 @@ namespace Services.Services.BatteryService
                     Notes = HistoryActionConstants.BATTERY_UPDATED.ToString(),
                     ActionType = BatteryHistoryActionTypeEnums.Updated.ToString(),
                     EnergyLevel = updatedBattery.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
 
                 };
