@@ -167,6 +167,17 @@ namespace Services.Services.BatteryService
             try
             {
                 var batteries = await _batteryRepo.GetAllBatteries();
+                if(batteries == null || batteries.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
                 var response = new List<object>();
 
                 foreach (var b in batteries)
