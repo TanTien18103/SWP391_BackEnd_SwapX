@@ -533,6 +533,27 @@ namespace Services.Services.BatteryService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+                if( existingBattery.Status == BatteryStatusEnums.InUse.ToString() ||
+                    existingBattery.Status == BatteryStatusEnums.Booked.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_INUSE_BOOKED_CANNOT_DELETE,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+                if(existingBattery.Status == BatteryStatusEnums.Decommissioned.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_ALREADY_DECOMMISSIONED,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
                 existingBattery.Status = BatteryStatusEnums.Decommissioned.ToString();
                 existingBattery.UpdateDate = TimeHepler.SystemTimeNow;
                 var deletedBattery = await _batteryRepo.UpdateBattery(existingBattery);
