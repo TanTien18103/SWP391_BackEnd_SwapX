@@ -159,14 +159,6 @@ namespace Services.Services.ReportService
             try
             {
                 var reports = await _reportReport.GetAllReports();
-                return new ResultModel
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    IsSuccess = true,
-                    ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsReport.GET_ALL_REPORT_SUCCESS,
-                    Data = reports
-                };
                 if (reports == null || reports.Count == 0)
                 {
                     return new ResultModel
@@ -178,7 +170,14 @@ namespace Services.Services.ReportService
                         Data = null
                     };
                 }
-
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsReport.GET_ALL_REPORT_SUCCESS,
+                    Data = reports
+                };
             }
             catch (Exception ex)
             {
@@ -400,7 +399,8 @@ namespace Services.Services.ReportService
                         report.Description
                     );
                     await _emailService.SendEmail(account.Email, subject, body);
-                }else
+                }
+                else
                 {
                     return new ResultModel
                     {

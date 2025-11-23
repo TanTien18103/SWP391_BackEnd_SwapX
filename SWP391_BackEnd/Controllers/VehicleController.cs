@@ -28,7 +28,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("delete_vehicle")]
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteVehicle([FromForm] string? vehicleId)
         {
             var res = await _vehicleService.DeleteVehicle(vehicleId);
@@ -42,7 +42,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_vehicle_by_name")]
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetVehicleByName([FromQuery] BusinessObjects.Enums.VehicleNameEnums vehicleName)
         {
             var res = await _vehicleService.GetVehicleByName(vehicleName);
@@ -63,7 +63,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("add_vehicle_in_package")]
-        [Authorize(Roles ="EvDriver, Admin")]
+        [Authorize(Roles = "EvDriver, Admin")]
         public async Task<IActionResult> AddVehicleInPackage([FromForm] Services.ApiModels.Vehicle.AddVehicleInPackageRequest addVehicleInPackageRequest)
         {
             var res = await _vehicleService.AddVehicleInPackage(addVehicleInPackageRequest);
@@ -109,6 +109,13 @@ namespace SWP391_BackEnd.Controllers
         public async Task<IActionResult> GetVehicleOfUserByVehicleId([FromQuery] string? vehicleId)
         {
             var res = await _vehicleService.GetVehicleOfUserByVehicleId(vehicleId);
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpPut("add_battery_in_vehicle")]
+        [Authorize(Roles = "EvDriver, Admin")]
+        public async Task<IActionResult> AddBatteryInVehicle([FromForm] Services.ApiModels.Vehicle.AddBatteryInVehicleRequest addBatteryInVehicleRequest)
+        {
+            var res = await _vehicleService.AddBatteryInVehicle(addBatteryInVehicleRequest);
             return StatusCode(res.StatusCode, res);
         }
     }

@@ -2,15 +2,19 @@
 using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using BusinessObjects.TimeCoreHelper;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Repositories.Repositories.AccountRepo;
+using Repositories.Repositories.BatteryHistoryRepo;
 using Repositories.Repositories.BatteryRepo;
 using Repositories.Repositories.EvDriverRepo;
 using Repositories.Repositories.PackageRepo;
+using Repositories.Repositories.StationRepo;
 using Repositories.Repositories.VehicleRepo;
 using Services.ApiModels;
 using Services.ApiModels.Vehicle;
+using Services.Services.EmailService;
 using Services.ServicesHelpers;
 using System;
 using System.Collections.Generic;
@@ -18,8 +22,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Repositories.Repositories.BatteryHistoryRepo;
-using Services.Services.EmailService;
 
 
 
@@ -38,17 +40,19 @@ namespace Services.Services.VehicleService
         private readonly IAccountRepo _accountRepo;
         private readonly IBatteryHistoryRepo _batteryHistoryRepo;
         private readonly IEmailService _emailService;
+        private readonly IStationRepo _stationRepo;
 
         public VehicleService(
-            IVehicleRepo vehicleRepo, 
-            IConfiguration configuration, 
-            IHttpContextAccessor httpContextAccessor, 
-            IBatteryRepo batteryRepo, 
-            IPackageRepo packageRepo, 
-            IEvDriverRepo evDriverRepo, 
-            IAccountRepo accountRepo, 
+            IVehicleRepo vehicleRepo,
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor,
+            IBatteryRepo batteryRepo,
+            IPackageRepo packageRepo,
+            IEvDriverRepo evDriverRepo,
+            IAccountRepo accountRepo,
             IBatteryHistoryRepo batteryHistoryRepo,
-            IEmailService emailService
+            IEmailService emailService,
+            IStationRepo stationRepo
             )
         {
             _vehicleRepo = vehicleRepo;
@@ -61,6 +65,7 @@ namespace Services.Services.VehicleService
             _accountRepo = accountRepo;
             _batteryHistoryRepo = batteryHistoryRepo;
             _emailService = emailService;
+            _stationRepo = stationRepo;
         }
         public async Task<ResultModel> AddVehicle(AddVehicleRequest addVehicleRequest)
         {
@@ -324,7 +329,7 @@ namespace Services.Services.VehicleService
         {
             try
             {
-               
+
                 // Lấy accountId từ claims của người dùng đang đăng nhập
                 if (!_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader)
                  || string.IsNullOrEmpty(authHeader)
@@ -389,7 +394,7 @@ namespace Services.Services.VehicleService
                         };
                     }
                     var user_of_vehicle = await _accountRepo.GetAccountByCustomerId(Vin.CustomerId);
-                    if (Vin.Status == VehicleStatusEnums.Unlinked.ToString()||
+                    if (Vin.Status == VehicleStatusEnums.Unlinked.ToString() ||
                         user_of_vehicle.Status == AccountStatusEnums.Inactive.ToString())
                     {
                         Vin.Status = VehicleStatusEnums.linked.ToString();
@@ -406,7 +411,7 @@ namespace Services.Services.VehicleService
                             Data = Vin
                         };
                     }
-                  
+
                     // Nếu xe tồn tại và vẫn đang active, nghĩa là người khác đang dùng
                     return new ResultModel
                     {
@@ -428,181 +433,44 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
-                var battery = new Battery();
-                // Kiểm tra battery
                 switch (vehicle.VehicleName)
                 {
                     case var name when name == VehicleNameEnums.YADEA_I6_Lithium_Battery.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_bike.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_I6_Accumulator.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Accumulator.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V48_Ah13.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_bike.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_I8_VINTAGE.ToString()
                                     || name == VehicleNameEnums.YADEA_I8.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_bike.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_IFUN.ToString()
                                     || name == VehicleNameEnums.YADEA_IGO.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V48_Ah12.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_bike.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_VITO.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V36_Ah10_4.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_assist_bicycle.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_FLIT.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Lithium.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V36_Ah7_8.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_assist_bicycle.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_VELAX.ToString()
                                     || name == VehicleNameEnums.YADEA_VELAX_SOOBIN.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.LFP.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V72_Ah30.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_VOLTGUARD_U.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.LFP.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V72_Ah50.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_VOLTGUARD_P.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V72_Ah38.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                         break;
 
@@ -613,42 +481,12 @@ namespace Services.Services.VehicleService
                                     || name == VehicleNameEnums.YADEA_M6I.ToString()
                                     || name == VehicleNameEnums.YADEA_VIGOR.ToString()
                                     || name == VehicleNameEnums.YADEA_X_MEN_NEO.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V60_Ah22.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                         break;
 
                     case var name when name == VehicleNameEnums.YADEA_ORIS.ToString()
                                     || name == VehicleNameEnums.YADEA_ORIS_SOOBIN.ToString()
                                     || name == VehicleNameEnums.YADEA_OSSY.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V72_Ah22.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                         break;
 
@@ -658,21 +496,6 @@ namespace Services.Services.VehicleService
                                     || name == VehicleNameEnums.YADEA_VEKOO_SOOBIN.ToString()
                                     || name == VehicleNameEnums.YADEA_X_SKY.ToString()
                                     || name == VehicleNameEnums.YADEA_X_BULL.ToString():
-                        battery = new Battery
-                        {
-                            BatteryId = _accountHelper.GenerateShortGuid(),
-                            Status = BatteryStatusEnums.InUse.ToString(),
-                            Capacity = 100,
-                            BatteryQuality = 100.00m,
-                            BatteryType = BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString(),
-                            BatteryName = account.Username + vehicle.VehicleName + ResponseMessageConstantsBattery.DefaultBatterySuffix,
-                            Specification = BatterySpecificationEnums.V48_Ah22.ToString(),
-                            Image = ResponseMessageConstantsBattery.BATTERY_IMAGE_LINK,
-                            StartDate = TimeHepler.SystemTimeNow,
-                            UpdateDate = TimeHepler.SystemTimeNow
-                        };
-                        await _batteryRepo.AddBattery(battery);
-                        vehicle.BatteryId = battery.BatteryId;
                         vehicle.VehicleType = VehicleTypeEnums.electric_motorbike.ToString();
                         break;
 
@@ -702,23 +525,6 @@ namespace Services.Services.VehicleService
                         Data = vehicle
                     };
                 }
-
-                //record lại lịch sử pin
-                var batteryHistory = new BatteryHistory
-                {
-                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
-                    BatteryId = battery.BatteryId,
-                    Notes = HistoryActionConstants.BATTERY_CREATED_BY_USER.ToString(),
-                    ActionType = BatteryHistoryActionTypeEnums.Created.ToString(),
-                    EnergyLevel = battery.Capacity.ToString(),
-                    Status = BatteryHistoryStatusEnums.Active.ToString(),
-                    Vin = vehicle.Vin,
-                    ActionDate = TimeHepler.SystemTimeNow,
-                    StartDate = TimeHepler.SystemTimeNow,
-                    UpdateDate = TimeHepler.SystemTimeNow
-
-                };
-                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
@@ -1023,7 +829,7 @@ namespace Services.Services.VehicleService
                         Data = null
                     };
                 }
-                if(vehicle.PackageId != null && vehicle.PackageExpiredate>TimeHepler.SystemTimeNow)
+                if (vehicle.PackageId != null && vehicle.PackageExpiredate > TimeHepler.SystemTimeNow)
                 {
                     return new ResultModel
                     {
@@ -1339,6 +1145,313 @@ namespace Services.Services.VehicleService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsVehicle.GET_VEHICLE_FAIL,
+                    Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> AddBatteryInVehicle(AddBatteryInVehicleRequest addBatteryInVehicleRequest)
+        {
+            try
+            {
+
+                var vehicle = await _vehicleRepo.GetVehicleById(addBatteryInVehicleRequest.VehicleId);
+                if (vehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var battery = await _batteryRepo.GetBatteryById(addBatteryInVehicleRequest.BatteryId);
+                if (battery == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                if (battery.Status != BatteryStatusEnums.Available.ToString())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_AVAILABLE,
+                        Data = null
+                    };
+                }
+                var account = await _accountRepo.GetAccountById(addBatteryInVehicleRequest.AccountId);
+                if (account == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageIdentity.ACCOUNT_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var evDriver = await _evDriverRepo.GetDriverByAccountId(addBatteryInVehicleRequest.AccountId);
+                if (evDriver == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.EVDRIVER_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                // Kiểm tra xem vehicle có thuộc về user hay không
+                if (vehicle.CustomerId != evDriver.CustomerId)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FORBIDDEN,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_OWNED,
+                        Data = null
+                    };
+                }
+                // Kiểm tra battery
+                switch (vehicle.VehicleName)
+                {
+                    case var name when name == VehicleNameEnums.YADEA_I6_Lithium_Battery.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V48_Ah13.ToString() && battery.BatteryType != BatteryTypeEnums.Lithium.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_I6_Accumulator.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V48_Ah13.ToString() && battery.BatteryType != BatteryTypeEnums.Accumulator.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_I8_VINTAGE.ToString()
+                                    || name == VehicleNameEnums.YADEA_I8.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V48_Ah22.ToString() && battery.BatteryType != BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_IFUN.ToString()
+                                    || name == VehicleNameEnums.YADEA_IGO.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V48_Ah12.ToString() && battery.BatteryType != BatteryTypeEnums.Lithium.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_VITO.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V36_Ah10_4.ToString() && battery.BatteryType != BatteryTypeEnums.Lithium.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_FLIT.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V36_Ah7_8.ToString() && battery.BatteryType != BatteryTypeEnums.Lithium.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_VELAX.ToString()
+                                    || name == VehicleNameEnums.YADEA_VELAX_SOOBIN.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V72_Ah30.ToString() && battery.BatteryType != BatteryTypeEnums.LFP.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_VOLTGUARD_U.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V72_Ah50.ToString() && battery.BatteryType != BatteryTypeEnums.LFP.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_VOLTGUARD_P.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V72_Ah38.ToString() && battery.BatteryType != BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_ORLA_P.ToString()
+                                    || name == VehicleNameEnums.YADEA_OCEAN.ToString()
+                                    || name == VehicleNameEnums.YADEA_ODORA_S.ToString()
+                                    || name == VehicleNameEnums.YADEA_ODORA_S2.ToString()
+                                    || name == VehicleNameEnums.YADEA_M6I.ToString()
+                                    || name == VehicleNameEnums.YADEA_VIGOR.ToString()
+                                    || name == VehicleNameEnums.YADEA_X_MEN_NEO.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V60_Ah22.ToString() && battery.BatteryType != BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_ORIS.ToString()
+                                    || name == VehicleNameEnums.YADEA_ORIS_SOOBIN.ToString()
+                                    || name == VehicleNameEnums.YADEA_OSSY.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V72_Ah22.ToString() && battery.BatteryType != BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+
+                    case var name when name == VehicleNameEnums.YADEA_ICUTE.ToString()
+                                    || name == VehicleNameEnums.YADEA_X_ZONE.ToString()
+                                    || name == VehicleNameEnums.YADEA_VEKOO.ToString()
+                                    || name == VehicleNameEnums.YADEA_VEKOO_SOOBIN.ToString()
+                                    || name == VehicleNameEnums.YADEA_X_SKY.ToString()
+                                    || name == VehicleNameEnums.YADEA_X_BULL.ToString():
+                        if (battery.Specification != BatterySpecificationEnums.V48_Ah22.ToString() && battery.BatteryType != BatteryTypeEnums.Graphene_TTFAR_Accumulator.ToString())
+                        {
+                            return new ResultModel
+                            {
+                                StatusCode = StatusCodes.Status400BadRequest,
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ResponseMessageConstantsBattery.INCOMPATIBLE_BATTERY_VEHICLE,
+                                Data = null
+                            };
+                        }
+                        break;
+                }
+                battery.Status = BatteryStatusEnums.InUse.ToString();
+                battery.UpdateDate = TimeHepler.SystemTimeNow;
+                await _batteryRepo.UpdateBattery(battery);
+                vehicle.BatteryId = addBatteryInVehicleRequest.BatteryId;
+                vehicle.UpdateDate = TimeHepler.SystemTimeNow;
+                await _vehicleRepo.UpdateVehicle(vehicle);
+                //record lại lịch sử pin
+                var batteryHistory = new BatteryHistory
+                {
+                    BatteryHistoryId = _accountHelper.GenerateShortGuid(),
+                    BatteryId = battery.BatteryId,
+                    Notes = HistoryActionConstants.BATTERY_ADDED_TO_VEHICLE,
+                    ActionType = BatteryHistoryActionTypeEnums.AssignedToVehicle.ToString(),
+                    EnergyLevel = battery.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    Vin = vehicle.Vin,
+                    ActionDate = TimeHepler.SystemTimeNow,
+                    StartDate = TimeHepler.SystemTimeNow,
+                    UpdateDate = TimeHepler.SystemTimeNow
+
+                };
+                await _batteryHistoryRepo.AddBatteryHistory(batteryHistory);
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsVehicle.ADD_BATTERY_IN_VEHICLE_SUCCESS,
+                    Data = vehicle
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsVehicle.ADD_BATTERY_IN_VEHICLE_FAILED,
                     Data = ex.Message,
                     StatusCode = StatusCodes.Status500InternalServerError
                 };

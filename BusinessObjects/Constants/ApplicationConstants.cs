@@ -211,6 +211,8 @@ namespace BusinessObjects.Constants
         public const string SLOT_NOT_FOUND = "Không tìm thấy vị trí";
         public const string SLOT_NOT_EMPTY = "Vị trí không trống";
         public const string STATION_HAS_EXISTING_BATTERIES = "Trạm có pin tồn tại, không thể xóa trạm.";
+
+        public static string STATION_NOT_ACTIVE = "Trạm hiện không hoạt động or không tồn tại. Vui lòng chọn trạm khác.";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery
@@ -268,6 +270,7 @@ namespace BusinessObjects.Constants
         public const string BATTERY_ALREADY_IN_ANOTHER_STATION = "Pin đã có trong trạm khác";
         public const string BATTERY_ALREADY_IN_STATION = "Pin đã có trong trạm";
         public const string BATTERY_IMAGE_LINK = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240";
+        public const string BATTERY_NOT_IN_STATION ="Pin không có trong trạm";
     }
     public static class EmailConstants
     {
@@ -386,6 +389,7 @@ public static class HistoryActionConstants
     public const string BATTERY_CREATED_BY_USER = "Pin đã được tạo bởi người dùng tích hợp xe";
     public const string BATTERY_RETURNED_TO_STATION_AFTER_EXCHANGE = "Battery returned to station {0} after exchange.";
     public const string BATTERY_ASSIGNED_TO_VEHICLE_AFTER_EXCHANGE = "Battery assigned to vehicle VIN: {0}, Model: {1} after exchange.";
+    public const string BATTERY_ADDED_TO_VEHICLE = "Pin được thêm vào xe bởi người dùng";
 }
 public static class ResponseMessageConstantsForm
 {
@@ -490,6 +494,8 @@ public static class ResponseMessageConstantsVehicle
     public const string LINK_VEHICLE_SUCCESS_BUT_NO_EMAIL = "Liên kết xe thành công nhưng không thể gửi email thông báo do tài khoản người dùng không có email";
     public const string VEHICLE_ALREADY_LINKED = "Xe đã được liên kết với tài khoản này";
     public const string VEHICLE_NAME_REQUIRED = "Tên xe không được để trống";
+    public const string ADD_BATTERY_IN_VEHICLE_FAILED= "Thêm pin vào xe thất bại";
+    public static string ADD_BATTERY_IN_VEHICLE_SUCCESS ="Thêm pin vào xe thành công";
 }
 //for StationSchedule (0-0-1)
 public static class ResponseMessageConstantsStationSchedule
