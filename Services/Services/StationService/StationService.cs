@@ -165,8 +165,7 @@ namespace Services.Services.StationService
                         BatteryNumber = batteryCount,
                         Image = station.Image,
                         StartDate = station.StartDate,
-                        UpdateDate = station.UpdateDate,
-                        Image = station.Image
+                        UpdateDate = station.UpdateDate
                     };
 
                     response.Add(stationObj);
