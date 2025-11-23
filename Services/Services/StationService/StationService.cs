@@ -163,6 +163,7 @@ namespace Services.Services.StationService
                         Status = station.Status,
                         Rating = station.Rating,
                         BatteryNumber = batteryCount,
+                        Image = station.Image,
                         StartDate = station.StartDate,
                         UpdateDate = station.UpdateDate,
                         Image = station.Image
@@ -220,6 +221,7 @@ namespace Services.Services.StationService
                     Status = station.Status,
                     Rating = station.Rating,
                     BatteryNumber = station.BatteryNumber,
+                    Image = station.Image,
                     StartDate = station.StartDate,
                     UpdateDate = station.UpdateDate,
                     BssStaffs = station.BssStaffs.Select(s => new

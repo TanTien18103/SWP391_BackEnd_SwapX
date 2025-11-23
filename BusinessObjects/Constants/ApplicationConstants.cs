@@ -270,6 +270,8 @@ namespace BusinessObjects.Constants
         public const string BATTERY_ALREADY_IN_ANOTHER_STATION = "Pin đã có trong trạm khác";
         public const string BATTERY_ALREADY_IN_STATION = "Pin đã có trong trạm";
         public const string BATTERY_IMAGE_LINK = "https://gogoro-about-uploads.s3.ap-northeast-1.amazonaws.com/1byus5c4ubenlumaz6naywxtx240";
+        public const string BATTERY_INUSE_BOOKED_CANNOT_DELETE = "Pin đang sử dụng hoặc đã được đặt không thể xóa";
+        public const string BATTERY_ALREADY_DECOMMISSIONED = "Pin đã được xóa rồi";
         public const string BATTERY_NOT_IN_STATION ="Pin không có trong trạm";
     }
     public static class EmailConstants

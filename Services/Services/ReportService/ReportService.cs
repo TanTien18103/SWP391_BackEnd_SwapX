@@ -238,6 +238,17 @@ namespace Services.Services.ReportService
             {
 
                 var reports = await _reportReport.GetReportsByStationId(stationId);
+                if (_stationRepo.GetStationById(stationId) == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsStation.STATION_NOT_FOUND,
+                        Data = null
+                    };
+                }
                 if (reports == null || reports.Count == 0)
                 {
                     return new ResultModel

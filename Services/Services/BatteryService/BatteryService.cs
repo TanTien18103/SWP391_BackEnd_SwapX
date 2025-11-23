@@ -167,6 +167,17 @@ namespace Services.Services.BatteryService
             try
             {
                 var batteries = await _batteryRepo.GetAllBatteries();
+                if(batteries == null || batteries.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
                 var response = new List<object>();
 
                 foreach (var b in batteries)
@@ -424,6 +435,8 @@ namespace Services.Services.BatteryService
                     Notes = HistoryActionConstants.BATTERY_UPDATED.ToString(),
                     ActionType = BatteryHistoryActionTypeEnums.Updated.ToString(),
                     EnergyLevel = updatedBattery.Capacity.ToString(),
+                    Status = BatteryHistoryStatusEnums.Active.ToString(),
+                    StartDate = TimeHepler.SystemTimeNow,
                     UpdateDate = TimeHepler.SystemTimeNow
 
                 };
@@ -518,6 +531,27 @@ namespace Services.Services.BatteryService
                         ResponseCode = ResponseCodeConstants.NOT_FOUND,
                         Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
                         StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+                if( existingBattery.Status == BatteryStatusEnums.InUse.ToString() ||
+                    existingBattery.Status == BatteryStatusEnums.Booked.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_INUSE_BOOKED_CANNOT_DELETE,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
+                if(existingBattery.Status == BatteryStatusEnums.Decommissioned.ToString())
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBattery.BATTERY_ALREADY_DECOMMISSIONED,
+                        StatusCode = StatusCodes.Status400BadRequest
                     };
                 }
                 existingBattery.Status = BatteryStatusEnums.Decommissioned.ToString();

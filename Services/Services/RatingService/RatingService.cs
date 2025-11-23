@@ -156,6 +156,7 @@ namespace Services.Services.RatingService
                 }
                 existingRating.Status = AccountStatusEnums.Inactive.ToString();
                 existingRating.UpdateDate = TimeHepler.SystemTimeNow;
+                await _ratingRepo.UpdateRating(existingRating);
                 var ratingOfStation = await _ratingRepo.GetAllRatingByStationId(existingRating.StationId);
                 decimal avg = 0m;
                 var station = await _stationRepo.GetStationById(existingRating.StationId);
@@ -414,6 +415,16 @@ namespace Services.Services.RatingService
                 existingRating.Status = AccountStatusEnums.Inactive.ToString();
                 existingRating.UpdateDate = TimeHepler.SystemTimeNow;
                 var deletedRating = await _ratingRepo.UpdateRating(existingRating);
+                var ratingOfStation = await _ratingRepo.GetAllRatingByStationId(existingRating.StationId);
+                decimal avg = 0m;
+                var station = await _stationRepo.GetStationById(existingRating.StationId);
+                if (ratingOfStation.Count > 0)
+                {
+                    avg = ratingOfStation.Average(r => r.Rating1.Value);
+                }
+                station.Rating = avg;
+                station.UpdateDate = TimeHepler.SystemTimeNow;
+                await _stationRepo.UpdateStation(station);
                 return new ResultModel
                 {
                     StatusCode = StatusCodes.Status200OK,
