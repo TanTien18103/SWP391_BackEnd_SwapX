@@ -165,29 +165,7 @@ namespace Services.Services.StationService
                         BatteryNumber = batteryCount,
                         Image = station.Image,
                         StartDate = station.StartDate,
-                        UpdateDate = station.UpdateDate,
-                        BssStaffs = station.BssStaffs.Select(s => new { s.StaffId }).ToList(),
-                        Slots = station.Slots.Select(sl => new
-                        {
-                            sl.SlotId,
-                            sl.Status,
-                            sl.CordinateX,
-                            sl.CordinateY,
-                            sl.StartDate,
-                            sl.UpdateDate,
-                            Battery = sl.Battery == null ? null : new
-                            {
-                                sl.Battery.BatteryId,
-                                sl.Battery.BatteryName,
-                                sl.Battery.Status,
-                                sl.Battery.Capacity,
-                                sl.Battery.BatteryType,
-                                sl.Battery.Specification,
-                                sl.Battery.BatteryQuality,
-                                sl.Battery.StartDate,
-                                sl.Battery.UpdateDate
-                            }
-                        }).ToList()
+                        UpdateDate = station.UpdateDate
                     };
 
                     response.Add(stationObj);

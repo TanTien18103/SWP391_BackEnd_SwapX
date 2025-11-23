@@ -25,6 +25,7 @@ namespace Services.Services.VehicleService
         Task<ResultModel> GetPackageByVehicleId(string vehicleId);
         Task<ResultModel> GetBatteryByVehicleId(string vehicleId);
         Task<ResultModel> GetVehicleOfUserByVehicleId(string vehicleId);
+        Task<ResultModel> AddBatteryInVehicle(AddBatteryInVehicleRequest addBatteryInVehicleRequest);
 
 
     }
