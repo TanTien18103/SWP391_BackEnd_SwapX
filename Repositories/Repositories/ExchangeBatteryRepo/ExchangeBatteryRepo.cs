@@ -1,3 +1,4 @@
+using BusinessObjects.Enums;
 using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -124,6 +125,38 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Include(e => e.VinNavigation)
                 .Where(e => e.ScheduleId == stationscheduleId)
                 .ToListAsync();
+        }
+
+        public async Task<ExchangeBattery> GetPendingByVin(string vin)
+        {
+            if (string.IsNullOrWhiteSpace(vin))
+                return null;
+
+            var pendingStatus = ExchangeStatusEnums.Pending.ToString();
+
+            return await _context.ExchangeBatteries
+                .FirstOrDefaultAsync(e => e.Vin == vin && e.Status == pendingStatus);
+        }
+
+        public async Task<ExchangeBattery?> GetPendingByVinAndAccountId(string vin, string accountId)
+        {
+            var pendingStatus = ExchangeStatusEnums.Pending.ToString();
+
+            return await _context.ExchangeBatteries
+                .Include(e => e.Station)
+                .Include(e => e.Order)
+                .Include(e => e.NewBattery)
+                .Include(e => e.OldBattery)
+                .Include(e => e.StaffAccount)
+                .Include(e => e.Schedule)
+                    .ThenInclude(s => s.Form)
+                .Include(e => e.VinNavigation)
+                .FirstOrDefaultAsync(e =>
+                    e.Vin == vin &&
+                    e.Status == pendingStatus &&
+                    e.Schedule != null &&
+                    e.Schedule.Form != null &&
+                    e.Schedule.Form.AccountId == accountId);
         }
     }
 }

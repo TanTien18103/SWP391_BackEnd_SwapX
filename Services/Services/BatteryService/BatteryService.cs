@@ -1668,7 +1668,7 @@ namespace Services.Services.BatteryService
                 foreach (var battery in chargingBatteries)
                 {
                     battery.Capacity ??= 0;
-                    battery.Capacity += 2;
+                    battery.Capacity += 5;
 
                     if (battery.Capacity >= 100)
                     {

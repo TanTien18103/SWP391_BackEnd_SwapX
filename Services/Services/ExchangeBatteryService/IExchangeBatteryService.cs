@@ -14,4 +14,5 @@ public interface IExchangeBatteryService
     Task<ResultModel> DeleteExchange(string exchangeId);
     Task<ResultModel> UpdateExchangeStatus(UpdateExchangeStatusRequest request);
     Task<ResultModel> GetExchangesByScheduleId(string stationscheduleId);
+    Task<ResultModel> GetPendingExchangeByVINAndAccountID(string vin, string accountId);
 }

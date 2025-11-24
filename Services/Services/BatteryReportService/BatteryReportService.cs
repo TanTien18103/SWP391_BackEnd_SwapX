@@ -16,6 +16,9 @@ using BusinessObjects.Constants;
 using BusinessObjects.Enums;
 using BusinessObjects.TimeCoreHelper;
 using Repositories.Repositories.ExchangeBatteryRepo;
+using Repositories.Repositories.SlotRepo;
+using Repositories.Repositories.VehicleRepo;
+using BusinessObjects.Models;
 
 namespace Services.Services.BatteryReportService
 {
@@ -29,7 +32,20 @@ namespace Services.Services.BatteryReportService
         private readonly AccountHelper _accountHelper;
         private readonly IConfiguration _configuration;
         private readonly IExchangeBatteryRepo _exchangeBatteryRepo;
-        public BatteryReportService(IBatteryReportRepo batteryReportRepository, IBatteryRepo batteryRepo, IAccountRepo accountRepo, IStationRepo stationRepo, IHttpContextAccessor httpContextAccessor, AccountHelper accountHelper, IConfiguration configuration, IExchangeBatteryRepo exchangeBatteryRepo)
+        private readonly ISlotRepo _slotRepo;
+        private readonly IVehicleRepo _vehicleRepo;
+        public BatteryReportService(
+            IBatteryReportRepo batteryReportRepository,
+            IBatteryRepo batteryRepo,
+            IAccountRepo accountRepo,
+            IStationRepo stationRepo,
+            IHttpContextAccessor httpContextAccessor,
+            AccountHelper accountHelper,
+            IConfiguration configuration,
+            IExchangeBatteryRepo exchangeBatteryRepo,
+            ISlotRepo slotRepo,
+            IVehicleRepo vehicleRepo
+            )
         {
             _batteryReportRepository = batteryReportRepository;
             _batteryRepo = batteryRepo;
@@ -39,6 +55,8 @@ namespace Services.Services.BatteryReportService
             _accountHelper = accountHelper;
             _configuration = configuration;
             _exchangeBatteryRepo = exchangeBatteryRepo;
+            _slotRepo = slotRepo;
+            _vehicleRepo = vehicleRepo;
         }
 
         public async Task<ResultModel> AddBatteryReport(AddBatteryReportRequest addBatteryReportRequest)
@@ -57,7 +75,8 @@ namespace Services.Services.BatteryReportService
                         Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
                         Data = null
                     };
-                }else
+                }
+                else
                 {
                     battery.Capacity = addBatteryReportRequest.Capacity;
                     battery.BatteryQuality = addBatteryReportRequest.BatteryQuality;
@@ -88,7 +107,7 @@ namespace Services.Services.BatteryReportService
                         Data = null
                     };
                 }
-                var batteryReport = new BusinessObjects.Models.BatteryReport
+                var batteryReport = new BatteryReport
                 {
                     BatteryReportId = _accountHelper.GenerateShortGuid(),
                     BatteryId = addBatteryReportRequest.BatteryId,
@@ -108,7 +127,7 @@ namespace Services.Services.BatteryReportService
                     var exchange = await _exchangeBatteryRepo.GetById(addBatteryReportRequest.ExchangeBatteryId);
                     if (exchange != null)
                     {
-                        if(battery.BatteryId != exchange.OldBatteryId)
+                        if (battery.BatteryId != exchange.OldBatteryId)
                         {
                             return new ResultModel
                             {
@@ -125,7 +144,7 @@ namespace Services.Services.BatteryReportService
                         await _exchangeBatteryRepo.Update(exchange);
                     }
                 }
-                
+
                 await _batteryReportRepository.AddBatteryReport(batteryReport);
                 return new ResultModel
                 {
@@ -415,17 +434,6 @@ namespace Services.Services.BatteryReportService
                     Message = ResponseMessageConstantsBatteryReport.GET_BATTERY_REPORT_SUCCESS,
                     Data = batteryReports
                 };
-
-
-                return new ResultModel
-                {
-                    StatusCode = StatusCodes.Status200OK,
-                    IsSuccess = true,
-                    ResponseCode = ResponseCodeConstants.SUCCESS,
-                    Message = ResponseMessageConstantsBatteryReport.GET_BATTERY_REPORT_SUCCESS,
-                    Data = batteryReports
-                };
-
             }
             catch (Exception ex)
             {
@@ -435,6 +443,114 @@ namespace Services.Services.BatteryReportService
                     IsSuccess = false,
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsBatteryReport.GET_BATTERY_REPORT_FAIL,
+                    Data = ex.Message
+                };
+            }
+        }
+
+        public async Task<ResultModel> AddBatteryReportDirect(AddBatteryReportDirectRequest addBatteryReportDirectRequest)
+        {
+            try
+            {
+                var account = await _accountRepo.GetAccountById(addBatteryReportDirectRequest.AccountId);
+                if (account == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var exchange = await _exchangeBatteryRepo.GetPendingByVin(addBatteryReportDirectRequest.VIN);
+                if (exchange == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ExchangeBatteryMessages.EXCHANGE_BATTERY_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var vehicle = await _vehicleRepo.GetVehicleById(addBatteryReportDirectRequest.VIN);
+                if (vehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
+                var batteryInVehicle = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
+
+                BatteryReport batteryReport;
+
+                if (batteryInVehicle != null)
+                {
+                    var batteryQualityScore = BatteryHelper.CalculateBatteryQuality(batteryInVehicle);
+
+                    batteryInVehicle.BatteryQuality = batteryQualityScore;
+                    await _batteryRepo.UpdateBattery(batteryInVehicle);
+
+                    batteryReport = new BatteryReport
+                    {
+                        BatteryReportId = _accountHelper.GenerateShortGuid(),
+                        BatteryId = batteryInVehicle.BatteryId,
+                        Name = string.Format(ResponseMessageConstantsBatteryReport.VEHICLE_HAS_BATTERY_NAME, exchange.ExchangeBatteryId),
+                        Image = null,
+                        AccountId = addBatteryReportDirectRequest.AccountId,
+                        StationId = exchange.StationId,
+                        Description = string.Format(ResponseMessageConstantsBatteryReport.VEHICLE_HAS_BATTERY_DESC, exchange.ExchangeBatteryId, batteryInVehicle.BatteryId),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Status = BatteryReportStatusEnums.Completed.ToString(),
+                        ExchangeBatteryId = exchange.ExchangeBatteryId
+                    };
+                }
+                else
+                {
+                    batteryReport = new BatteryReport
+                    {
+                        BatteryReportId = _accountHelper.GenerateShortGuid(),
+                        BatteryId = null,
+                        Name = string.Format(ResponseMessageConstantsBatteryReport.VEHICLE_NO_BATTERY_NAME, exchange.ExchangeBatteryId),
+                        Image = null,
+                        AccountId = addBatteryReportDirectRequest.AccountId,
+                        StationId = exchange.StationId,
+                        Description = string.Format(ResponseMessageConstantsBatteryReport.VEHICLE_NO_BATTERY_DESC, exchange.ExchangeBatteryId),
+                        StartDate = TimeHepler.SystemTimeNow,
+                        UpdateDate = TimeHepler.SystemTimeNow,
+                        Status = BatteryReportStatusEnums.Completed.ToString(),
+                        ExchangeBatteryId = exchange.ExchangeBatteryId
+                    };
+                }
+
+                await _batteryReportRepository.AddBatteryReport(batteryReport);
+
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBatteryReport.ADD_BATTERY_REPORT_SUCCESS,
+                    Data = batteryReport
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsBatteryReport.ADD_BATTERY_REPORT_FAIL,
                     Data = ex.Message
                 };
             }

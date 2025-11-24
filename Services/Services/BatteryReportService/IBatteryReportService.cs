@@ -13,6 +13,7 @@ namespace Services.Services.BatteryReportService
         Task<ResultModel> GetBatteryReportById(string batteryReportId);
         Task<ResultModel> GetAllBatteryReports();
         Task<ResultModel> AddBatteryReport(AddBatteryReportRequest addBatteryReportRequest);
+        Task<ResultModel> AddBatteryReportDirect(AddBatteryReportDirectRequest addBatteryReportDirectRequest);
         Task<ResultModel> UpdateBatteryReport(UpdateBatteryReportRequest updateBatteryReportRequest);
         Task<ResultModel> DeleteBatteryReport(string batteryReportId);
         Task<ResultModel> GetBatteryReportsByStation(string stationId);

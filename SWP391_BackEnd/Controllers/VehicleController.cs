@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BusinessObjects.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Services.ApiModels.Vehicle;
 
 namespace SWP391_BackEnd.Controllers
 {
@@ -15,7 +17,7 @@ namespace SWP391_BackEnd.Controllers
         }
         [HttpPost("add_vehicle_for_package")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddVehicle([FromForm] Services.ApiModels.Vehicle.AddVehicleRequest addVehicleRequest)
+        public async Task<IActionResult> AddVehicle([FromForm] AddVehicleRequest addVehicleRequest)
         {
             var res = await _vehicleService.AddVehicle(addVehicleRequest);
             return StatusCode(res.StatusCode, res);
@@ -43,28 +45,28 @@ namespace SWP391_BackEnd.Controllers
         }
         [HttpGet("get_vehicle_by_name")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetVehicleByName([FromQuery] BusinessObjects.Enums.VehicleNameEnums vehicleName)
+        public async Task<IActionResult> GetVehicleByName([FromQuery] VehicleNameEnums vehicleName)
         {
             var res = await _vehicleService.GetVehicleByName(vehicleName);
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_package_by_vehicle_name")]
         [Authorize]
-        public async Task<IActionResult> GetPackageByVehicleName([FromQuery] BusinessObjects.Enums.VehicleNameEnums vehicleName)
+        public async Task<IActionResult> GetPackageByVehicleName([FromQuery] VehicleNameEnums vehicleName)
         {
             var res = await _vehicleService.GetPackageByVehicleName(vehicleName);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPost("link_vehicle")]
         [Authorize(Roles = "EvDriver, Admin")]
-        public async Task<IActionResult> LinkVehicle([FromForm] Services.ApiModels.Vehicle.LinkVehicleRequest linkVehicleRequest)
+        public async Task<IActionResult> LinkVehicle([FromForm] LinkVehicleRequest linkVehicleRequest)
         {
             var res = await _vehicleService.LinkVehicle(linkVehicleRequest);
             return StatusCode(res.StatusCode, res);
         }
         [HttpPut("add_vehicle_in_package")]
         [Authorize(Roles = "EvDriver, Admin")]
-        public async Task<IActionResult> AddVehicleInPackage([FromForm] Services.ApiModels.Vehicle.AddVehicleInPackageRequest addVehicleInPackageRequest)
+        public async Task<IActionResult> AddVehicleInPackage([FromForm] AddVehicleInPackageRequest addVehicleInPackageRequest)
         {
             var res = await _vehicleService.AddVehicleInPackage(addVehicleInPackageRequest);
             return StatusCode(res.StatusCode, res);
@@ -113,7 +115,7 @@ namespace SWP391_BackEnd.Controllers
         }
         [HttpPut("add_battery_in_vehicle")]
         [Authorize(Roles = "EvDriver, Admin")]
-        public async Task<IActionResult> AddBatteryInVehicle([FromForm] Services.ApiModels.Vehicle.AddBatteryInVehicleRequest addBatteryInVehicleRequest)
+        public async Task<IActionResult> AddBatteryInVehicle([FromForm] AddBatteryInVehicleRequest addBatteryInVehicleRequest)
         {
             var res = await _vehicleService.AddBatteryInVehicle(addBatteryInVehicleRequest);
             return StatusCode(res.StatusCode, res);

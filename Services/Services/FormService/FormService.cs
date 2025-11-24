@@ -23,6 +23,7 @@ using Repositories.Repositories.ExchangeBatteryRepo;
 using Repositories.Repositories.OrderRepo;
 using Services.Services.EmailService;
 using Repositories.Repositories.AccountRepo;
+using Services.ServicesHelpers.VehicleBattery;
 
 namespace Services.Services.FormService
 {
@@ -150,20 +151,25 @@ namespace Services.Services.FormService
                     };
                 }
                 var battery = await _batteryRepo.GetBatteryById(addFormRequest.BatteryId);
-                var batteryOfVehicle = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
-                if (battery == null || battery.StationId != station.StationId)
+
+                // Check compatibility: battery at station must match *vehicle requirements*
+                if (!VehicleBatteryMapping.Map.TryGetValue(vehicle.VehicleName, out var req))
                 {
                     return new ResultModel
                     {
-                        StatusCode = StatusCodes.Status404NotFound,
+                        StatusCode = StatusCodes.Status400BadRequest,
                         IsSuccess = false,
-                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_BATTERY_REQUIREMENT_NOT_FOUND,
                         Data = null
                     };
                 }
-                //Kiểm tra xem pin có tương thích với xe không
-                if (battery.Specification != batteryOfVehicle.Specification || battery.BatteryType != batteryOfVehicle.BatteryType)
+
+                bool incompatible =
+                    battery.Specification != req.Specification ||
+                    battery.BatteryType != req.BatteryType;
+
+                if (incompatible)
                 {
                     return new ResultModel
                     {
@@ -174,17 +180,34 @@ namespace Services.Services.FormService
                         Data = null
                     };
                 }
-                if (batteryOfVehicle.BatteryQuality > battery.BatteryQuality)
+                var batteryOfVehicle = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
+                if (batteryOfVehicle != null)
+                {
+                    if (batteryOfVehicle.BatteryQuality > battery.BatteryQuality)
+                    {
+                        return new ResultModel
+                        {
+                            StatusCode = StatusCodes.Status400BadRequest,
+                            IsSuccess = false,
+                            ResponseCode = ResponseCodeConstants.FAILED,
+                            Message = ResponseMessageConstantsBattery.BATTERY_QUALITY_LOWER_THAN_CURRENT_BATTERY,
+                            Data = null
+                        };
+                    }
+                }
+                var exchange = await _exchangeBatteryRepo.GetPendingByVin(addFormRequest.Vin);
+                if (exchange != null)
                 {
                     return new ResultModel
                     {
                         StatusCode = StatusCodes.Status400BadRequest,
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FAILED,
-                        Message = ResponseMessageConstantsBattery.BATTERY_QUALITY_LOWER_THAN_CURRENT_BATTERY,
+                        Message = ResponseMessageConstantsForm.VEHICLE_ALREADY_HAS_PENDING_EXCHANGE,
                         Data = null
                     };
                 }
+
                 //kiểm tra xem xe đó đã lên tạo form trước đó nhưng chưa được approve
                 var existingForms = await _formRepo.GetFormsByVin(addFormRequest.Vin);
                 if (existingForms.Any(f => f.Status == FormStatusEnums.Submitted.ToString()))
@@ -198,7 +221,7 @@ namespace Services.Services.FormService
                         Data = null
                     };
                 }
-                if(battery.Status != BatteryStatusEnums.Available.ToString())
+                if (battery.Status != BatteryStatusEnums.Available.ToString())
                 {
                     return new ResultModel
                     {
