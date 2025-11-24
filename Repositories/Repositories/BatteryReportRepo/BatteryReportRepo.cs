@@ -84,5 +84,15 @@ namespace Repositories.Repositories.BatteryReportRepo
             return await _context.BatteryReports
                 .Where(r => r.BatteryId == batteryId).ToListAsync();
         }
+
+        public async Task<List<BatteryReport>> GetByAccountId(string accountId)
+        {
+            return await _context.BatteryReports
+                .Include(r => r.Battery)
+                .Include(r => r.Station)
+                .Where(r => r.AccountId == accountId)
+                .OrderByDescending(r => r.StartDate)
+                .ToListAsync();
+        }
     }
 }

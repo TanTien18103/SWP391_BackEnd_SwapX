@@ -575,5 +575,43 @@ namespace Services.Services.BatteryReportService
                 };
             }
         }
+
+        public async Task<ResultModel> GetBatteryReportByAccountId(string accountId)
+        {
+            try
+            {
+                var batteryReports = await _batteryReportRepository.GetByAccountId(accountId);
+                if (batteryReports == null || !batteryReports.Any())
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsBatteryReport.BATTERY_REPORT_LIST_EMPTY,
+                        Data = null
+                    };
+                }
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status200OK,
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBatteryReport.GET_BATTERY_REPORT_SUCCESS,
+                    Data = batteryReports
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResultModel
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.FAILED,
+                    Message = ResponseMessageConstantsBatteryReport.GET_BATTERY_REPORT_FAIL,
+                    Data = ex.Message
+                };
+            }
+        }
     }
 }

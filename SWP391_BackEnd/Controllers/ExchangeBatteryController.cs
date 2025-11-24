@@ -54,7 +54,7 @@ public class ExchangeBatteryController : ControllerBase
 
 
     [HttpGet("get_exchange_by_driver/{accountId}")]
-    [Authorize(Roles = "Bsstaff, Admin")]
+    [Authorize]
     public async Task<IActionResult> GetByDriver(string accountId)
     {
         var result = await _exchangeService.GetExchangeByDriver(accountId);

@@ -45,12 +45,20 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_battery_report_by_id")]
-        [Authorize(Roles ="Admin, Bsstaff")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> GetBatteryReportById([FromQuery] string? batteryReportId)
         {
             var res = await _batteryReportService.GetBatteryReportById(batteryReportId);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpGet("get_battery_report_by_accountId")]
+        [Authorize]
+        public async Task<IActionResult> GetBatteryReportByAccountId([FromQuery] string accountId)
+        {
+            var res = await _batteryReportService.GetBatteryReportByAccountId(accountId);
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpPut("update_battery_report")]
         [Authorize("Bsstaff, Admin")]
         public async Task<IActionResult> UpdateBatteryReport([FromForm] UpdateBatteryReportRequest updateBatteryReportRequest)
