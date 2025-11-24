@@ -422,6 +422,7 @@ public static class ResponseMessageConstantsForm
     public const string CREATE_STATION_SCHEDULE_FAILED = "Tạo lịch trạm thất bại";
     public const string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
     public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
+    public const string VEHICLE_ALREADY_HAS_PENDING_EXCHANGE = "Xe đã có yêu cầu đổi pin đang chờ xử lý";
 }
 // For Package (0-0-1)
 public static class ResponseMessageConstantsPackage
@@ -497,7 +498,8 @@ public static class ResponseMessageConstantsVehicle
     public const string VEHICLE_ALREADY_LINKED = "Xe đã được liên kết với tài khoản này";
     public const string VEHICLE_NAME_REQUIRED = "Tên xe không được để trống";
     public const string ADD_BATTERY_IN_VEHICLE_FAILED= "Thêm pin vào xe thất bại";
-    public static string ADD_BATTERY_IN_VEHICLE_SUCCESS ="Thêm pin vào xe thành công";
+    public const string ADD_BATTERY_IN_VEHICLE_SUCCESS ="Thêm pin vào xe thành công";
+    public const string VEHICLE_BATTERY_REQUIREMENT_NOT_FOUND = "Yêu cầu pin cho xe không tồn tại";
 }
 //for StationSchedule (0-0-1)
 public static class ResponseMessageConstantsStationSchedule
@@ -602,6 +604,13 @@ public static class ResponseMessageConstantsBatteryReport
     public const string DELETE_BATTERY_REPORT_FAILED = "Xóa báo cáo pin thất bại";
     public const string BATTERY_REPORT_NOT_COMPLETED = "Báo cáo pin chưa hoàn thành";
     public const string BATTERY_MISMATCH_WITH_EXCHANGE = "Pin trong báo cáo không khớp với pin trong giao dịch đổi pin";
+
+    public const string VEHICLE_HAS_BATTERY_NAME = "Auto Report for Exchange {0} (Vehicle had battery)";
+    public const string VEHICLE_HAS_BATTERY_DESC = "Auto-generated report for exchange {0}. Vehicle had battery {1}.";
+
+    public const string VEHICLE_NO_BATTERY_NAME = "Auto Report for Exchange {0} (Vehicle had no battery)";
+    public const string VEHICLE_NO_BATTERY_DESC = "Auto-generated report for exchange {0}. Vehicle had no battery.";
+
 }
 
 public static class ExchangeMessages
@@ -656,6 +665,8 @@ public static class ExchangeBatteryMessages
     public const string FORM_NOT_BELONG_TO_EXCHANGE_BATTERY = "Biểu mẫu không thuộc về giao dịch đổi pin.";
     public const string SLOT_WITH_NEW_BATTERY_NOT_FOUND = "Không tìm thấy vị trí chứa pin mới trong trạm.";
     public const string NO_EMPTY_SLOT_FOR_OLD_BATTERY = "Không có vị trí trống trong trạm để đặt pin cũ.";
+    public const string GET_PENDING_EXCHANGE_FAILED = "Lấy giao dịch đổi pin đang chờ xử lý thất bại";
+    public const string GET_PENDING_EXCHANGE_SUCCESS = "Lấy giao dịch đổi pin đang chờ xử lý thành công";
 }
 public static class ResponseMessageBatteryHistory
 {

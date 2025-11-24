@@ -12,8 +12,7 @@ namespace Services.ApiModels.ExchangeBattery
     {
         [Required]
         public string ExchangeBatteryId { get; set; }
-        [Required]
-        public string StaffId { get; set; }
+        public string? StaffId { get; set; }
         [Required]
         public ExchangeStatusEnums Status { get; set; }
         public string? Note { get; set; }

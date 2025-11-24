@@ -21,6 +21,14 @@ namespace SWP391_BackEnd.Controllers
             var res = await _batteryReportService.AddBatteryReport(addBatteryReportRequest);
             return StatusCode(res.StatusCode, res);
         }
+        [HttpPost("add_battery_report_direct")]
+        [Authorize]
+        public async Task<IActionResult> AddBatteryReportDirect([FromForm] AddBatteryReportDirectRequest addBatteryReportDirectRequest)
+        {
+            var res = await _batteryReportService.AddBatteryReportDirect(addBatteryReportDirectRequest);
+            return StatusCode(res.StatusCode, res);
+        }
+
         [HttpPut("delete_battery_report")]
         [Authorize]
         public async Task<IActionResult> DeleteBatteryReport([FromForm] string? batteryReportId)

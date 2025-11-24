@@ -295,28 +295,31 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     StatusCode = StatusCodes.Status404NotFound
                 };
             }
-            //Lấy thông tin của staff
-            var staff = await _accountRepo.GetAccountById(request.StaffId);
-            if (staff == null)
+            if (!string.IsNullOrEmpty(request.StaffId))
             {
-                return new ResultModel
+                //Lấy thông tin của staff
+                var staff = await _accountRepo.GetAccountById(request.StaffId);
+                if (staff == null)
                 {
-                    IsSuccess = false,
-                    ResponseCode = ResponseCodeConstants.NOT_FOUND,
-                    Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
-                    StatusCode = StatusCodes.Status404NotFound
-                };
-            }
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsUser.USER_NOT_FOUND,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
 
-            if (staff.Role != RoleEnums.Bsstaff.ToString())
-            {
-                return new ResultModel
+                if (staff.Role != RoleEnums.Bsstaff.ToString())
                 {
-                    IsSuccess = false,
-                    ResponseCode = ResponseCodeConstants.FAILED,
-                    Message = ResponseMessageConstantsUser.USER_NOT_STAFF,
-                    StatusCode = StatusCodes.Status400BadRequest
-                };
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.FAILED,
+                        Message = ResponseMessageConstantsUser.USER_NOT_STAFF,
+                        StatusCode = StatusCodes.Status400BadRequest
+                    };
+                }
             }
 
             //Lấy thông tin order liên quan
@@ -483,7 +486,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
                         };
                     }
 
-                    //Kiểm tra Order đã thanh toán
+                    // Kiểm tra Order đã thanh toán
                     if (order.Status != PaymentStatus.Paid.ToString())
                     {
                         return new ResultModel
@@ -495,6 +498,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
                         };
                     }
 
+                    // Lấy slot chứa newBattery và cập nhật
                     var slotWithNewBattery = await _slotRepo.GetByBatteryId(newBattery.BatteryId);
                     if (slotWithNewBattery != null)
                     {
@@ -505,59 +509,68 @@ public class ExchangeBatteryService : IExchangeBatteryService
                         await _slotRepo.UpdateSlot(slotWithNewBattery);
                     }
 
-                    var emptySlot = await _slotRepo.GetFirstAvailableSlot(exchange.StationId);
-                    if (emptySlot == null)
+                    // Nếu có oldBattery thì đặt vào slot trống
+                    if (oldBattery != null)
                     {
-                        return new ResultModel
+                        var emptySlot = await _slotRepo.GetFirstAvailableSlot(exchange.StationId);
+                        if (emptySlot == null)
                         {
-                            IsSuccess = false,
-                            ResponseCode = ResponseCodeConstants.FAILED,
-                            Message = ExchangeBatteryMessages.NO_EMPTY_SLOT_FOR_OLD_BATTERY,
-                            StatusCode = StatusCodes.Status400BadRequest
-                        };
-                    }
-                    else
-                    {
+                            return new ResultModel
+                            {
+                                IsSuccess = false,
+                                ResponseCode = ResponseCodeConstants.FAILED,
+                                Message = ExchangeBatteryMessages.NO_EMPTY_SLOT_FOR_OLD_BATTERY,
+                                StatusCode = StatusCodes.Status400BadRequest
+                            };
+                        }
                         emptySlot.BatteryId = oldBattery.BatteryId;
                         emptySlot.Status = SlotStatusEnum.Occupied.ToString();
                         emptySlot.UpdateDate = TimeHepler.SystemTimeNow;
+                        await _slotRepo.UpdateSlot(emptySlot);
+
+                        // Cập nhật thông tin oldBattery
+                        oldBattery.BatteryName = _batteryHelper.GenBatteryName(oldBattery.BatteryType, oldBattery.Specification, "EX");
+                        oldBattery.StationId = exchange.StationId;
+                        oldBattery.Status = BatteryStatusEnums.Maintenance.ToString();
+                        oldBattery.UpdateDate = TimeHepler.SystemTimeNow;
+
+                        var oldbatteryhistory = new BatteryHistory
+                        {
+                            BatteryHistoryId = Guid.NewGuid().ToString(),
+                            BatteryId = oldBattery.BatteryId,
+                            StationId = oldBattery.StationId,
+                            ActionType = BatteryHistoryActionTypeEnums.ReturnedToStation.ToString(),
+                            Notes = string.Format(HistoryActionConstants.BATTERY_RETURNED_TO_STATION_AFTER_EXCHANGE, station.StationName),
+                            Status = BatteryHistoryStatusEnums.Active.ToString(),
+                            ActionDate = TimeHepler.SystemTimeNow,
+                            EnergyLevel = oldBattery.Capacity.ToString(),
+                            StartDate = TimeHepler.SystemTimeNow,
+                            UpdateDate = TimeHepler.SystemTimeNow
+                        };
+                        await _batteryHistoryRepo.AddBatteryHistory(oldbatteryhistory);
                     }
-                    exchange.Status = ExchangeStatusEnums.Completed.ToString();
-                    exchange.StaffAccountId = request.StaffId;
-                    exchange.Notes = request.Note;
-                    exchange.UpdateDate = TimeHepler.SystemTimeNow;
 
-                    oldBattery.BatteryName = _batteryHelper.GenBatteryName(oldBattery.BatteryType, oldBattery.Specification, "EX");
-                    oldBattery.StationId = exchange.StationId;
-                    oldBattery.Status = BatteryStatusEnums.Maintenance.ToString();
-                    oldBattery.UpdateDate = TimeHepler.SystemTimeNow;
-
+                    // Cập nhật newBattery
                     newBattery.BatteryName = _batteryHelper.GenBatteryName(newBattery.BatteryType, newBattery.Specification, "USE");
                     newBattery.StationId = null;
                     newBattery.Status = BatteryStatusEnums.InUse.ToString();
                     newBattery.UpdateDate = TimeHepler.SystemTimeNow;
 
+                    // Gắn newBattery cho xe
                     vehicleOfExchange.BatteryId = newBattery.BatteryId;
                     vehicleOfExchange.UpdateDate = TimeHepler.SystemTimeNow;
 
+                    // Cập nhật lịch trình
                     schedule.Status = StationScheduleStatusEnums.Completed.ToString();
                     schedule.UpdateDate = TimeHepler.SystemTimeNow;
 
+                    // Cập nhật exchange
+                    exchange.Status = ExchangeStatusEnums.Completed.ToString();
+                    exchange.StaffAccountId = request.StaffId;
+                    exchange.Notes = request.Note;
+                    exchange.UpdateDate = TimeHepler.SystemTimeNow;
 
-
-                    var oldbatteryhistory = new BatteryHistory
-                    {
-                        BatteryHistoryId = Guid.NewGuid().ToString(),
-                        BatteryId = oldBattery.BatteryId,
-                        StationId = oldBattery.StationId,
-                        ActionType = BatteryHistoryActionTypeEnums.ReturnedToStation.ToString(),
-                        Notes = string.Format(HistoryActionConstants.BATTERY_RETURNED_TO_STATION_AFTER_EXCHANGE, station.StationName),
-                        Status = BatteryHistoryStatusEnums.Active.ToString(),
-                        ActionDate = TimeHepler.SystemTimeNow,
-                        EnergyLevel = oldBattery.Capacity.ToString(),
-                        StartDate = TimeHepler.SystemTimeNow,
-                        UpdateDate = TimeHepler.SystemTimeNow
-                    };
+                    // Tạo history cho newBattery
                     var newbatteryhistory = new BatteryHistory
                     {
                         BatteryHistoryId = Guid.NewGuid().ToString(),
@@ -573,14 +586,12 @@ public class ExchangeBatteryService : IExchangeBatteryService
                     };
 
                     await _vehicleRepo.UpdateVehicle(vehicleOfExchange);
-                    await _batteryRepo.UpdateBattery(oldBattery);
                     await _batteryRepo.UpdateBattery(newBattery);
                     await _stationScheduleRepo.UpdateStationSchedule(schedule);
                     await _exchangeRepo.Update(exchange);
-                    await _batteryHistoryRepo.AddBatteryHistory(oldbatteryhistory);
                     await _batteryHistoryRepo.AddBatteryHistory(newbatteryhistory);
-                    await _slotRepo.UpdateSlot(emptySlot);
 
+                    // Gửi email cho khách
                     var Completedform = await _formRepo.GetById(formInSchdeule.FormId);
                     if (Completedform != null)
                     {
@@ -694,5 +705,43 @@ public class ExchangeBatteryService : IExchangeBatteryService
             return new ResultModel { StatusCode = 204, Message = ExchangeMessages.ListEmpty };
         var response = list.Select(MapToResponse).ToList();
         return new ResultModel { StatusCode = 200, IsSuccess = true, Data = response };
+    }
+
+    public async Task<ResultModel> GetPendingExchangeByVINAndAccountID(string vin, string accountId)
+    {
+        try
+        {
+            var exchange = await _exchangeRepo.GetPendingByVinAndAccountId(vin, accountId);
+            if (exchange == null)
+            {
+                return new ResultModel()
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                    Message = ExchangeBatteryMessages.EXCHANGE_BATTERY_NOT_FOUND,
+                    StatusCode = StatusCodes.Status404NotFound
+                };
+            }
+            var response = MapToResponse(exchange);
+            return new ResultModel()
+            {
+                IsSuccess = true,
+                ResponseCode = ResponseCodeConstants.SUCCESS,
+                Message = ExchangeBatteryMessages.GET_PENDING_EXCHANGE_SUCCESS,
+                StatusCode = StatusCodes.Status200OK,
+                Data = response
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ResultModel()
+            {
+                IsSuccess = false,
+                ResponseCode = ResponseCodeConstants.FAILED,
+                Message = ExchangeBatteryMessages.GET_PENDING_EXCHANGE_FAILED,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Data = ex.InnerException?.Message ?? ex.Message
+            };
+        }
     }
 }

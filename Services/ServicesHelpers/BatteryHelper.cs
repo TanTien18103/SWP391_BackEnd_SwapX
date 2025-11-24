@@ -1,4 +1,6 @@
 ﻿using BusinessObjects.Enums;
+using BusinessObjects.Models;
+using BusinessObjects.TimeCoreHelper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +27,24 @@ namespace Services.ServicesHelpers
             return $"{shortType}_{shortSpec}_{suffix}";
         }
 
+
+      
+        public static decimal CalculateBatteryQuality(Battery battery)
+        {
+            if (battery == null || !battery.BatteryQuality.HasValue || !battery.UpdateDate.HasValue)
+                return 0;
+
+            var now = TimeHepler.SystemTimeNow;
+            var daysSinceUpdate = (now - battery.UpdateDate.Value).TotalDays;
+
+            decimal dailyDegradation = 0.05M;
+
+            decimal newQuality = battery.BatteryQuality.Value - (decimal)daysSinceUpdate * dailyDegradation;
+
+            newQuality = Math.Clamp(newQuality, 0, 100);
+
+            return newQuality;
+        }
+     
     }
 }

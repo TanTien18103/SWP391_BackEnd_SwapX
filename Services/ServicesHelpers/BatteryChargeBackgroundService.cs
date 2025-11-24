@@ -29,7 +29,7 @@ namespace Services.ServicesHelpers
                     Console.WriteLine($"[AutoCharge] {result.Message}");
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
             }
         }
     }
