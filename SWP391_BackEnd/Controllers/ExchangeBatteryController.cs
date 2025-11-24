@@ -80,7 +80,7 @@ public class ExchangeBatteryController : ControllerBase
     }
     
     [HttpPut("update_exchange_battery_status")]
-    [Authorize(Roles = "Bsstaff, Admin")]
+    [Authorize]
     public async Task<IActionResult> UpdateExchangeStatus([FromForm] UpdateExchangeStatusRequest request)
     {
         var result = await _exchangeService.UpdateExchangeStatus(request);
