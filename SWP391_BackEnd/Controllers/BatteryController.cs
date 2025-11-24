@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Json.Schema;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.ApiModels.Battery;
 using Services.ApiModels.Station;
 using Services.Services.BatteryService;
+using System.ComponentModel.DataAnnotations;
 
 namespace SWP391_BackEnd.Controllers
 {
@@ -85,6 +87,12 @@ namespace SWP391_BackEnd.Controllers
         public async Task<IActionResult> DeleteBatteryInStation([FromForm] string? batteryId)
         {
             var res = await _batteryService.DeleteBatteryInStation(batteryId);
+            return StatusCode(res.StatusCode, res);
+        }
+        [HttpGet("get_all_page_batteries")]
+        public async Task<IActionResult> GetAllPageBatteries([FromQuery, Range(1, int.MaxValue, ErrorMessage = "Số trang phải lớn hơn 0")]  int pageNum, [FromQuery, Range(1, int.MaxValue, ErrorMessage = "Kích thước trang phải lớn hơn 0")] int pageSize)
+        {
+            var res = await _batteryService.GetAllBatteriesPage(pageNum, pageSize);
             return StatusCode(res.StatusCode, res);
         }
     }

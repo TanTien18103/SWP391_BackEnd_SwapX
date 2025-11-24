@@ -40,8 +40,8 @@ public class StationController : ControllerBase
         return StatusCode(res.StatusCode, res);
     }
 
-    [HttpGet("get_station_by_id_for_admin")]
-    [Authorize(Roles = "Admin, Bsstaff")]
+    [HttpGet("get_station_by_id")]
+    [Authorize]
     public async Task<IActionResult> GetStationByIdForAdmin([FromQuery] string? stationId)
     {
         var res = await _stationService.GetStationById(stationId);
