@@ -17,6 +17,7 @@ using Services.ApiModels.Battery;
 using Services.ApiModels.Station;
 using Services.Services.StationService;
 using Services.ServicesHelpers;
+using Services.ServicesHelpers.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -1703,6 +1704,100 @@ namespace Services.Services.BatteryService
                     ResponseCode = ResponseCodeConstants.FAILED,
                     Message = ResponseMessageConstantsBattery.AUTO_CHARGE_FAILED,
                     Data = ex.Message,
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        public async Task<ResultModel> GetAllBatteriesPage(int pageNum, int pageSize)
+        {
+            try
+            {
+                var batteries = await _batteryRepo.GetAllBatteries();
+                if (batteries == null || batteries.Count == 0)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsBattery.BATTERY_NOT_FOUND,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
+
+                var response = new List<object>();
+
+                foreach (var b in batteries)
+                {
+                    var vehicle = await _vehicleRepo.GetVehicleByBatteryId(b.BatteryId);
+                    var slot = await _slotRepo.GetByBatteryId(b.BatteryId);
+
+                    response.Add(new
+                    {
+                        BatteryId = b.BatteryId,
+                        BatteryName = b.BatteryName,
+                        Status = b.Status,
+                        Capacity = b.Capacity,
+                        BatteryType = b.BatteryType,
+                        Specification = b.Specification,
+                        BatteryQuality = b.BatteryQuality,
+                        StartDate = b.StartDate,
+                        UpdateDate = b.UpdateDate,
+                        Image = b.Image,
+
+                        Station = b.Station == null ? null : new
+                        {
+                            StationId = b.Station.StationId,
+                            StationName = b.Station.StationName,
+                            Location = b.Station.Location,
+                            Status = b.Station.Status,
+                            Rating = b.Station.Rating,
+                            BatteryNumber = b.Station.BatteryNumber,
+                            StartDate = b.Station.StartDate,
+                            UpdateDate = b.Station.UpdateDate,
+                            Image = b.Station.Image,
+                        },
+                        Vehicle = vehicle == null ? null : new
+                        {
+                            Vin = vehicle.Vin,
+                            VehicleName = vehicle.VehicleName,
+                            CustomerId = vehicle.CustomerId
+                        },
+                        Slot = slot == null ? null : new
+                        {
+                            SlotId = slot.SlotId,
+                            StationId = slot.StationId,
+                            BatteryId = slot.BatteryId,
+                            CordinateX = slot.CordinateX,
+                            CordinateY = slot.CordinateY,
+                            Status = slot.Status,
+                            StartDate = slot.StartDate,
+                            UpdateDate = slot.UpdateDate
+                        }
+                    });
+                }
+
+                // Gọi helper phân trang - đúng chuẩn
+                var pagedResult = PaginationHelper.Paginate(response, pageNum, pageSize);
+
+                return new ResultModel
+                {
+                    IsSuccess = true,
+                    ResponseCode = ResponseCodeConstants.SUCCESS,
+                    Message = ResponseMessageConstantsBattery.GET_BATTERY_LIST_SUCCESS,
+                    Data = pagedResult,
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch
+            {
+                return new ResultModel
+                {
+                    IsSuccess = false,
+                    ResponseCode = ResponseCodeConstants.INTERNAL_SERVER_ERROR,
+                    Message = ResponseMessageConstantsBattery.GET_ALL_BATTERY_FAIL,
+                    Data = null,
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
             }
