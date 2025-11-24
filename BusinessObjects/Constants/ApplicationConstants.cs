@@ -596,7 +596,7 @@ public static class ResponseMessageConstantsBatteryReport
     public const string GET_BATTERY_REPORT_DETAIL_SUCCESS = "Lấy chi tiết báo cáo pin thành công";
     public const string ADD_BATTERY_REPORT_FAIL = "Thêm báo cáo pin thất bại";
     public const string GET_ALL_BATTERY_REPORT_FAIL = "Lấy danh sách báo cáo pin thất bại";
-    public const string BATTERY_REPORT_LIST_EMPTY = "Lấy danh sách báo cáo pin thất bại";
+    public const string BATTERY_REPORT_LIST_EMPTY = "Danh sách báo cáo pin trống";
     public const string GET_ALL_BATTERY_REPORT_SUCCESS = "Lấy danh sách báo cáo pin thành công";
     public const string UPDATE_BATTERY_REPORT_FAILED = "Cập nhật báo cáo pin thất bại";
     public const string GET_BATTERY_REPORT_FAIL = "Lấy báo cáo pin thất bại";
@@ -605,11 +605,11 @@ public static class ResponseMessageConstantsBatteryReport
     public const string BATTERY_REPORT_NOT_COMPLETED = "Báo cáo pin chưa hoàn thành";
     public const string BATTERY_MISMATCH_WITH_EXCHANGE = "Pin trong báo cáo không khớp với pin trong giao dịch đổi pin";
 
-    public const string VEHICLE_HAS_BATTERY_NAME = "Auto Report for Exchange {0} (Vehicle had battery)";
-    public const string VEHICLE_HAS_BATTERY_DESC = "Auto-generated report for exchange {0}. Vehicle had battery {1}.";
+    public const string VEHICLE_HAS_BATTERY_NAME = "Auto Report for Exchange (Vehicle had battery)";
+    public const string VEHICLE_HAS_BATTERY_DESC = "Auto-generated report for exchange, vehicle had battery.";
 
-    public const string VEHICLE_NO_BATTERY_NAME = "Auto Report for Exchange {0} (Vehicle had no battery)";
-    public const string VEHICLE_NO_BATTERY_DESC = "Auto-generated report for exchange {0}. Vehicle had no battery.";
+    public const string VEHICLE_NO_BATTERY_NAME = "Auto Report for Exchange (Vehicle had no battery)";
+    public const string VEHICLE_NO_BATTERY_DESC = "Auto-generated report for exchange, vehicle had no battery.";
 
 }
 
