@@ -90,6 +90,7 @@ namespace SWP391_BackEnd.Controllers
             return StatusCode(res.StatusCode, res);
         }
         [HttpGet("get_all_page_batteries")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllPageBatteries([FromQuery, Range(1, int.MaxValue, ErrorMessage = "Số trang phải lớn hơn 0")]  int pageNum, [FromQuery, Range(1, int.MaxValue, ErrorMessage = "Kích thước trang phải lớn hơn 0")] int pageSize)
         {
             var res = await _batteryService.GetAllBatteriesPage(pageNum, pageSize);
