@@ -596,7 +596,7 @@ public static class ResponseMessageConstantsBatteryReport
     public const string GET_BATTERY_REPORT_DETAIL_SUCCESS = "Lấy chi tiết báo cáo pin thành công";
     public const string ADD_BATTERY_REPORT_FAIL = "Thêm báo cáo pin thất bại";
     public const string GET_ALL_BATTERY_REPORT_FAIL = "Lấy danh sách báo cáo pin thất bại";
-    public const string BATTERY_REPORT_LIST_EMPTY = "Lấy danh sách báo cáo pin thất bại";
+    public const string BATTERY_REPORT_LIST_EMPTY = "Danh sách báo cáo pin trống";
     public const string GET_ALL_BATTERY_REPORT_SUCCESS = "Lấy danh sách báo cáo pin thành công";
     public const string UPDATE_BATTERY_REPORT_FAILED = "Cập nhật báo cáo pin thất bại";
     public const string GET_BATTERY_REPORT_FAIL = "Lấy báo cáo pin thất bại";

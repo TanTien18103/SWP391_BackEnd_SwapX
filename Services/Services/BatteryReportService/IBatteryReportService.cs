@@ -18,5 +18,6 @@ namespace Services.Services.BatteryReportService
         Task<ResultModel> DeleteBatteryReport(string batteryReportId);
         Task<ResultModel> GetBatteryReportsByStation(string stationId);
         Task<ResultModel> GetBatteryReportsByBatteryId(string batteryId);
+        Task<ResultModel> GetBatteryReportByAccountId(string accountId);
     }
 }
