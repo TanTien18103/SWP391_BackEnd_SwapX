@@ -96,7 +96,7 @@ public class ExchangeBatteryController : ControllerBase
     }
 
     [HttpGet("get_pending_exchange_by_VIN_and_AccountId")]
-    //[Authorize]
+    [Authorize]
     public async Task<IActionResult> GetPendingExchangeByVINAndAccountID([FromQuery] string vin, [FromQuery] string accountId)
     {
         var result = await _exchangeService.GetPendingExchangeByVINAndAccountID(vin, accountId);
