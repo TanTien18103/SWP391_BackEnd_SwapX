@@ -877,30 +877,28 @@ namespace Services.Services.StationService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
-                var response = stations.Select(station => new
+                var response = new List<object>();
+
+                foreach (var station in stations)
                 {
-                    StationId = station.StationId,
-                    StationName = station.StationName,
-                    Location = station.Location,
-                    Status = station.Status,
-                    Rating = station.Rating,
-                    BatteryNumber = station.BatteryNumber,
-                    BssStaffs = station.BssStaffs.Select(s => new
+                    var batteries = await _batteryRepo.GetBatteriesByStationId(station.StationId);
+                    var batteryCount = batteries.Count;
+
+                    var stationObj = new
                     {
-                        StaffId = s.StaffId,
-                    }).ToList(),
-                    Batteries = station.Batteries.Select(b => new
-                    {
-                        BatteryId = b.BatteryId,
-                        BatteryName = b.BatteryName,
-                        Status = b.Status,
-                        Capacity = b.Capacity,
-                        BatteryType = b.BatteryType,
-                        Specification = b.Specification,
-                        BatteryQuality = b.BatteryQuality,
-                        // KHÔNG có trường station ở đây!
-                    }).ToList()
-                }).ToList();
+                        StationId = station.StationId,
+                        StationName = station.StationName,
+                        Location = station.Location,
+                        Status = station.Status,
+                        Rating = station.Rating,
+                        BatteryNumber = batteryCount,
+                        Image = station.Image,
+                        StartDate = station.StartDate,
+                        UpdateDate = station.UpdateDate
+                    };
+
+                    response.Add(stationObj);
+                }
 
                 return new ResultModel
                 {
