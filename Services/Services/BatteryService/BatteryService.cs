@@ -203,30 +203,6 @@ namespace Services.Services.BatteryService
                         {
                             StationId = b.Station.StationId,
                             StationName = b.Station.StationName,
-                            Location = b.Station.Location,
-                            Status = b.Station.Status,
-                            Rating = b.Station.Rating,
-                            BatteryNumber = b.Station.BatteryNumber,
-                            StartDate = b.Station.StartDate,
-                            UpdateDate = b.Station.UpdateDate,
-                            Image = b.Station.Image,
-                        },
-                        Vehicle = vehicle == null ? null : new
-                        {
-                            Vin = vehicle.Vin,
-                            VehicleName = vehicle.VehicleName,
-                            CustomerId = vehicle.CustomerId
-                        },
-                        Slot = slot == null ? null : new
-                        {
-                            SlotId = slot.SlotId,
-                            StationId = slot.StationId,
-                            BatteryId = slot.BatteryId,
-                            CordinateX = slot.CordinateX,
-                            CordinateY = slot.CordinateY,
-                            Status = slot.Status,
-                            StartDate = slot.StartDate,
-                            UpdateDate = slot.UpdateDate
                         }
                     });
                 }
@@ -1750,31 +1726,7 @@ namespace Services.Services.BatteryService
                         {
                             StationId = b.Station.StationId,
                             StationName = b.Station.StationName,
-                            Location = b.Station.Location,
-                            Status = b.Station.Status,
-                            Rating = b.Station.Rating,
-                            BatteryNumber = b.Station.BatteryNumber,
-                            StartDate = b.Station.StartDate,
-                            UpdateDate = b.Station.UpdateDate,
-                            Image = b.Station.Image,
                         },
-                        Vehicle = vehicle == null ? null : new
-                        {
-                            Vin = vehicle.Vin,
-                            VehicleName = vehicle.VehicleName,
-                            CustomerId = vehicle.CustomerId
-                        },
-                        Slot = slot == null ? null : new
-                        {
-                            SlotId = slot.SlotId,
-                            StationId = slot.StationId,
-                            BatteryId = slot.BatteryId,
-                            CordinateX = slot.CordinateX,
-                            CordinateY = slot.CordinateY,
-                            Status = slot.Status,
-                            StartDate = slot.StartDate,
-                            UpdateDate = slot.UpdateDate
-                        }
                     });
                 }
 
