@@ -202,7 +202,7 @@ namespace Services.Services.BatteryService
                         Station = b.Station == null ? null : new
                         {
                             StationId = b.Station.StationId,
-                            StationName = b.Station.StationName,
+                            StationName = b.Station.StationName
                         }
                     });
                 }
@@ -296,14 +296,6 @@ namespace Services.Services.BatteryService
                 {
                     StationId = b.Station.StationId,
                     StationName = b.Station.StationName,
-                    Location = b.Station.Location,
-                    Status = b.Station.Status,
-                    Rating = b.Station.Rating,
-                    BatteryNumber = b.Station.BatteryNumber,
-                    StartDate = b.Station.StartDate,
-                    UpdateDate = b.Station.UpdateDate,
-                    Image = b.Station.Image,
-                    // No Batteries field here!
                 };
 
                 var response = new
@@ -318,24 +310,7 @@ namespace Services.Services.BatteryService
                     StartDate = b.StartDate,
                     UpdateDate = b.UpdateDate,
                     Image = b.Image,
-                    Station = stationObj,
-                    Vehicle = b.Vehicles == null ? null : new
-                    {
-                        Vin = vehicle?.Vin,
-                        VehicleName = vehicle?.VehicleName,
-                        CustomerId = vehicle?.CustomerId,
-                    },
-                    Slot = slot == null ? null : new
-                    {
-                        SlotId = slot.SlotId,
-                        StationId = slot.StationId,
-                        BatteryId = slot.BatteryId,
-                        CordinateX = slot.CordinateX,
-                        CordinateY = slot.CordinateY,
-                        Status = slot.Status,
-                        StartDate = slot.StartDate,
-                        UpdateDate = slot.UpdateDate
-                    }
+                    Station = stationObj
                 };
 
 
@@ -1163,27 +1138,8 @@ namespace Services.Services.BatteryService
                         Station = b.Station == null ? null : new
                         {
                             StationId = b.Station.StationId,
-                            StationName = b.Station.StationName,
-                            Location = b.Station.Location,
-                            Status = b.Station.Status,
-                            Rating = b.Station.Rating,
-                            BatteryNumber = b.Station.BatteryNumber,
-                            StartDate = b.Station.StartDate,
-                            UpdateDate = b.Station.UpdateDate,
-                            Image = b.Station.Image,
-                        },
-                        Slot = slot == null ? null : new
-                        {
-                            SlotId = slot.SlotId,
-                            StationId = slot.StationId,
-                            BatteryId = slot.BatteryId,
-                            CordinateX = slot.CordinateX,
-                            CordinateY = slot.CordinateY,
-                            Status = slot.Status,
-                            StartDate = slot.StartDate,
-                            UpdateDate = slot.UpdateDate
+                            StationName = b.Station.StationName
                         }
-
                     });
                 }
                 return new ResultModel
@@ -1725,8 +1681,8 @@ namespace Services.Services.BatteryService
                         Station = b.Station == null ? null : new
                         {
                             StationId = b.Station.StationId,
-                            StationName = b.Station.StationName,
-                        },
+                            StationName = b.Station.StationName
+                        }
                     });
                 }
 
