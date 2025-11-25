@@ -500,6 +500,7 @@ public static class ResponseMessageConstantsVehicle
     public const string ADD_BATTERY_IN_VEHICLE_FAILED= "Thêm pin vào xe thất bại";
     public const string ADD_BATTERY_IN_VEHICLE_SUCCESS ="Thêm pin vào xe thành công";
     public const string VEHICLE_BATTERY_REQUIREMENT_NOT_FOUND = "Yêu cầu pin cho xe không tồn tại";
+    public const string VEHICLE_HAS_NO_BATTERY = "Xe không có pin nào được liên kết";
 }
 //for StationSchedule (0-0-1)
 public static class ResponseMessageConstantsStationSchedule

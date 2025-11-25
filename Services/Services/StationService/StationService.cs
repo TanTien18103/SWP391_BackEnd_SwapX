@@ -235,7 +235,7 @@ namespace Services.Services.StationService
                         CordinateY = sl.CordinateY,
                         StartDate = sl.StartDate,
                         UpdateDate = sl.UpdateDate,
-                        Battery= sl.Battery == null ? null : new
+                        Battery = sl.Battery == null ? null : new
                         {
                             sl.Battery.BatteryId,
                             sl.Battery.BatteryName,
@@ -247,7 +247,7 @@ namespace Services.Services.StationService
                             sl.Battery.StartDate,
                             sl.Battery.UpdateDate
                         }
-                    })  .ToList()
+                    }).ToList()
                 };
 
                 return new ResultModel
@@ -853,6 +853,19 @@ namespace Services.Services.StationService
                     };
                 }
                 var vehicle = await _vehicleRepo.GetVehicleById(vehicleId);
+
+                //kiểm tra vehicle có tồn tại không
+                if (vehicle ==null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_FOUND,
+                        Data = null
+                    };
+                }
                 // kiểm tra xem vehicle có thuộc về customer không
                 if (vehicle.CustomerId != evDriver.CustomerId)
                 {
@@ -862,6 +875,18 @@ namespace Services.Services.StationService
                         IsSuccess = false,
                         ResponseCode = ResponseCodeConstants.FORBIDDEN,
                         Message = ResponseMessageConstantsVehicle.VEHICLE_NOT_OWNED,
+                        Data = null
+                    };
+                }
+                //kiểm tra vehicle có pin không
+                if (vehicle.BatteryId==null)
+                {
+                    return new ResultModel
+                    {
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.BAD_REQUEST,
+                        Message = ResponseMessageConstantsVehicle.VEHICLE_HAS_NO_BATTERY,
                         Data = null
                     };
                 }
