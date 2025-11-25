@@ -855,7 +855,7 @@ namespace Services.Services.StationService
                 var vehicle = await _vehicleRepo.GetVehicleById(vehicleId);
 
                 //kiểm tra vehicle có tồn tại không
-                if (vehicle ==null)
+                if (vehicle == null)
                 {
                     return new ResultModel
                     {
@@ -879,7 +879,7 @@ namespace Services.Services.StationService
                     };
                 }
                 //kiểm tra vehicle có pin không
-                if (vehicle.BatteryId==null)
+                if (vehicle.BatteryId == null)
                 {
                     return new ResultModel
                     {
@@ -890,7 +890,8 @@ namespace Services.Services.StationService
                         Data = null
                     };
                 }
-                var stations = await _stationRepository.GetAllStationsOfCustomerSuitVehicle(vehicleId);
+                var batteryOfVehicle = await _batteryRepo.GetBatteryById(vehicle.BatteryId);
+                var stations = await _stationRepository.GetAllStationsOfCustomer();
                 if (stations == null || stations.Count == 0)
                 {
                     return new ResultModel
@@ -902,9 +903,34 @@ namespace Services.Services.StationService
                         StatusCode = StatusCodes.Status404NotFound
                     };
                 }
+                var stationSuitVehicle = new List<Station>();
+                foreach (var station in stations)
+                {
+                    var batteries = await _batteryRepo.GetBatteriesByStationId(station.StationId);
+                    foreach (var batteryOfStation in batteries)
+                    {
+                        if (batteryOfStation.BatteryType == batteryOfVehicle.BatteryType &&
+                           batteryOfStation.Specification == batteryOfVehicle.Specification)
+                        {
+                            stationSuitVehicle.Add(station);
+                            break;
+                        }
+                    }
+                }
+                if (stationSuitVehicle == null)
+                {
+                    return new ResultModel
+                    {
+                        IsSuccess = false,
+                        ResponseCode = ResponseCodeConstants.NOT_FOUND,
+                        Message = ResponseMessageConstantsStation.NO_STATION_SUITABLE_FOR_VEHICLE,
+                        Data = null,
+                        StatusCode = StatusCodes.Status404NotFound
+                    };
+                }
                 var response = new List<object>();
 
-                foreach (var station in stations)
+                foreach (var station in stationSuitVehicle)
                 {
                     var batteries = await _batteryRepo.GetBatteriesByStationId(station.StationId);
                     var batteryCount = batteries.Count;

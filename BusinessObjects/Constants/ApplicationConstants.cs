@@ -212,7 +212,9 @@ namespace BusinessObjects.Constants
         public const string SLOT_NOT_EMPTY = "Vị trí không trống";
         public const string STATION_HAS_EXISTING_BATTERIES = "Trạm có pin tồn tại, không thể xóa trạm.";
 
-        public static string STATION_NOT_ACTIVE = "Trạm hiện không hoạt động or không tồn tại. Vui lòng chọn trạm khác.";
+        public const string STATION_NOT_ACTIVE = "Trạm hiện không hoạt động or không tồn tại. Vui lòng chọn trạm khác.";
+
+        public const string NO_STATION_SUITABLE_FOR_VEHICLE= "Không có trạm phù hợp với xe của bạn trong phạm vi tìm kiếm.";
     }
     // For battery (0-0-1)
     public class ResponseMessageConstantsBattery

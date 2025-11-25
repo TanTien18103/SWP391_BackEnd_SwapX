@@ -15,6 +15,5 @@ namespace Repositories.Repositories.StationRepo
         Task AddStation(Station station);
         Task<Station> UpdateStation(Station station);
         Task<List<Station>> GetAllStationsOfCustomer();
-        Task<List<Station>> GetAllStationsOfCustomerSuitVehicle(string vehicleId);
     }
 }
