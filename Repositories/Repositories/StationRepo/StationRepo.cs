@@ -58,18 +58,5 @@ namespace Repositories.Repositories.StationRepo
                 .Include(s => s.Slots)
                 .ToListAsync();
         }
-
-        public async Task<List<Station>> GetAllStationsOfCustomerSuitVehicle(string vehicleId)
-        {
-            var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Vin == vehicleId);
-            if(vehicle == null) return await GetAllStationsOfCustomer();
-            var batteryOfVehicle = await _context.Batteries.FirstOrDefaultAsync(b => b.BatteryId == vehicle.BatteryId);
-            return await _context.Stations
-                .Where(s => s.Status == StationStatusEnum.Active.ToString())
-                .Include(b => b.Batteries)
-                .Include(s => s.BssStaffs)
-                .Where(s => s.Batteries.Any(b => b.BatteryType == batteryOfVehicle.BatteryType && b.Status == BatteryStatusEnums.Available.ToString()&& b.Specification == batteryOfVehicle.Specification))
-                .ToListAsync();
-        }
     }
 }
