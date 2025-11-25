@@ -154,8 +154,8 @@ namespace Services.Controllers
             return StatusCode(res.StatusCode, res);
         }
 
-        [HttpGet("get_account_by_id/{accountId}_for_admin")]
-        [Authorize(Roles = "Admin")]
+        [HttpGet("get_account_by_id/{accountId}")]
+        [Authorize(Roles = "Admin, Bsstaff")]
         public async Task<IActionResult> GetAccountById(string? accountId)
         {
             var res = await _accountService.GetAccountById(accountId);
