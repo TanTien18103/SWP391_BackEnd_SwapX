@@ -85,7 +85,7 @@ public class ExchangeBatteryService : IExchangeBatteryService
             StaffAccountId = entity.StaffAccountId,
             StaffAccountName = entity.StaffAccount?.Name,
             ScheduleId = entity.ScheduleId,
-            ScheduleTime = entity.Schedule.Form.StartDate,
+            ScheduleTime = entity.Schedule.Form.Date,
             OrderId = entity.OrderId,
             StationId = entity.StationId,
             StationName = entity.Station?.StationName,
