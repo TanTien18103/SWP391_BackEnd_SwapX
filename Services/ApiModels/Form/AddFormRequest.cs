@@ -12,18 +12,16 @@ namespace Services.ApiModels.Form
     {
         [Required]
         public string AccountId { get; set; }
+        
+        [RegularExpression(@"^.{3,100}$", ErrorMessage = "Lời nhắn phải từ 3 đến 100 ký tự")]
+        public string? Title { get; set; }
 
-        [Required]
-        [RegularExpression(@"^.{3,100}$", ErrorMessage = "Title phải từ 3 đến 100 ký tự")]
-        public string Title { get; set; }
-
-        [Required]
-        [RegularExpression(@"^.{10,500}$", ErrorMessage = "Description phải từ 10 đến 500 ký tự")]
-        public string Description { get; set; }
-
+        [RegularExpression(@"^.{10,500}$", ErrorMessage = "Chi tiết lời nhắn phải từ 10 đến 500 ký tự")]
+        public string? Description { get; set; }
+        
         [Required]
         public DateTime? Date { get; set; }
-        
+
         [Required]
         public string StationId { get; set; }
         [Required]

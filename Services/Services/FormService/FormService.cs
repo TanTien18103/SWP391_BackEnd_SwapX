@@ -253,8 +253,15 @@ namespace Services.Services.FormService
                     FormId = _accountHelper.GenerateShortGuid(),
                     AccountId = addFormRequest.AccountId,
                     StationId = addFormRequest.StationId,
-                    Title = addFormRequest.Title,
-                    Description = addFormRequest.Description,
+
+                    Title = string.IsNullOrWhiteSpace(addFormRequest.Title)
+                        ? ResponseMessageConstantsForm.DefaultTitle
+                        : addFormRequest.Title,
+
+                    Description = string.IsNullOrWhiteSpace(addFormRequest.Description)
+                        ? ResponseMessageConstantsForm.DefaultDescription
+                        : addFormRequest.Description,
+
                     Date = addFormRequest.Date,
                     Status = FormStatusEnums.Submitted.ToString(),
                     Vin = addFormRequest.Vin,
