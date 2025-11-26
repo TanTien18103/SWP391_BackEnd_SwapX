@@ -50,6 +50,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
         {
             return await _context.ExchangeBatteries
                 .Include(sc => sc.Schedule)
+                                .ThenInclude(s => s.Form)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.ExchangeBatteryId == exchangeId);
         }
@@ -64,6 +65,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Include(e => e.OldBattery)
                 .Include(e => e.StaffAccount)
                 .Include(e => e.Schedule)
+                .ThenInclude(s => s.Form)
                 .Include(e => e.VinNavigation)
                 .ToListAsync();
         }
@@ -78,6 +80,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Include(e => e.OldBattery)
                 .Include(e => e.StaffAccount)
                 .Include(e => e.Schedule)
+                .ThenInclude(s => s.Form)
                 .Include(e => e.VinNavigation)
                 .Where(e => e.StationId == stationId)
                 .ToListAsync();
@@ -93,6 +96,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Include(e => e.OldBattery)
                 .Include(e => e.StaffAccount)
                 .Include(e => e.Schedule)
+                .ThenInclude(s => s.Form)
                 .Include(e => e.VinNavigation)
                 .Where(e => e.Vin == driverId)
                 .ToListAsync();
@@ -108,6 +112,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Include(e => e.OldBattery)
                 .Include(e => e.StaffAccount)
                 .Include(e => e.Schedule)
+                        .ThenInclude(s => s.Form)
                 .Include(e => e.VinNavigation)
                 .FirstOrDefaultAsync(e => e.OrderId == orderId);
         }
@@ -122,6 +127,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Include(e => e.OldBattery)
                 .Include(e => e.StaffAccount)
                 .Include(e => e.Schedule)
+                        .ThenInclude(s => s.Form)
                 .Include(e => e.VinNavigation)
                 .Where(e => e.ScheduleId == stationscheduleId)
                 .ToListAsync();
