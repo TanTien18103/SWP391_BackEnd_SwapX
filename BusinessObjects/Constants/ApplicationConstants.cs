@@ -425,6 +425,8 @@ public static class ResponseMessageConstantsForm
     public const string ORDER_NOT_PAID_OR_INVALID_SERVICE_TYPE = "Đơn hàng chưa được thanh toán hoặc loại dịch vụ không hợp lệ để tạo biểu mẫu";
     public const string ORDER_NOT_PAID = "Đơn hàng chưa được thanh toán";
     public const string VEHICLE_ALREADY_HAS_PENDING_EXCHANGE = "Xe đã có yêu cầu đổi pin đang chờ xử lý";
+    public const string DefaultTitle = "Người dùng không gửi lời nhắn";
+    public const string DefaultDescription = "Không có lời nhắn chi tiết cho form này";
 }
 // For Package (0-0-1)
 public static class ResponseMessageConstantsPackage
