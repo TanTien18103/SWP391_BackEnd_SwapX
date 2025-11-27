@@ -98,7 +98,7 @@ namespace Repositories.Repositories.ExchangeBatteryRepo
                 .Include(e => e.Schedule)
                 .ThenInclude(s => s.Form)
                 .Include(e => e.VinNavigation)
-                .Where(e => e.Vin == driverId)
+                .Where(e => e.Schedule.Form.AccountId == driverId)
                 .ToListAsync();
         }
 
